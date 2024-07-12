@@ -1,4 +1,4 @@
-let circles = new Container({
+let circles = new Scene({
         title: 'Circles', 
 
         code: root => {

@@ -1,4 +1,4 @@
-let grid = new Container({
+let grid = new Scene({
     title: 'Simple grid', 
 
     code: root => {

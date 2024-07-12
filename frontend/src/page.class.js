@@ -3,27 +3,27 @@
  * I know that modifying built-in objects is bad form for a modern language standard. 
  * We've moved on from the days when people extended the array class with their own methods
  * 
- * In this case, the 'exportedObjects' array below is a repository of imported containers, 
- * which can be accessed whenever there is a need to execute container code.
+ * In this case, the 'exportedObjects' array below is a repository of imported demo scenes, 
+ * which can be accessed whenever there is a need to execute scene code.
  */
 window.exportedObjects = [];
 
 class Page {
-    // soma important attributes names
+    // some important attributes names
     static #linkDataAttribute = "data-link-to-demo";
-    static #importedContainerAttribute = "data-improted-container";
+    static #importedSceneAttribute = "data-improted-scene";
     
-    // html id of root element for containers
+    // html id of root element for scenes
     static #rootElementID = '#root';
 
-    //location of demo
-    static #containerLocation = './src/demos/';
+    //location of demo scenes
+    static #scenesLocation = './src/demo-scenes/';
 
     constructor(){
         this.displayName = 'Page';
         this.windowTitle = 'Canvas demo'
 
-        // root for container drawning
+        // root for demo scene drawning
         this.root = Page.parseRoot();
 
         // get all finded links
@@ -46,7 +46,7 @@ class Page {
 
 
     /**
-     * Parses document and returns root node for containers.
+     * Parses document and returns root node for scenes.
      * @returns {HTMLDivElement} - single div element
      */
     static parseRoot(){
@@ -65,47 +65,47 @@ class Page {
     }
 
     /**
-     * Some important notes about Page.loadContainer() method:
+     * Some important notes about Page.loadScene() method:
      * 
      */
     
     /**
-     * Asynchronously loads container using container file path string
-     * @param {string} scriptPath - path to container file
+     * Asynchronously loads scene using scene file path string
+     * @param {string} scriptPath - path to scene file
      * @returns - resolve/reject
      */
-    loadContainer(scriptPath) {
+    loadScene(scriptPath) {
         return new Promise((resolve, reject) => {
             // Adding some comment for visual separation for block of imported scripts tags
             if(window.exportedObjects.length == 0){
-                let commentElement = document.createComment('containers of various demo codes');
+                let commentElement = document.createComment('imported scenes');
                 document.body.appendChild(commentElement);
             }
 
             // (1) - Trying to find a script tag with same 'sciptPath'
             let scriptElement = document.querySelector(`script[src="${scriptPath}"]`);
             // (2a) - If we successfully found this element - switching to 'true' flow
-            //       At this flow we know that this container has previously been loaded
-            if (typeof scriptElement !== undefined) {
+            //       At this flow we know that this demo scene has previously been loaded
+            if (scriptElement && scriptElement.constructor.name == 'HTMLScriptElement') {
                 // (3a) - Getting a script attribute indicating that this script is imported
                 //        The attribute  value contains a numeric label that is exactly the same 
-                //        as the numeric label of the previously loaded container.
+                //        as the numeric label of the previously loaded scene.
                 //        Because the timestamp is issued at loading time for both 
-                //        the element and the container itself, that is, they refer to the time 
+                //        the element and the scene itself, that is, they refer to the time 
                 //        of their creation as a unique identifier
-                let scriptTimestampt = scriptElement.getAttribute(Page.#importedContainerAttribute);
+                let scriptTimestampt = scriptElement.getAttribute(Page.#importedSceneAttribute);
 
-                // (4a) - Find container inside array using their single timestamp
-                let containerObject = window.exportedObjects.find(container => {
-                    return container.timestamp == Number(scriptTimestampt);
+                // (4a) - Find scene inside array using their single timestamp
+                let sceneObject = window.exportedObjects.find(scene => {
+                    return scene.timestamp == Number(scriptTimestampt);
                 });
 
                 // (5a) - return object asynchronously
-                resolve(containerObject);                                               
+                resolve(sceneObject);                                               
                 return;
             } else { 
             // (2b) - If we cant found this element - swtchiong to 'false' flow
-                // (3b) - In this flow we know for sure that the container has not been loaded before
+                // (3b) - In this flow we know for sure that the scene has not been loaded before
                 //        Therefore, it creates an element on its own and adds it to part of the document
                 scriptElement = Page.createSciptTag(scriptPath);                        
                 document.body.appendChild(scriptElement);
@@ -115,16 +115,16 @@ class Page {
                     // (5b) - IMPORTANT! Create a timestamp only once - while loading the script!
                     //        And set this timestamp value for script element...
                     let timestamp = Date.now();
-                    scriptElement.setAttribute(`${Page.#importedContainerAttribute}`, timestamp);
+                    scriptElement.setAttribute(`${Page.#importedSceneAttribute}`, timestamp);
     
     
                     if (window.exportedObjects && window.exportedObjects.length > 0) {
-                        let containerObject = getArrayLast(window.exportedObjects);
-                        // (5b) ...and for loaded container object!
-                        containerObject.timestamp = timestamp;
+                        let sceneObject = getArrayLast(window.exportedObjects);
+                        // (5b) ...and for loaded scene object!
+                        sceneObject.timestamp = timestamp;
                         
                         // (6b) - return object asynchronously
-                        resolve(containerObject);
+                        resolve(sceneObject);
                     } else {
                         reject(new Error("Object not found after script load"));
                     }
@@ -148,24 +148,24 @@ class Page {
             // adding event for each link from array
             this.links.forEach(link => {
                 link.addEventListener('click', (event) => {
-                    // getting name of container
-                    let targetContainerName = link.getAttribute(Page.#linkDataAttribute);
-                    // preparing full relative path to container file
-                    let containerPath = `${Page.#containerLocation}${targetContainerName}.js`;
+                    // getting name of scene
+                    let targetSceneName = link.getAttribute(Page.#linkDataAttribute);
+                    // preparing full relative path to scene file
+                    let scenePath = `${Page.#scenesLocation}${targetSceneName}.js`;
 
-                    // additionally set href as '#nameOfContainerFile'
-                    link.setAttribute('href', `#${targetContainerName}`);
+                    // additionally set href as name of scene to display scene changing at browser's url input
+                    link.setAttribute('href', `#${targetSceneName}`);
                     
-                    // load container using class method
-                    // it will return a container object if the container is loaded for the first time 
+                    // load demo scene using class method
+                    // it will return a scene object if the scene is loaded for the first time 
                     // or even if it has already been loaded before
-                    this.loadContainer(containerPath).then(loadedContainer => {
-                        // Container contains code of demo
+                    this.loadScene(scenePath).then(loadedScene => {
+                        // Scene contains code of demo
                         // we can execute that code when user clicks at link
                         // Code will affect to html root node and windows tab title
-                        loadedContainer.execute({
+                        loadedScene.execute({
                             root: this.root,
-                            baseWindowTitle: this.windowTitle,
+                            baseTabTitle: this.windowTitle,
                         });
                     }).catch(error => {
                         console.log(error);
@@ -181,7 +181,7 @@ class Page {
      */
     init() {
         // Modify all marked links by adding event listener 
-        // and event hanlder which loads the container using the address of the clicked link 
+        // and event hanlder which loads the demo scene using the address of the clicked link 
         this.#addEventsToLinks();
     }
 }
