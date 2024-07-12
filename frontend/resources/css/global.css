@@ -25,6 +25,8 @@ header {
     font-weight: bold;
     font-size: 20px;
     padding: 10px;
+    width: fit-content;
+    float: right;
 }
 
 main {
@@ -53,7 +55,7 @@ main {
 
 .left-section-block {
     /* background: #ff000040; */
-    width: 20%;
+    width: 25%;
 }
 
 .left-section-block .section-block__inner {
@@ -68,12 +70,12 @@ main {
 
 .center-section-block {
     /* background: #0000ff30; */
-    width: 55%;
+    width: 45%;
 }
 
 .right-section-block {
     /* background: #0080005c; */
-    width: 25%;
+    width: 30%;
 }
 
 .right-section-block .section-block__inner {
@@ -100,7 +102,7 @@ main {
 }
 
 .wide-block {
-    width: 600px;
+    width: 95%;
 }
 
 footer {
