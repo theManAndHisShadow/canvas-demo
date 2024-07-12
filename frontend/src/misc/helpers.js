@@ -13,6 +13,36 @@ function getArrayLast(array){
 }
 
 
+/**
+ * Returns object full deep clone
+ * @param {object} targetObject - target object
+ * @returns {object} - clone of target object
+ */
+function deepClone(targetObject){
+    /**
+     * N.B.: In some cases, the cloning process may be interrupted due to a “circular reference error”
+     */
+    return JSON.parse(JSON.stringify(targetObject));
+}
+
+
+
+/**
+ * Returns real mouse position (above canvas, for example)
+ * @param {HTMLCanvasElement} canvas - referance to target canvas
+ * @param {MouseEvent} event - mousemove or mouseover event objects
+ * @returns {{x: number, y: number}} - object of mouse position
+ */
+function getMousePos(canvas, event) {
+    var rect = canvas.getBoundingClientRect();
+
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+  }
+
+
 
 /**
  * Draws a line from point A (x1, y1) to point B (x2, y2)
@@ -36,6 +66,41 @@ function drawLine (context, {x1, y1, x2, y2, thickness, color} = {}){
 
     context.stroke();
     context.fill();
+}
+
+
+
+/**
+ * Draws a rectangle
+ * @param {Object} param
+ * @param {number} param.x - position at x axis
+ * @param {number} param.y - position at y axis
+ * @param {number} param.width - width of rect
+ * @param {number} param.height - height of rect
+ * @param {string} param.fillColor - color of rect
+ */
+function drawRect (context, {x, y, width, height, fillColor}){
+    context.fillStyle = fillColor;
+    context.fillRect(x, y, width, height);
+}
+
+
+
+/**
+ * Returns angle between two points
+ * @param {number} ax - first point x pos
+ * @param {number} ay - first point y pos
+ * @param {number} bx - second point x pos
+ * @param {number} by - second point y pos
+ * @returns {number} - angle between two points
+ */
+function angleBetweenTwoPoints(ax, ay, bx, by) {
+    var dy = by - ay;
+    var dx = bx - ax;
+    var theta = Math.atan2(dy, dx);
+    theta *= 180 / Math.PI;
+
+    return theta;
 }
 
 
