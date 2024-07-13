@@ -34,13 +34,13 @@ function deepClone(targetObject){
  * @returns {{x: number, y: number}} - object of mouse position
  */
 function getMousePos(canvas, event) {
-    var rect = canvas.getBoundingClientRect();
+    let rect = canvas.getBoundingClientRect();
 
     return {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
     };
-  }
+}
 
 
 
@@ -95,9 +95,9 @@ function drawRect (context, {x, y, width, height, fillColor}){
  * @returns {number} - angle between two points
  */
 function angleBetweenTwoPoints(ax, ay, bx, by) {
-    var dy = by - ay;
-    var dx = bx - ax;
-    var theta = Math.atan2(dy, dx);
+    let dy = by - ay;
+    let dx = bx - ax;
+    let theta = Math.atan2(dy, dx);
     theta *= 180 / Math.PI;
 
     return theta;
