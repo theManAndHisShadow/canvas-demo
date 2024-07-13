@@ -1,7 +1,22 @@
 let concentricCircles = new Scene({
         title: 'Concentric circles', 
 
-        code: root => {
+        ui: {
+            'dev': {
+                type: 'checkbox',
+                label: 'Show dev visual',
+                state: false,
+            },
+
+            'circlesAmount': {
+                type: 'input',
+                label: 'Circles',
+                maxValue: 55,
+                defaultValue: 5,
+            },
+        },
+
+        code: (root, settings) => {
             const canvas = root.querySelector('canvas');
             const width = 600;
             const height = 400;
@@ -15,7 +30,6 @@ let concentricCircles = new Scene({
             const centerX = width / 2;
             const centerY = height / 2;
             const outerRadius = 150;
-            const amount = 10;
             const gainFactor = 0.0002;
 
             // some dynamic values (updates in 'mousemove' event)
@@ -24,6 +38,8 @@ let concentricCircles = new Scene({
             let distance = null;
 
             let loop = () => {
+                const amount = settings.circlesAmount;
+
                 context.clearRect(
                     0, 0,
                     width,
@@ -37,8 +53,10 @@ let concentricCircles = new Scene({
                     lineColor: 'rgba(0, 0, 0, 0.0032)',
                 });
 
-                // show active quarter area of canvas
-                paintTheQuarters(context, {width, height, currentActiveQuarter});
+                if(settings.dev === true) {
+                    // show active quarter area of canvas
+                    paintTheQuarters(context, {width, height, currentActiveQuarter});
+                }
 
                 // draw concetric circles
                 for(let i = 0; i <= amount; i++) {
@@ -85,16 +103,18 @@ let concentricCircles = new Scene({
                             fillColor: '#4A235A',
                         });
 
-                        // Draw a line from the center of the innermost circle to the mouse position
-                        if (mousePos.x && mousePos.y) {
-                            drawLine(context, {
-                                x1: nx,
-                                y1: ny,
-                                x2: mousePos.x,
-                                y2: mousePos.y,
-                                color: 'rgba(0, 0, 0, 0.5)',
-                                thickness: 1,
-                            });
+                        if(settings.dev === true){
+                            // Draw a line from the center of the innermost circle to the mouse position
+                            if (mousePos.x && mousePos.y) {
+                                drawLine(context, {
+                                    x1: nx,
+                                    y1: ny,
+                                    x2: mousePos.x,
+                                    y2: mousePos.y,
+                                    color: 'rgba(0, 0, 0, 0.5)',
+                                    thickness: 1,
+                                });
+                            }
                         }
                     }
                 }
