@@ -94,13 +94,35 @@ function drawRect (context, {x, y, width, height, fillColor}){
  * @param {number} by - second point y pos
  * @returns {number} - angle between two points
  */
-function angleBetweenTwoPoints(ax, ay, bx, by) {
+function getAngleBetweenTwoPoints(ax, ay, bx, by) {
     let dy = by - ay;
     let dx = bx - ax;
     let theta = Math.atan2(dy, dx);
     theta *= 180 / Math.PI;
 
     return theta;
+}
+
+
+/**
+ * Returns a distance value between two points
+ * @param {number} ax - first point x pos
+ * @param {number} ay - first point y pos
+ * @param {number} bx - second point x pos
+ * @param {number} by - second point y pos
+ * @returns {number} - distance value
+ */
+function getDistanseBetweenTwoPoint(ax, ay, bx, by){
+    // first short side of triangle
+    let a = ax - bx;
+
+    // second short side of triangle
+    let b = ay - by;
+    
+    // if we know the two sides of a triangle, we can also calculate the long side - the hypotenuse
+    let hypotenuse = Math.sqrt((a * a) + (b * b));
+
+    return hypotenuse;
 }
 
 
