@@ -9,14 +9,19 @@ let concentricCircles = new Scene({
             canvas.height = height;
 
             const context = canvas.getContext('2d');
+
+            // circles preferences
             const borderThickness = 2;
             const centerX = width / 2;
             const centerY = height / 2;
             const outerRadius = 150;
             const amount = 10;
+            const gainFactor = 0.0002;
 
+            // some dynamic values (updates in 'mousemove' event)
             let mousePos = {x: false, y: false};
             let currentActiveQuarter = 0;
+            let distance = null;
 
             let loop = () => {
                 context.clearRect(
@@ -35,41 +40,63 @@ let concentricCircles = new Scene({
                 // show active quarter area of canvas
                 paintTheQuarters(context, {width, height, currentActiveQuarter});
 
+                // draw concetric circles
                 for(let i = 0; i <= amount; i++) {
-                    // calc radius of each circle
-                    let radius = outerRadius - (outerRadius /  amount) * i;
-                    
-                    // draw each circle
+                    // Calculate the radius of each circle
+                    let radius = outerRadius - ((outerRadius / amount) * i);
+
+                    // Calculate the distance from the center to the mouse position
+                    let dx = centerX - mousePos.x;
+                    let dy = centerY - mousePos.y;
+
+                    // Calculate stepsize between circles
+                    let p = (outerRadius / amount);
+
+                    // calculate gain - еhe further the mouse pointer is from the center, the stronger the offset gain
+                    let gain = getPersentOfDistance(distance, canvas.height / 2) * gainFactor;
+
+                    // Calculate the offset for each circle
+                    let offset = p * (i / amount);
+                    let offsetX = dx * offset * gain;
+                    let offsetY = dy * offset * gain;
+
+                    // Calculate the new center coordinates for the current circle
+                    let nx = centerX - offsetX;
+                    let ny = centerY - offsetY;
+
+                    // Draw each circle
                     drawCircle(context, {
-                        cx: centerX,
-                        cy: centerY,
-                        r: radius, 
+                        cx: nx,
+                        cy: ny,
+                        r: radius,
                         borderThickness: borderThickness,
                         borderColor: '#4A235A',
                         fillColor: '#7D3C98',
                     });
-                }
 
-                // draw point at center
-                drawCircle(context, {
-                    cx: centerX,
-                    cy: centerY,
-                    r: 5, 
-                    borderThickness: borderThickness,
-                    borderColor: '#4A235A',
-                    fillColor: '#4A235A',
-                });
+                    // Draw a point at the center of the innermost circle
+                    if (i === amount - 1) {
+                        drawCircle(context, {
+                            cx: nx,
+                            cy: ny,
+                            r: 5,
+                            borderThickness: borderThickness,
+                            borderColor: '#4A235A',
+                            fillColor: '#4A235A',
+                        });
 
-                // draw line from circle center to mouse
-                if(mousePos.x && mousePos.y) {
-                    drawLine(context, {
-                        x1: centerX,
-                        y1: centerY,
-                        x2: mousePos.x,
-                        y2: mousePos.y,
-                        color: 'rgba(0, 0, 0, 0.5)',
-                        thickness: 1,
-                    });
+                        // Draw a line from the center of the innermost circle to the mouse position
+                        if (mousePos.x && mousePos.y) {
+                            drawLine(context, {
+                                x1: nx,
+                                y1: ny,
+                                x2: mousePos.x,
+                                y2: mousePos.y,
+                                color: 'rgba(0, 0, 0, 0.5)',
+                                thickness: 1,
+                            });
+                        }
+                    }
                 }
 
                 requestAnimationFrame(loop);
@@ -81,10 +108,8 @@ let concentricCircles = new Scene({
             root.addEventListener('mousemove', event => {
                 // updating some values when mouse moves
                 mousePos = getMousePos(canvas, event);
+                distance = Math.round(getDistanseBetweenTwoPoint(mousePos.x, mousePos.y, centerX, centerY));
                 currentActiveQuarter = getQuarterWithMouse({x: centerX, y: centerY}, mousePos);
-                
-                // debug
-                console.log(currentActiveQuarter);
             });
         }
     });
@@ -95,6 +120,16 @@ window.exportedObjects.push(concentricCircles);
 /**
  * Scene file internal helper function defenitions
 */
+
+/**
+ * Calculates persent of movement based of max distanse value
+ * @param {number} distance - how much distance has been covered (current progress in px)
+ * @param {number} maxDistance - max distance
+ * @returns {number} - how mush disnatce has been covered in %
+ */
+function getPersentOfDistance(distance, maxDistance) {
+    return distance >= maxDistance ? 100 : Math.round((distance * 100) / maxDistance);
+}
 
 /**
  * Fill each quaerter area of canvas with semi-trasnparent color
@@ -160,7 +195,7 @@ function paintTheQuarters(context, {width, height, currentActiveQuarter}) {
 function getQuarterWithMouse(centerPos, mousePos) {
     let centerX = centerPos.x;
     let centerY = centerPos.y;
-    let angle = angleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y);
+    let angle = getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y);
     let numeric = null;
 
     if(angle < 0) {
