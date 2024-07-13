@@ -15,6 +15,7 @@ class Page {
     
     // html id of root element for scenes
     static #rootElementID = '#root';
+    static #controlsContainerElementID = '#controls';
 
     //location of demo scenes
     static #scenesLocation = './src/demo-scenes/';
@@ -25,6 +26,10 @@ class Page {
 
         // root for demo scene drawning
         this.root = Page.parseRoot();
+
+        this.ui = new UI({
+            html: Page.parseUIContainer(),
+        });
 
         // get all finded links
         this.links = Page.parseLinks();
@@ -53,6 +58,12 @@ class Page {
         let root = document.querySelector(`${Page.#rootElementID}`);
 
         return root;
+    }
+
+    static parseUIContainer(){
+        let container = document.querySelector(`${Page.#controlsContainerElementID}`);
+
+        return container;
     }
 
     static createSciptTag(scriptPath){
@@ -160,12 +171,21 @@ class Page {
                     // it will return a scene object if the scene is loaded for the first time 
                     // or even if it has already been loaded before
                     this.loadScene(scenePath).then(loadedScene => {
+                        // getting scene ui structure tree with settings and controls
+                        let uiTree = loadedScene.ui;
+                        // render it (and add event handlers, that updated values)
+                        this.ui.render(uiTree);
+
                         // Scene contains code of demo
                         // we can execute that code when user clicks at link
                         // Code will affect to html root node and windows tab title
                         loadedScene.execute({
                             root: this.root,
                             baseTabTitle: this.windowTitle,
+
+                            // put updated values to settings params
+                            // it makes updated values available inside scene code
+                            settings: this.ui.states,
                         });
                     }).catch(error => {
                         console.log(error);
