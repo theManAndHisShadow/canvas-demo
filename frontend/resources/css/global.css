@@ -44,6 +44,7 @@ main {
 
 .section-block h2, h3, h4 {
     margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .section-block__inner {
@@ -103,6 +104,14 @@ main {
 
 .wide-block {
     width: 95%;
+}
+
+.controls__checkbox-checkbox {
+    margin: 0;
+    position: relative;
+    right: 1px;
+    top: 1px;
+    cursor: pointer;
 }
 
 footer {
