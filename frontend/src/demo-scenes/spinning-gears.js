@@ -24,14 +24,14 @@ let spinningGears = new Scene({
         
         // describing scene's gears
         const gears = [
-            {
-                cx: centerX + 125,
-                cy: centerY - 50,
-                r: 35,
-                numberOfTeeth: 5,
-                tootheHeight: 10,
-                hasHandle: false,
-            },
+            // {
+            //     cx: centerX + 125,
+            //     cy: centerY - 50,
+            //     r: 35,
+            //     numberOfTeeth: 5,
+            //     tootheHeight: 10,
+            //     hasHandle: false,
+            // },
 
             {
                 cx: centerX,
@@ -42,16 +42,22 @@ let spinningGears = new Scene({
                 hasHandle: true,
             },
 
-            {
-                cx: centerX - 140,
-                cy: centerY + 50,
-                r: 50,
-                numberOfTeeth: 7,
-                tootheHeight: 10,
-                hasHandle: false,
-            },
+            // {
+            //     cx: centerX - 140,
+            //     cy: centerY + 50,
+            //     r: 50,
+            //     numberOfTeeth: 7,
+            //     tootheHeight: 10,
+            //     hasHandle: false,
+            // },
             
-        ]
+        ];
+
+        // some dynamic values (updates in 'mousemove' event)
+        let mousePos = {x: false, y: false};
+        let angle = 0;
+        let handleTailPos = false;
+        let tailRotatedPos = false;
 
         // main function
         let loop = () => {
@@ -88,6 +94,7 @@ let spinningGears = new Scene({
                     cx: gear.cx,
                     cy: gear.cy,
                     r: gear.r,
+                    angle: angle,
                     numberOfTeeth: gear.numberOfTeeth,
                     tootheHeight: gear.tootheHeight,
                     
@@ -97,10 +104,48 @@ let spinningGears = new Scene({
                 });
 
                 // draw the gear handle if it has one
-                if(gear.hasHandle === true) {        
+                if(gear.hasHandle === true) {    
+                    let tailDefaultPos = {
+                        x: gear.cx + (gear.r * 1.5),
+                        y: gear.cy,
+                    };
+
+                    handleTailPos = tailDefaultPos;
+
+                    if(settings.dev === true) {
+                        // draw line from primary gear's center to handle tail
+                        drawLine(context, {
+                            x1: gear.cx,
+                            y1: gear.cy,
+                            x2: tailRotatedPos.x,
+                            y2: tailRotatedPos.y,
+                            thickness: 2,
+                            color: 'black',
+                        });
+
+                        let rotatedBpoint = rotatePoint(
+                            gear.cx, gear.cy, gear.cx, 
+                            gear.cy - gear.r - gear.tootheHeight, 
+                            angle
+                        );
+
+                        // draw another line
+                        drawLine(context, {
+                            x1: gear.cx,
+                            y1: gear.cy,
+                            x2: rotatedBpoint.x,
+                            y2: rotatedBpoint.y,
+                            thickness: 2,
+                            color: 'black',
+                        });
+                    }
+
                     drawHandle(context, {
                         jointCX: gear.cx,
                         jointCY: gear.cy,
+                        tailCX: tailRotatedPos.x,
+                        tailCY: tailRotatedPos.y,
+                        angle: angle,
                         r: gear.r / 3,
                         fillColor: fillColor,
                         borderLineWidth: lineWidth,
@@ -114,6 +159,17 @@ let spinningGears = new Scene({
 
         // animate
         requestAnimationFrame(loop);
+
+        root.addEventListener('mousemove', event => {
+            mousePos = getMousePos(canvas, event);
+            angle = getAngleBetweenTwoPoints(gears[0].cx, gears[0].cy, mousePos.x, mousePos.y);
+
+            if(handleTailPos){
+                tailRotatedPos = rotatePoint(gears[0].cx, gears[0].cy, handleTailPos.x, handleTailPos.y, angle);
+            }
+
+            // console.log(angle, tailRotatedPos)
+        });
     }
 });
 
@@ -205,13 +261,14 @@ function drawBlueprintBG(context, {canvasWidth, canvasHeight, devMode}){
  * @param {number} param.cx - gear center x poos
  * @param {number} param.cy - gear center y poos
  * @param {number} param.r - gear radius
+ * @param {number} param.angle - angle of gear
  * @param {number} param.numberOfTeeth - gear's number of teeth 
  * @param {number} param.tootheHeight - gear's single tooth height
  * @param {number} param.borderLineWidth - gear's border line width/thickness
  * @param {string} param.borderColor - gears's border color
  * @param {string} param.fillColor - gear's inner color
  */
-function drawGear(context, {cx, cy, r, numberOfTeeth, tootheHeight, fillColor, borderColor, borderLineWidth}) {
+function drawGear(context, {cx, cy, r, angle, numberOfTeeth, tootheHeight, fillColor, borderColor, borderLineWidth}) {
     // Set fill color and stroke properties
     context.fillStyle = fillColor;
     context.lineWidth = borderLineWidth;
@@ -239,12 +296,14 @@ function drawGear(context, {cx, cy, r, numberOfTeeth, tootheHeight, fillColor, b
         let distanceOfVertexFromCenter = distancesOfVerticesFromCenter[vModded];
         let drawPosX = cx + distanceOfVertexFromCenter * Math.cos(angleInRadians);
         let drawPosY = cy + distanceOfVertexFromCenter * Math.sin(angleInRadians);
+
+        let rotatedPos = rotatePoint(cx, cy, drawPosX, drawPosY, angle)
         
         // Move to the first vertex, then line to the rest
         if (v == 0) {
-            context.moveTo(drawPosX, drawPosY);
+            context.moveTo(rotatedPos.x, rotatedPos.y);
         } else {
-            context.lineTo(drawPosX, drawPosY);
+            context.lineTo(rotatedPos.x, rotatedPos.y);
         }
     }
     
@@ -259,13 +318,17 @@ function drawGear(context, {cx, cy, r, numberOfTeeth, tootheHeight, fillColor, b
  * Draws a handle.
  * @param {CanvasRenderingContext2D} context - 2d context of target canvas
  * @param {number} param.jointCX - handle main joint center x pos
- * @param {number} param.jointCY - handle main joint center y pos
+ * @param {number} param.jointCY - handle main joint center y pos  
+ * @param {number} param.tailCX - handle tail center x pos
+ * @param {number} param.tailCY - handle tail center y pos  
+ * @param {number} param.angle - angle of gear's handler
  * @param {number} param.r - handle main joint radius
  * @param {number} param.borderLineWidth - handle border line with
  * @param {string} param.borderColor - handle border line color
  * @param {string} param.fillColor - handle inner filler color
  */
-function drawHandle(context, {jointCX, jointCY, r, fillColor, borderColor, borderLineWidth}){
+function drawHandle(context, {jointCX, jointCY, tailCX, tailCY, angle, r, fillColor, borderColor, borderLineWidth}){
+
     // draw a main joint circle
     drawCircle(context, {
         cx: jointCX,
@@ -277,34 +340,65 @@ function drawHandle(context, {jointCX, jointCY, r, fillColor, borderColor, borde
         borderThickness: borderLineWidth,
     });
 
-    let a = 100;
-    let b = 10;
+    let tailRadius = r / 2;
+
+    // draw fixator
+    let fixatorPos = {
+        start: {x: jointCX, y: jointCY - r}, 
+        end: {x: jointCX, y: jointCY - r - 10}
+    };
+    
+
+    let fixatorRotatedPos = {
+        start: rotatePoint(jointCX, jointCY, fixatorPos.start.x, fixatorPos.start.y, angle),
+        end: rotatePoint(jointCX, jointCY, fixatorPos.end.x, fixatorPos.end.y, angle),
+    };
+
+    let handleConnectPoints = {
+        top: {x: jointCX, y: jointCY - r},
+        bottom: {x: jointCX, y: jointCY + r},
+    }
+
+    let handlerRotatedConnectPoint = {
+        top: rotatePoint(jointCX, jointCY, handleConnectPoints.top.x, handleConnectPoints.top.y, angle),
+        bottom: rotatePoint(jointCX, jointCY, handleConnectPoints.bottom.x, handleConnectPoints.bottom.y, angle),
+    }
+
+    // drawning a fixator
+    drawLine(context, {
+        x1: fixatorRotatedPos.start.x,
+        y1: fixatorRotatedPos.start.y,
+        x2: fixatorRotatedPos.end.x,
+        y2: fixatorRotatedPos.end.y,
+        thickness: 2,
+        color: borderColor,
+    })
 
     // draw a handle top side
     drawLine(context, {
-        x1: jointCX,
-        y1: jointCY - r,
-        x2: jointCX + a,
-        y2: jointCY - b,
-        thickness: borderColor,
+        x1: handlerRotatedConnectPoint.top.x,
+        y1: handlerRotatedConnectPoint.top.y,
+        x2: tailCX,
+        y2: tailCY,
+        thickness: borderLineWidth,
         color: borderColor,
     });
 
     // draw a bottom handle side
     drawLine(context, {
-        x1: jointCX,
-        y1: jointCY + r,
-        x2: jointCX + a,
-        y2: jointCY + b,
+        x1: handlerRotatedConnectPoint.bottom.x,
+        y1: handlerRotatedConnectPoint.bottom.y,
+        x2: tailCX,
+        y2: tailCY,
         thickness: borderColor,
         color: borderColor,
     });
 
     // draw a circle at handle tail
     drawCircle(context, {
-        cx: jointCX + a,
-        cy: jointCY,
-        r: b,
+        cx: tailCX,
+        cy: tailCY,
+        r: tailRadius,
 
         fillColor: fillColor,
         borderColor: borderColor,
