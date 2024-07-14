@@ -28,6 +28,28 @@ function deepClone(targetObject){
 
 
 /**
+ * Rotates point around epicenter
+ * @param {number} cx - epicenter point x pos
+ * @param {number} cy - epicenter point y pos
+ * @param {number} pointX - target point x pos 
+ * @param {number} pointY - target point y pos
+ * @param {number} angleInDegrees - angle of rotation
+ * @returns 
+ */
+function rotatePoint(cx, cy, pointX, pointY, angleInDegrees) {
+    let angleInRadians = angleInDegrees * Math.PI / 180;
+    let cosTheta = Math.cos(angleInRadians);
+    let sinTheta = Math.sin(angleInRadians);
+    
+    let rotatedX = cx + (pointX - cx) * cosTheta - (pointY - cy) * sinTheta;
+    let rotatedY = cy + (pointX - cx) * sinTheta + (pointY - cy) * cosTheta;
+    
+    return { x: rotatedX, y: rotatedY };
+}
+
+
+
+/**
  * Returns real mouse position (above canvas, for example)
  * @param {HTMLCanvasElement} canvas - referance to target canvas
  * @param {MouseEvent} event - mousemove or mouseover event objects
@@ -62,8 +84,8 @@ function drawLine (context, {x1, y1, x2, y2, thickness, color} = {}){
     context.beginPath();
     context.moveTo(x1, y1);
     context.lineTo(x2, y2);
+    
     context.closePath();
-
     context.stroke();
     context.fill();
 }
