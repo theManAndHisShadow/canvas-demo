@@ -24,40 +24,42 @@ let spinningGears = new Scene({
         
         // describing scene's gears
         const gears = [
-            // {
-            //     cx: centerX + 125,
-            //     cy: centerY - 50,
-            //     r: 35,
-            //     numberOfTeeth: 5,
-            //     tootheHeight: 10,
-            //     hasHandle: false,
-            // },
-
-            {
-                cx: centerX,
+            new Gear({
+                role: 'drive',
+                cx: centerX + 80,
                 cy: centerY,
-                r: 90,
+                r: 120,
+                numberOfTeeth: 30,
+                tootheHeight: 10,
+                renderer: context,
+            }),
+
+            new Gear({
+                cx: centerX - 59,
+                cy: centerY + 30,
+                r: 30,
+                numberOfTeeth: 7,
+                tootheHeight: 10,
+                renderer: context,
+            }),
+
+            new Gear({
+                cx: centerX - 134,
+                cy: centerY - 25,
+                r: 70,
                 numberOfTeeth: 15,
                 tootheHeight: 10,
-                hasHandle: true,
-            },
-
-            // {
-            //     cx: centerX - 140,
-            //     cy: centerY + 50,
-            //     r: 50,
-            //     numberOfTeeth: 7,
-            //     tootheHeight: 10,
-            //     hasHandle: false,
-            // },
-            
+                renderer: context,
+            }),
         ];
+
+        console.log(gears);
 
         // some dynamic values (updates in 'mousemove' event)
         let mousePos = {x: false, y: false};
+        let isMouseDown = false;
+        let isMoseMoving = false;
         let angle = 0;
-        let handleTailPos = false;
-        let tailRotatedPos = false;
 
         // main function
         let loop = () => {
@@ -74,101 +76,68 @@ let spinningGears = new Scene({
                 devMode: settings.dev,
             });
 
-            // some settings of gears
-            let lineWidth = 2;
-            let fillColor = 'rgba(255, 255, 255, 0.1)';
-            let borderColor = 'white';
-            for(let gear of gears) {
-                // center gear joint
-                drawCircle(context, {
-                    cx: gear.cx,
-                    cy: gear.cy,
-                    r: 10,
-                    fillColor: fillColor,
-                    borderColor: borderColor,
-                    borderThickness: lineWidth,
-                });
+            gears.forEach((gear, i) => {
+                // is first main gear - pev gear not existed
+                let prevGear = false;
 
-                // draw gear
-                drawGear(context, {
-                    cx: gear.cx,
-                    cy: gear.cy,
-                    r: gear.r,
-                    angle: angle,
-                    numberOfTeeth: gear.numberOfTeeth,
-                    tootheHeight: gear.tootheHeight,
-                    
-                    borderColor: borderColor,
-                    borderLineWidth: lineWidth,
-                    fillColor: fillColor,
-                });
+                if(i > 0) prevGear = gears[i - 1];
+                
+                // render each gear
+                gear.render(settings.dev);
 
-                // draw the gear handle if it has one
-                if(gear.hasHandle === true) {    
-                    let tailDefaultPos = {
-                        x: gear.cx + (gear.r * 1.5),
-                        y: gear.cy,
-                    };
+                if(isMoseMoving === true && isMouseDown === true) {
+                    // if is main drive gear - rotate in regular way
+                    if(gear.role == 'drive'){
+                        gear.rotate(angle);
 
-                    handleTailPos = tailDefaultPos;
-
-                    if(settings.dev === true) {
-                        // draw line from primary gear's center to handle tail
-                        drawLine(context, {
-                            x1: gear.cx,
-                            y1: gear.cy,
-                            x2: tailRotatedPos.x,
-                            y2: tailRotatedPos.y,
-                            thickness: 2,
-                            color: 'black',
-                        });
-
-                        let rotatedBpoint = rotatePoint(
-                            gear.cx, gear.cy, gear.cx, 
-                            gear.cy - gear.r - gear.tootheHeight, 
-                            angle
-                        );
-
-                        // draw another line
-                        drawLine(context, {
-                            x1: gear.cx,
-                            y1: gear.cy,
-                            x2: rotatedBpoint.x,
-                            y2: rotatedBpoint.y,
-                            thickness: 2,
-                            color: 'black',
-                        });
+                    // if is driven slave gear 
+                    // rotate backwards usinn ratio coeff
+                    } else if(gear.role == 'slave'){
+                        let ratioCoefficient = prevGear.numberOfTeeth / gear.numberOfTeeth;
+                        // rotate using ration coeff
+                        if(prevGear) gear.rotate(prevGear.angle * -1 * ratioCoefficient);
                     }
-
-                    drawHandle(context, {
-                        jointCX: gear.cx,
-                        jointCY: gear.cy,
-                        tailCX: tailRotatedPos.x,
-                        tailCY: tailRotatedPos.y,
-                        angle: angle,
-                        r: gear.r / 3,
-                        fillColor: fillColor,
-                        borderLineWidth: lineWidth,
-                        borderColor: borderColor,
-                    });
                 }
-            }
+            });
 
             requestAnimationFrame(loop);
         }
 
         // animate
         requestAnimationFrame(loop);
+        
+        // updating mousedown state
+        root.addEventListener('mousedown', event => {
+            isMouseDown = true;
+        });
 
+        // updating mouseup state
+        root.addEventListener('mouseup', event => {
+            isMouseDown = false;
+            isMoseMoving = false;
+        });
+
+        let masterGear = gears.find(gear => gear.role == 'drive');
+
+        masterGear.addEventListener('rotate', () => {
+
+        });
+
+        // main event handler
         root.addEventListener('mousemove', event => {
-            mousePos = getMousePos(canvas, event);
-            angle = getAngleBetweenTwoPoints(gears[0].cx, gears[0].cy, mousePos.x, mousePos.y);
+            // Updated values pnly when mouse left button is presse
+            // Without pressed left button - gear will stay without rotating!
+            if(isMouseDown === true) {
+                if(masterGear == undefined) {
+                    throw new Error('Drive gear not found!')
+                } else {
+                    // update global angle var and mousePos
+                    angle = getAngleBetweenTwoPoints(masterGear.cx, masterGear.cy, mousePos.x, mousePos.y);
+                    mousePos = getMousePos(canvas, event);
+                    isMoseMoving = true;
+                }
 
-            if(handleTailPos){
-                tailRotatedPos = rotatePoint(gears[0].cx, gears[0].cy, handleTailPos.x, handleTailPos.y, angle);
             }
-
-            // console.log(angle, tailRotatedPos)
         });
     }
 });
@@ -177,8 +146,382 @@ window.exportedObjects.push(spinningGears);
 
 
 /**
-* Scene file internal helper function defenitions
+* Scene file internal classes and helper functions defenitions
 */
+
+class SynteticEventTarget {
+    constructor (){
+        this.events = {};
+    }
+
+    addEventListener(eventType, callback) {
+        if (!this.events[eventType]) {
+            this.events[eventType] = [];
+        }
+        
+        this.events[eventType].push(callback);
+    }
+
+    dispatchEvent(eventType, data) {
+        if (this.events[eventType]) {
+            this.events[eventType].forEach(callback => callback(data));
+        }
+    }
+}
+
+class GearHandle extends SynteticEventTarget {
+    /**
+     * 
+    * @param {CanvasRenderingContext2D} renderer - 2d context of target canvas
+    * @param {number} param.cx - gear's handle center x pos
+    * @param {number} param.cy - gear's handle center y pos
+    * @param {object} param.connectedWith - which gear connected with this handle
+    * @param {number} param.angle - angle of gear
+    * @param {length} param.length - length of handle
+    * @param {number} param.borderLineWidth - gear's border line width/thickness
+    * @param {string} param.borderColor - gears's border color
+    * @param {string} param.fillColor - gear's inner color
+     */
+    constructor({
+        renderer, cx, cy, length, angle = 0, 
+        connectedWith, fillColor = 'rgba(255, 255, 255, 0.1', 
+        borderColor = 'white', borderLineWidth = 2
+    }){
+        super();
+
+        length = typeof length == 'number' ? length : connectedWith.r + 35;
+
+        this.cx = cx;
+        this.cy = cy;
+        this.length = length;
+
+        this.connectedWith = connectedWith;
+
+        // joint - circle that connects gear center and handle
+        this.joint = {
+            cx: this.connectedWith.cx,
+            cy: this.connectedWith.cy,
+            r: this.connectedWith.r / 3,
+        }
+
+        // points of handle connection to joint
+        this.joint.connectingPoints = [
+            {x: this.joint.cx, y: this.joint.cy + this.joint.r},
+            {x: this.joint.cx, y: this.joint.cy - this.joint.r},
+        ];
+
+        // joint fixator element points
+        this.joint.fixatorPoints = [
+            {x: this.joint.cx, y: this.joint.cy - this.joint.r},
+            {x: this.joint.cx, y: this.joint.cy - this.joint.r - 5},
+        ];
+
+        // circle at handle end (tail)
+        this.tail = {
+            cx: cx + length,
+            cy: cy,
+            r: this.connectedWith.r / 6,
+            angle: angle,
+        };
+        
+        this.fillColor = fillColor;
+        this.borderColor = borderColor;
+        this.borderLineWidth = borderLineWidth;
+
+        this.renderer = renderer;
+    }
+
+
+
+    /**
+     * Updates angle of handle ant recalculate positions using delta angle
+     * @param {number} angle - new angle value
+     */
+    rotate(angle){
+        // delta of old angle and new angle
+        let delta = this.tail.angle - angle;
+        
+        // recalculate position of tail
+        let rotatedTailPos = rotatePoint(this.joint.cx, this.joint.cy, this.tail.cx, this.tail.cy, -delta);
+
+        // recalculate position of handle connections
+        let rotatetConnectiongPoints = this.joint.connectingPoints.map(point => {
+            return rotatePoint(this.joint.cx, this.joint.cy, point.x, point.y, -delta);
+        });
+
+        let rotatedFixatorPoint = this.joint.fixatorPoints.map(point => {
+            return rotatePoint(this.joint.cx, this.joint.cy, point.x, point.y, -delta);
+        });
+
+        
+        // updatiing value
+        this.tail.angle = angle;
+        this.tail.cx = rotatedTailPos.x;
+        this.tail.cy = rotatedTailPos.y;
+        this.joint.connectingPoints = rotatetConnectiongPoints;
+        this.joint.fixatorPoints = rotatedFixatorPoint;
+    }
+
+
+
+    /**
+     * Draws joint of handle
+     */
+    #renderJoint(devState){
+        drawCircle(this.renderer, {
+            cx: this.connectedWith.cx,
+            cy: this.connectedWith.cy,
+            r: this.connectedWith.r / 3,
+
+            fillColor: this.fillColor,
+            borderColor: this.borderColor,
+            borderThickness: this.borderLineWidth,
+        });
+    }
+
+
+
+    /**
+     * Renders handle joint fixator element
+     */
+    #renderJointFixator() {
+        drawLine(this.renderer, {
+            x1: this.joint.fixatorPoints[0].x,
+            y1: this.joint.fixatorPoints[0].y,
+            x2: this.joint.fixatorPoints[1].x,
+            y2: this.joint.fixatorPoints[1].y,
+            thickness: 8,
+            color: this.borderColor,
+        })
+    }
+
+
+
+    /**
+     * Draws lines from the junction to the end of the handle 
+     */
+    #renderConnections(){
+        for(let connectingPoint of this.joint.connectingPoints) {
+            drawLine(this.renderer, {
+                x1: connectingPoint.x,
+                y1: connectingPoint.y,
+                x2: this.tail.cx,
+                y2: this.tail.cy,
+                thickness: this.borderLineWidth,
+                color: this.borderColor,
+            });  
+        }
+    }
+
+
+
+    /**
+     * Renders of tail circle of handle
+     */
+    #renderTail(){
+        drawCircle(this.renderer, {
+            cx: this.tail.cx,
+            cy: this.tail.cy,
+            r: this.tail.r,
+
+            fillColor: this.fillColor,
+            borderColor: this.borderColor,
+            borderThickness: this.borderLineWidth,
+        });
+    }
+
+
+
+    /**
+     * Renders handle.
+     */
+    render(devState){
+        // draw a main joint circle
+        this.#renderJoint(devState);
+
+
+        // draw a handler's fixator
+        this.#renderJointFixator();
+
+        // draw a handler sides (lines from joint to tail)
+        this.#renderConnections();
+
+        // draw a circle at handle tail
+        this.#renderTail();
+
+        // dev option
+        if(devState === true) {
+            drawLine(this.renderer, {
+                x1: this.joint.cx,
+                y1: this.joint.cy,
+                x2: this.tail.cx,
+                y2: this.tail.cy,
+                thickness: 2,
+                color: 'black',
+            });
+        }
+    }
+}
+
+
+
+class Gear extends SynteticEventTarget {
+    /**
+    * @constructor 
+    * @param {CanvasRenderingContext2D} renderer - 2d context of target canvas
+    * @param {number} param.cx - gear center x pos
+    * @param {number} param.cy - gear center y pos
+    * @param {number} param.r - gear radius
+    * @param {number} [param.angle=0] - angle of gear
+    * @param {number} [param.role='slave'] - is gear driver or driven
+    * @param {number} param.numberOfTeeth - gear's number of teeth 
+    * @param {number} param.tootheHeight - gear's single tooth height
+    * @param {number} [param.borderLineWidth=2] - gear's border line width/thickness
+    * @param {string} [param.borderColor='white'] - gears's border color
+    * @param {string} [param.fillColor='rgba(255, 255, 255, 0.1'] - gear's inner color
+     */
+    constructor({
+        renderer, cx, cy, r, angle = 0, 
+        numberOfTeeth, tootheHeight, role = 'slave', 
+        fillColor = 'rgba(255, 255, 255, 0.1', 
+        borderColor = 'white', borderLineWidth = 2,
+    }){
+        super();
+
+        this.cx = cx;
+        this.cy = cy;
+        this.r = r;
+        this.angle = angle;
+
+        this.numberOfTeeth = numberOfTeeth;
+        this.tootheHeight = tootheHeight;
+        
+        this.fillColor = fillColor;
+        this.borderColor = borderColor;
+        this.borderLineWidth = borderLineWidth;
+
+        this.renderer = renderer;
+
+        this.role = role;
+        this.handle = role == 'drive' ? new GearHandle({
+            renderer: this.renderer, connectedWith: this,
+            cx, cy, angle, fillColor, borderColor, borderLineWidth
+        }) : null;
+    }
+
+
+
+    /**
+     * 
+     * @param {*} angle 
+     */
+    rotate(angle){
+        this.angle = angle;
+
+        if(this.role == 'drive') {
+            // TODO
+            // now integrate
+            // rotation calc at render functions
+            this.handle.rotate(angle);
+        }
+
+        this.dispatchEvent('rotate');
+    }
+
+
+
+    /**
+     * 
+     */
+    #renderJoint(devState){
+        drawCircle(this.renderer, {
+            cx: this.cx,
+            cy: this.cy,
+            r: 10,
+            fillColor: this.fillColor,
+            borderColor: this.borderColor,
+            borderThickness: this.borderLineWidth,
+        });
+
+
+        if(devState === true) {
+            let helperLineconnectionPoint = {x: this.cx, y: this.cy - this.r + this.tootheHeight};
+            let rotated = rotatePoint(this.cx, this.cy, helperLineconnectionPoint.x, helperLineconnectionPoint.y, this.angle);
+
+            drawLine(this.renderer, {
+                x1: this.cx,
+                y1: this.cy,
+                x2: rotated.x,
+                y2: rotated.y,
+                thickness: this.borderLineWidth,
+                color: 'black',
+            });
+        }
+    }
+
+
+
+    /**
+     * Draws a gear with given teeth and radius from instance.
+     */
+    #renderGear() {
+        // Set fill color and stroke properties
+        this.renderer.fillStyle = this.fillColor;
+        this.renderer.lineWidth = this.borderLineWidth;
+        this.renderer.strokeStyle = this.borderColor;
+
+        let radiusMinusTeeth = this.r - this.tootheHeight;
+
+        // Array representing the radii for vertices
+        let distancesOfVerticesFromCenter = [
+            this.r, // Outer vertex (tooth tip)
+            this.r, // Outer vertex (tooth tip)
+            radiusMinusTeeth, // Inner vertex (root of tooth)
+            radiusMinusTeeth, // Inner vertex (root of tooth)
+        ];
+
+        // Total number of vertices
+        let verticesPerTooth = distancesOfVerticesFromCenter.length;
+        let numberOfVertices = this.numberOfTeeth * verticesPerTooth;
+
+        this.renderer.beginPath();
+
+        for (let v = 0; v < numberOfVertices; v++) {
+            let angleInRadians = Math.PI * 2 * v / numberOfVertices;
+            let vModded = v % verticesPerTooth;
+            let distanceOfVertexFromCenter = distancesOfVerticesFromCenter[vModded];
+            let drawPosX = this.cx + distanceOfVertexFromCenter * Math.cos(angleInRadians);
+            let drawPosY = this.cy + distanceOfVertexFromCenter * Math.sin(angleInRadians);
+
+            let rotatedPos = rotatePoint(this.cx, this.cy, drawPosX, drawPosY, this.angle)
+
+            // Move to the first vertex, then line to the rest
+            if (v == 0) {
+                this.renderer.moveTo(rotatedPos.x, rotatedPos.y);
+            } else {
+                this.renderer.lineTo(rotatedPos.x, rotatedPos.y);
+            }
+        }
+
+        this.renderer.closePath();
+        this.renderer.fill();
+        this.renderer.stroke();
+    }
+
+
+
+    /**
+     * 
+     */
+    render(devState = false) {
+        this.#renderJoint(devState);
+        this.#renderGear();
+
+        if(this.role == 'drive') {
+            this.handle.render(devState);
+        }
+    }
+}
 
 /**
  * Draws a background in 'blueprint' paper style (with grid).
@@ -250,158 +593,5 @@ function drawBlueprintBG(context, {canvasWidth, canvasHeight, devMode}){
         width: freeBorderSpace,
         height: canvasHeight,
         fillColor: bluePrintColor,
-    });
-}
-
-
-
-/**
- * Draws a gear with given teeth and radius.
- * @param {CanvasRenderingContext2D} context - 2d context of target canvas
- * @param {number} param.cx - gear center x poos
- * @param {number} param.cy - gear center y poos
- * @param {number} param.r - gear radius
- * @param {number} param.angle - angle of gear
- * @param {number} param.numberOfTeeth - gear's number of teeth 
- * @param {number} param.tootheHeight - gear's single tooth height
- * @param {number} param.borderLineWidth - gear's border line width/thickness
- * @param {string} param.borderColor - gears's border color
- * @param {string} param.fillColor - gear's inner color
- */
-function drawGear(context, {cx, cy, r, angle, numberOfTeeth, tootheHeight, fillColor, borderColor, borderLineWidth}) {
-    // Set fill color and stroke properties
-    context.fillStyle = fillColor;
-    context.lineWidth = borderLineWidth;
-    context.strokeStyle = borderColor;
-
-    let radiusMinusTeeth = r - tootheHeight;
-
-    // Array representing the radii for vertices
-    let distancesOfVerticesFromCenter = [
-        r, // Outer vertex (tooth tip)
-        r, // Outer vertex (tooth tip)
-        radiusMinusTeeth, // Inner vertex (root of tooth)
-        radiusMinusTeeth, // Inner vertex (root of tooth)
-    ];
-
-    // Total number of vertices
-    let verticesPerTooth = distancesOfVerticesFromCenter.length;
-    let numberOfVertices = numberOfTeeth * verticesPerTooth;
-
-    context.beginPath();
-
-    for (let v = 0; v < numberOfVertices; v++) {
-        let angleInRadians = Math.PI * 2 * v / numberOfVertices;
-        let vModded = v % verticesPerTooth;
-        let distanceOfVertexFromCenter = distancesOfVerticesFromCenter[vModded];
-        let drawPosX = cx + distanceOfVertexFromCenter * Math.cos(angleInRadians);
-        let drawPosY = cy + distanceOfVertexFromCenter * Math.sin(angleInRadians);
-
-        let rotatedPos = rotatePoint(cx, cy, drawPosX, drawPosY, angle)
-        
-        // Move to the first vertex, then line to the rest
-        if (v == 0) {
-            context.moveTo(rotatedPos.x, rotatedPos.y);
-        } else {
-            context.lineTo(rotatedPos.x, rotatedPos.y);
-        }
-    }
-    
-    context.closePath();
-    context.fill();
-    context.stroke();
-}
-
-
-
-/**
- * Draws a handle.
- * @param {CanvasRenderingContext2D} context - 2d context of target canvas
- * @param {number} param.jointCX - handle main joint center x pos
- * @param {number} param.jointCY - handle main joint center y pos  
- * @param {number} param.tailCX - handle tail center x pos
- * @param {number} param.tailCY - handle tail center y pos  
- * @param {number} param.angle - angle of gear's handler
- * @param {number} param.r - handle main joint radius
- * @param {number} param.borderLineWidth - handle border line with
- * @param {string} param.borderColor - handle border line color
- * @param {string} param.fillColor - handle inner filler color
- */
-function drawHandle(context, {jointCX, jointCY, tailCX, tailCY, angle, r, fillColor, borderColor, borderLineWidth}){
-
-    // draw a main joint circle
-    drawCircle(context, {
-        cx: jointCX,
-        cy: jointCY,
-        r: r,
-
-        fillColor: fillColor,
-        borderColor: borderColor,
-        borderThickness: borderLineWidth,
-    });
-
-    let tailRadius = r / 2;
-
-    // draw fixator
-    let fixatorPos = {
-        start: {x: jointCX, y: jointCY - r}, 
-        end: {x: jointCX, y: jointCY - r - 10}
-    };
-    
-
-    let fixatorRotatedPos = {
-        start: rotatePoint(jointCX, jointCY, fixatorPos.start.x, fixatorPos.start.y, angle),
-        end: rotatePoint(jointCX, jointCY, fixatorPos.end.x, fixatorPos.end.y, angle),
-    };
-
-    let handleConnectPoints = {
-        top: {x: jointCX, y: jointCY - r},
-        bottom: {x: jointCX, y: jointCY + r},
-    }
-
-    let handlerRotatedConnectPoint = {
-        top: rotatePoint(jointCX, jointCY, handleConnectPoints.top.x, handleConnectPoints.top.y, angle),
-        bottom: rotatePoint(jointCX, jointCY, handleConnectPoints.bottom.x, handleConnectPoints.bottom.y, angle),
-    }
-
-    // drawning a fixator
-    drawLine(context, {
-        x1: fixatorRotatedPos.start.x,
-        y1: fixatorRotatedPos.start.y,
-        x2: fixatorRotatedPos.end.x,
-        y2: fixatorRotatedPos.end.y,
-        thickness: 2,
-        color: borderColor,
-    })
-
-    // draw a handle top side
-    drawLine(context, {
-        x1: handlerRotatedConnectPoint.top.x,
-        y1: handlerRotatedConnectPoint.top.y,
-        x2: tailCX,
-        y2: tailCY,
-        thickness: borderLineWidth,
-        color: borderColor,
-    });
-
-    // draw a bottom handle side
-    drawLine(context, {
-        x1: handlerRotatedConnectPoint.bottom.x,
-        y1: handlerRotatedConnectPoint.bottom.y,
-        x2: tailCX,
-        y2: tailCY,
-        thickness: borderColor,
-        color: borderColor,
-    });
-
-    // draw a circle at handle tail
-    drawCircle(context, {
-        cx: tailCX,
-        cy: tailCY,
-        r: tailRadius,
-
-        fillColor: fillColor,
-        borderColor: borderColor,
-        borderThickness: borderLineWidth,
     });
 }
