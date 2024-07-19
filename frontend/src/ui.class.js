@@ -48,6 +48,9 @@ class UI {
      * @returns {HTMLDivElement} - ready for appending UI element
      */
     #renderInput(elementName, elementObject){
+        // fixing bug with values less than min value when minValue is undefined
+        elementObject.minVlue = elementObject.minVlue || elementObject.defaultValue;
+
         let element = document.createElement('div');
             element.id = elementName;
 
