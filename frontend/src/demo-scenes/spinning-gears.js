@@ -19,7 +19,13 @@ let spinningGears = new Scene({
         'selectedPreset': {
             type: 'preset-picker',
             label: 'Choose preset',
-            presetNames: ['small+big drive', 'big+small drive', 'two equal', 'triple'],
+            presetNames: [
+                'small+big driver', 
+                'big+small driver', 
+                'two equal', 
+                'multiple',
+                'planetary'
+            ],
             defaultValue: 0,
         },
     },
@@ -43,9 +49,11 @@ let spinningGears = new Scene({
          * This array contains several preset arrays, each nested array stores sketch info for Gear class.
          */
         const presets = [
+            // small + big driverr gear
             [
                 {
-                    role: 'drive',
+                    id: 0,
+                    role: 'driver',
                     cx: centerX + 60,
                     cy: centerY,
                     r: 170,
@@ -54,6 +62,8 @@ let spinningGears = new Scene({
                 },
     
                 {
+                    id: 1,
+                    linkedTo: 0,
                     cx: centerX - 132,
                     cy: centerY - 26,
                     r: 40,
@@ -61,17 +71,22 @@ let spinningGears = new Scene({
                     tootheHeight: 18,
                 }
             ],
+
+            // big + small driverr gear
             [
                 {
-                    role: 'drive',
-                    cx: centerX + 168,
-                    cy: centerY + 46,
+                    id: 0,
+                    role: 'driver',
+                    cx: centerX + 169,
+                    cy: centerY + 43,
                     r: 40,
                     numberOfTeeth: 5,
                     tootheHeight: 18,
                 },
 
                 {
+                    id: 1,
+                    linkedTo: 0,
                     cx: centerX,
                     cy: centerY,
                     r: 150,
@@ -80,9 +95,11 @@ let spinningGears = new Scene({
                 },
             ],
 
+            // two same sized gears, one of them is driverr
             [
                 {
-                    role: 'drive',
+                    id: 0,
+                    role: 'driver',
                     cx: centerX + 92,
                     cy: centerY - 12,
                     r: 100,
@@ -91,6 +108,8 @@ let spinningGears = new Scene({
                 },
 
                 {
+                    id: 1,
+                    linkedTo: 0,
                     cx: centerX - 92,
                     cy: centerY + 12,
                     r: 100,
@@ -99,31 +118,127 @@ let spinningGears = new Scene({
                 },
             ],
 
+            // six same sized gears, one of them is driverr gear
             [
                 {
-                    role: 'drive',
+                    id: 0,
+                    role: 'driver',
                     cx: centerX + 183,
-                    cy: centerY + 109,
+                    cy: centerY,
                     r: 40,
                     numberOfTeeth: 13,
                     tootheHeight: 10,
                 },
 
                 {
-                    cx: centerX + 105,
-                    cy: centerY + 61,
-                    r: 60,
-                    numberOfTeeth: 24,
+                    id: 1,
+                    linkedTo: 0,
+                    angle: -35,
+                    cx: centerX + 110,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+                {
+                    id: 2,
+                    linkedTo: 1,
+                    angle: -56,
+                    cx: centerX + 37,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+                {
+                    id: 3,
+                    linkedTo: 2,
+                    angle: -90,
+                    cx: centerX - 37,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+                {
+                    id: 4,
+                    linkedTo: 3,
+                    angle: -138,
+                    cx: centerX - 110,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+
+                {
+                    id: 5,
+                    linkedTo: 4,
+                    angle: -173,
+                    cx: centerX - 183,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+            ],
+
+            // The planetary gearbox
+            [
+                {
+                    id: 0,
+                    role: 'driver',
+                    cx: centerX,
+                    cy: centerY,
+                    r: 80,
+                    numberOfTeeth: 28,
                     tootheHeight: 13,
                 }, 
 
                 {
-                    cx: centerX - 75,
-                    cy: centerY - 14,
-                    r: 140,
-                    numberOfTeeth: 50,
-                    tootheHeight: 16,
-                },
+                    id: 1,
+                    linkedTo: 0,
+                    cx: centerX - 98,
+                    cy: centerY + 73,
+                    r: 50,
+                    numberOfTeeth: 15,
+                    tootheHeight: 14,
+                }, 
+
+                {
+                    id: 2,
+                    linkedTo: 0,
+                    cx: centerX + 99,
+                    cy: centerY + 72,
+                    r: 50,
+                    numberOfTeeth: 15,
+                    tootheHeight: 14,
+                }, 
+
+                {
+                    id: 3,
+                    linkedTo: 0,
+                    cx: centerX,
+                    cy: centerY - 122,
+                    r: 50,
+                    numberOfTeeth: 15,
+                    tootheHeight: 14,
+                }, 
+
+                {
+                    id: 4,
+                    linkedTo: 0,
+                    cx: centerX,
+                    cy: centerY,
+                    r: 176,
+                    toothing: 'internal',
+                    numberOfTeeth: 55, // 55 ok!
+                    tootheHeight: 14,
+                }, 
             ],
         ];
 
@@ -149,6 +264,10 @@ let spinningGears = new Scene({
 
                 // going through the presetS array - preset = presets[selected preset's index]
                 presets[newValue].forEach(gearObject => {
+                    // setting gear direction of rotation
+                    let linkedGear =  presets[newValue].find(item => item.id == gearObject.linkedTo);
+                    gearObject.direction = gearObject.role == 'driver' ? 1 : linkedGear.direction * -1; 
+                    
                     // linking context to gear's objects
                     gearObject.renderer = context;
 
@@ -199,19 +318,13 @@ let spinningGears = new Scene({
                 // render each gear
                 gear.render(settings.getState('dev'));
 
-                let angle = settings.getState('rotationSpeed');
-                // if is main drive gear - rotate in regular way
-                if(gear.role == 'drive'){
-                    gear.rotate(angle);
+                // getting delta angle of rotation
+                let deltaAngle = settings.getState('rotationSpeed');
 
-                // if is driven slave gear 
-                // rotate backwards usinп ratio coeff
-                } else if(gear.role == 'slave'){
-                    let ratioCoefficient = activePreset[0].numberOfTeeth / gear.numberOfTeeth;
-                    let direction = (i % 2 === 0) ? 1 : -1;
-                    // rotate using ration coeff
-                    gear.rotate(angle * direction * ratioCoefficient);
-                }
+                // getting speed of rotation
+                let speed = gear.getRotationSpeed(activePreset);
+
+                gear.rotate(deltaAngle * speed);
             });
 
             requestAnimationFrame(loop);
@@ -258,7 +371,8 @@ class Gear extends SynteticEventTarget {
     * @param {number} param.cy - gear center y pos
     * @param {number} param.r - gear radius
     * @param {number} [param.angle=0.001] - angle of gear
-    * @param {number} [param.role='slave'] - is gear driver or driven
+    * @param {number} [param.role='slave'] - is gear driverr or drivern
+    * @param {number|null} param.linkedTo - The id of the gear to which this gear is attached. If null, this gear is not attached to any other gear.
     * @param {number} param.numberOfTeeth - gear's number of teeth 
     * @param {number} param.tootheHeight - gear's single tooth height
     * @param {number} [param.borderLineWidth=2] - gear's border line width/thickness
@@ -266,18 +380,25 @@ class Gear extends SynteticEventTarget {
     * @param {string} [param.fillColor='rgba(255, 255, 255, 0.1'] - gear's inner color
      */
     constructor({
-        renderer, cx, cy, r, angle = 0.001, 
-        numberOfTeeth, tootheHeight, role = 'slave',
+        id = null, renderer, 
+        cx, cy, r, angle = 0.001, direction = 1, linkedTo = null,
+        toothing = 'external', numberOfTeeth, tootheHeight, role = 'slave',
         fillColor = 'rgba(255, 255, 255, 0.1', 
         borderColor = 'white', borderLineWidth = 2,
     }){
         super();
+        this.id = id;
         this.cx = cx;
         this.cy = cy;
         this.r = r;
         this.angle = angle;
+        this.direction = direction,
         this.rotations = 0;
 
+        this.role = role;
+        this.linkedTo = role == 'driverr' ? null : linkedTo;
+
+        this.toothing = toothing;
         this.numberOfTeeth = numberOfTeeth;
         this.tootheHeight = tootheHeight;
         
@@ -286,8 +407,30 @@ class Gear extends SynteticEventTarget {
         this.borderLineWidth = borderLineWidth;
 
         this.renderer = renderer;
+    }
 
-        this.role = role;
+
+
+    /**
+     * Calculating ration between two linked gears and return speed of rotation.
+     * @param {Gear[]} gears - array of all created gears
+     * @returns {number}
+     */
+    getRotationSpeed(gears){
+        // if linked gear === null - is driverr gear
+        if (this.linkedTo === null) {
+            return 1; 
+        }
+
+        // get the gear to which ours is connected 
+        const linkedGear = gears.find(gear => gear.id === this.linkedTo);
+
+        // calculate ration between two linked gears
+        const ratio = linkedGear.numberOfTeeth / this.numberOfTeeth;
+
+        // To take into account the direction of rotation, 
+        // multiply the ratio value by the direction eigenvalue (-1 or 1)
+        return ratio * this.direction;
     }
 
 
@@ -308,19 +451,19 @@ class Gear extends SynteticEventTarget {
 
 
     /**
-     * 
+     * Draws joint circle to gear (only with to gears with external toothing)
      */
     #renderJoint(devState){
         drawCircle(this.renderer, {
             cx: this.cx,
             cy: this.cy,
             r: 10,
-            fillColor: this.role == 'drive' ? 'white' : this.fillColor,
+            fillColor: this.role == 'driver' ? 'white' : this.fillColor,
             borderColor: this.borderColor,
             borderThickness: this.borderLineWidth,
         });
 
-        if(this.role == 'drive') {
+        if(this.role == 'driver') {
             let r = this.r / 3;
             let w = 10;
             let h = 4;
@@ -366,9 +509,9 @@ class Gear extends SynteticEventTarget {
 
 
     /**
-     * Draws a gear with given teeth and radius from instance.
+     * Draws a gear with external toothing.
      */
-    #renderGear() {
+    #renderExternalGear() {
         let radiusMinusTeeth = this.r - this.tootheHeight;
 
         // Array representing the radii for vertices
@@ -415,14 +558,35 @@ class Gear extends SynteticEventTarget {
 
 
 
+    #renderInternalGear(){
+        drawCircle(this.renderer, {
+            cx: this.cx,
+            cy: this.cy,
+            r: this.r + 8,
+            borderColor: this.borderColor,
+            borderThickness: this.borderLineWidth,
+            fillColor: this.fillColor,
+        });
+
+        this.#renderExternalGear();
+    }
+
+
+
     /**
      * 
      */
     render(devState = false) {
-        this.#renderJoint(devState);
-        this.#renderGear();
+        if(this.toothing == 'external') {
+            this.#renderJoint(devState);
+            this.#renderExternalGear();
+        } else if(this.toothing == 'internal') {
+            this.#renderInternalGear();
+        }
     }
 }
+
+
 
 /**
  * Draws a background in 'blueprint' paper style (with grid).
