@@ -30,7 +30,7 @@ class UI {
         this.states.setState(elementName, elementObject.state);
 
         checkbox.addEventListener('click', event => {
-            this.states[elementName] = checkbox.checked; 
+            this.states.setState(elementName, checkbox.checked);
         });
 
         element.appendChild(label);
