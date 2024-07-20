@@ -55,7 +55,7 @@ let spinningGears = new Scene({
     
                 {
                     cx: centerX - 132,
-                    cy: centerY - 29,
+                    cy: centerY - 26,
                     r: 40,
                     numberOfTeeth: 5,
                     tootheHeight: 18,
@@ -257,7 +257,7 @@ class Gear extends SynteticEventTarget {
     * @param {number} param.cx - gear center x pos
     * @param {number} param.cy - gear center y pos
     * @param {number} param.r - gear radius
-    * @param {number} [param.angle=1] - angle of gear
+    * @param {number} [param.angle=0.001] - angle of gear
     * @param {number} [param.role='slave'] - is gear driver or driven
     * @param {number} param.numberOfTeeth - gear's number of teeth 
     * @param {number} param.tootheHeight - gear's single tooth height
@@ -266,7 +266,7 @@ class Gear extends SynteticEventTarget {
     * @param {string} [param.fillColor='rgba(255, 255, 255, 0.1'] - gear's inner color
      */
     constructor({
-        renderer, cx, cy, r, angle = 1, 
+        renderer, cx, cy, r, angle = 0.001, 
         numberOfTeeth, tootheHeight, role = 'slave',
         fillColor = 'rgba(255, 255, 255, 0.1', 
         borderColor = 'white', borderLineWidth = 2,
