@@ -49,7 +49,8 @@ class UI {
      */
     #renderInput(elementName, elementObject){
         // fixing bug with values less than min value when minValue is undefined
-        elementObject.minVlue = elementObject.minVlue || elementObject.defaultValue;
+        elementObject.minValue = typeof elementObject.minValue == 'number' 
+            ? elementObject.minValue : elementObject.defaultValue;
 
         let element = document.createElement('div');
             element.id = elementName;
@@ -61,7 +62,7 @@ class UI {
         let input = document.createElement('input');
             input.classList.add('controls__input-input');
             input.type = 'number';
-            input.min = elementObject.minVlue;
+            input.min = elementObject.minValue;
             input.max = elementObject.maxValue;
             input.placeholder = 'max ' + elementObject.maxValue;
             input.value = elementObject.defaultValue;
