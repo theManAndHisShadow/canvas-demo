@@ -58,8 +58,6 @@ let concentricCircles = new Scene({
                 paintTheQuarters(context, {width, height, currentActiveQuarter});
             }
 
-            console.log(settings, settings.getState('dev'));
-
             // draw concetric circles
             for(let i = 0; i <= amount; i++) {
                 // Calculate the radius of each circle
@@ -266,7 +264,7 @@ function getQuarterWithMouse(centerPos, mousePos) {
         }
     } else {
                                             // down
-        if(Math.abs(angle) >= 90) {
+        if(Mat1h.abs(angle) >= 90) {
             numeric = 4;                    // down-right
         } else {
             numeric = 3;                    // down-left
