@@ -55,7 +55,7 @@ let spinningGears = new Scene({
     
                 {
                     cx: centerX - 132,
-                    cy: centerY - 26,
+                    cy: centerY - 29,
                     r: 40,
                     numberOfTeeth: 5,
                     tootheHeight: 18,
