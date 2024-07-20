@@ -4,7 +4,7 @@ class UI {
         this.html = html;
 
         // storing some pure values for later use inside the SCENE code
-        this.states = {};
+        this.states = new StateManager();
     }
 
 
@@ -27,8 +27,8 @@ class UI {
             checkbox.classList.add('controls__checkbox-checkbox');
             checkbox.checked = elementObject.state;
 
-        this.states[elementName] = elementObject.state;
-        
+        this.states.setState(elementName, elementObject.state);
+
         checkbox.addEventListener('click', event => {
             this.states[elementName] = checkbox.checked; 
         });
@@ -66,10 +66,11 @@ class UI {
             input.placeholder = 'max ' + elementObject.maxValue;
             input.value = elementObject.defaultValue;
 
-        this.states[elementName] = elementObject.defaultValue;    
+        // this.states[elementName] = elementObject.defaultValue;
+        this.states.setState(elementName, elementObject.defaultValue);    
 
         input.addEventListener('change', event => {
-            this.states[elementName] = Number(input.value);
+            this.states.setState(elementName, Number(input.value));
         });
 
         element.appendChild(label);
@@ -101,13 +102,13 @@ class UI {
                 button.setAttribute('data-preset-num', i);
 
             button.addEventListener('click', ()=>{
-                this.states[elementName] = Number(i);
+                this.states.setState(elementName, Number(i));    
             });
 
             presetsContainer.appendChild(button);
         });
 
-        this.states[elementName] = elementObject.defaultValue;
+        this.states.setState(elementName, elementObject.defaultValue);    
 
         element.appendChild(label);
         element.appendChild(presetsContainer);
