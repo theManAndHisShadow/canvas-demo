@@ -114,6 +114,26 @@ main {
     cursor: pointer;
 }
 
+.controls__preset-picker-button {
+    background: none;
+    border: 1px solid rgb(0 0 0 / 61%);
+    position: relative;
+    border-radius: 3px;
+    margin: 2px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    opacity: 1;
+}
+
+.controls__preset-picker-button:hover {
+    color: #0f35ff;
+    border-color: #0f35ff;
+}
+
+.controls__preset-picker-button:active {
+    opacity: 0.3;
+}
+
 footer {
     background: #0e111c;
     color: white;

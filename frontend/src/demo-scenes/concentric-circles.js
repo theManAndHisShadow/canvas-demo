@@ -38,7 +38,7 @@ let concentricCircles = new Scene({
         let distance = null;
 
         let loop = () => {
-            const amount = settings.circlesAmount;
+            const amount = settings.getState("circlesAmount");
 
             context.clearRect(
                 0, 0,
@@ -53,7 +53,7 @@ let concentricCircles = new Scene({
                 lineColor: 'rgba(0, 0, 0, 0.0032)',
             });
 
-            if(settings.dev === true) {
+            if(settings.getState("dev") === true) {
                 // show active quarter area of canvas
                 paintTheQuarters(context, {width, height, currentActiveQuarter});
             }
@@ -103,7 +103,7 @@ let concentricCircles = new Scene({
                     });
                 }
 
-                if(settings.dev === true) {
+                if(settings.getState("dev") === true) {
                      // Draw a point at the center of the innermost circle
                     if (i === amount - 1) {
                         if (mousePos.x && mousePos.y) {
@@ -185,7 +185,7 @@ window.exportedObjects.push(concentricCircles);
 * @returns {number} - how mush disnatce has been covered in %
 */
 function getPersentOfDistance(distance, maxDistance) {
-return distance >= maxDistance ? 100 : Math.round((distance * 100) / maxDistance);
+    return distance >= maxDistance ? 100 : Math.round((distance * 100) / maxDistance);
 }
 
 /**
@@ -196,49 +196,49 @@ return distance >= maxDistance ? 100 : Math.round((distance * 100) / maxDistance
 * @param {number} param.currentActiveQuarter - number of active quarter to gain its color
 */
 function paintTheQuarters(context, {width, height, currentActiveQuarter}) {
-let opacity = 0.3;
-let gain = 0.3;
+    let opacity = 0.3;
+    let gain = 0.3;
 
-// drawning quarter zones
-// if mouse currently at this zone - set to 'fillColor' gained color using inline comparations:
-// ->  if true, then add 'gain' value to 'opacity' value
-// ->  else - set regular 'opacity' value
+    // drawning quarter zones
+    // if mouse currently at this zone - set to 'fillColor' gained color using inline comparations:
+    // ->  if true, then add 'gain' value to 'opacity' value
+    // ->  else - set regular 'opacity' value
 
-// drawn first quarter zone
-drawRect(context, {
-    x: 0,
-    y: 0,
-    width: width / 2,
-    height: height / 2,
-    fillColor: `rgba(255, 0, 0, ${currentActiveQuarter == 1 ? opacity + gain : opacity})`,
-});
+    // drawn first quarter zone
+    drawRect(context, {
+        x: 0,
+        y: 0,
+        width: width / 2,
+        height: height / 2,
+        fillColor: `rgba(255, 0, 0, ${currentActiveQuarter == 1 ? opacity + gain : opacity})`,
+    });
 
-// drawn second quarter zone
-drawRect(context, {
-    x: width / 2,
-    y: 0,
-    width: width,
-    height: height / 2,
-    fillColor: `rgba(255, 255, 0, ${currentActiveQuarter == 2 ? opacity + gain : opacity})`,
-});
+    // drawn second quarter zone
+    drawRect(context, {
+        x: width / 2,
+        y: 0,
+        width: width,
+        height: height / 2,
+        fillColor: `rgba(255, 255, 0, ${currentActiveQuarter == 2 ? opacity + gain : opacity})`,
+    });
 
-// drawn fourth quarter zone
-drawRect(context, {
-    x: 0,
-    y: height / 2,
-    width: width / 2,
-    height: height / 2,
-    fillColor: `rgba(0, 255, 0, ${currentActiveQuarter == 4 ? opacity + gain : opacity})`,
-});
+    // drawn fourth quarter zone
+    drawRect(context, {
+        x: 0,
+        y: height / 2,
+        width: width / 2,
+        height: height / 2,
+        fillColor: `rgba(0, 255, 0, ${currentActiveQuarter == 4 ? opacity + gain : opacity})`,
+    });
 
-// drawn third quarter zone
-drawRect(context, {
-    x: width / 2,
-    y: height / 2,
-    width: width,
-    height: height / 2,
-    fillColor: `rgba(0, 255, 255, ${currentActiveQuarter == 3 ? opacity + gain : opacity})`,
-});
+    // drawn third quarter zone
+    drawRect(context, {
+        x: width / 2,
+        y: height / 2,
+        width: width,
+        height: height / 2,
+        fillColor: `rgba(0, 255, 255, ${currentActiveQuarter == 3 ? opacity + gain : opacity})`,
+    });
 }
 
 
@@ -250,26 +250,26 @@ drawRect(context, {
 * @returns {number} - number of quarter
 */
 function getQuarterWithMouse(centerPos, mousePos) {
-let centerX = centerPos.x;
-let centerY = centerPos.y;
-let angle = getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y);
-let numeric = null;
+    let centerX = centerPos.x;
+    let centerY = centerPos.y;
+    let angle = getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y);
+    let numeric = null;
 
-if(angle < 0) {
-                                        // up
-    if(Math.abs(angle) >= 90) {
-        numeric = 1;                    // up-left
+    if(angle < 0) {
+                                            // up
+        if(Math.abs(angle) >= 90) {
+            numeric = 1;                    // up-left
+        } else {
+            numeric = 2;                    // up-right
+        }
     } else {
-        numeric = 2;                    // up-right
+                                            // down
+        if(Mat1h.abs(angle) >= 90) {
+            numeric = 4;                    // down-right
+        } else {
+            numeric = 3;                    // down-left
+        }
     }
-} else {
-                                        // down
-    if(Math.abs(angle) >= 90) {
-        numeric = 4;                    // down-right
-    } else {
-        numeric = 3;                    // down-left
-    }
-}
 
-return numeric;
+    return numeric;
 }

@@ -7,61 +7,298 @@ let spinningGears = new Scene({
             label: 'Show dev visual',
             state: true,
         },
+
+        'rotationSpeed': {
+            type: 'input',
+            label: 'Rotation speed',
+            minValue: 0,
+            maxValue: 100,
+            defaultValue: 7,
+        },
+
+        'selectedPreset': {
+            type: 'preset-picker',
+            label: 'Choose preset',
+            presetNames: [
+                'small+big driver', 
+                'big+small driver', 
+                'two equal', 
+                'multiple',
+                'planetary'
+            ],
+            defaultValue: 0,
+        },
     },
 
     code: (root, settings) => {
-        // describing basic variables
+        // describing basic canvas variables
         const canvas = root.querySelector('canvas');
         const width = 600;
         const height = 400;
         canvas.width = width;
         canvas.height = height;
 
+        // describing main variables
         const context = canvas.getContext('2d');
-
         const centerX = width / 2 + 1;
         const centerY = height / 2 + 0.5;
-        
-        // describing scene's gears
-        const gears = [
-            new Gear({
-                role: 'drive',
-                cx: centerX + 80,
-                cy: centerY,
-                r: 120,
-                numberOfTeeth: 30,
-                tootheHeight: 10,
-                renderer: context,
-            }),
 
-            new Gear({
-                cx: centerX - 59,
-                cy: centerY + 30,
-                r: 30,
-                numberOfTeeth: 7,
-                tootheHeight: 10,
-                renderer: context,
-            }),
 
-            new Gear({
-                cx: centerX - 134,
-                cy: centerY - 25,
-                r: 70,
-                numberOfTeeth: 15,
-                tootheHeight: 10,
-                renderer: context,
-            }),
+        /**
+         * Preset is a kind of sketch for the future instance of the Gear classresets is some sort of 'skeleton' 
+         * This array contains several preset arrays, each nested array stores sketch info for Gear class.
+         */
+        const presets = [
+            // small + big driverr gear
+            [
+                {
+                    id: 0,
+                    role: 'driver',
+                    cx: centerX + 60,
+                    cy: centerY,
+                    r: 170,
+                    numberOfTeeth: 30,
+                    tootheHeight: 25,
+                },
+    
+                {
+                    id: 1,
+                    linkedTo: 0,
+                    cx: centerX - 132,
+                    cy: centerY - 26,
+                    r: 40,
+                    numberOfTeeth: 5,
+                    tootheHeight: 18,
+                }
+            ],
+
+            // big + small driverr gear
+            [
+                {
+                    id: 0,
+                    role: 'driver',
+                    cx: centerX + 169,
+                    cy: centerY + 43,
+                    r: 40,
+                    numberOfTeeth: 5,
+                    tootheHeight: 18,
+                },
+
+                {
+                    id: 1,
+                    linkedTo: 0,
+                    cx: centerX,
+                    cy: centerY,
+                    r: 150,
+                    numberOfTeeth: 25,
+                    tootheHeight: 25,
+                },
+            ],
+
+            // two same sized gears, one of them is driverr
+            [
+                {
+                    id: 0,
+                    role: 'driver',
+                    cx: centerX + 92,
+                    cy: centerY - 12,
+                    r: 100,
+                    numberOfTeeth: 19,
+                    tootheHeight: 18,
+                },
+
+                {
+                    id: 1,
+                    linkedTo: 0,
+                    cx: centerX - 92,
+                    cy: centerY + 12,
+                    r: 100,
+                    numberOfTeeth: 19,
+                    tootheHeight: 18,
+                },
+            ],
+
+            // six same sized gears, one of them is driverr gear
+            [
+                {
+                    id: 0,
+                    role: 'driver',
+                    cx: centerX + 183,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+                {
+                    id: 1,
+                    linkedTo: 0,
+                    angle: -35,
+                    cx: centerX + 110,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+                {
+                    id: 2,
+                    linkedTo: 1,
+                    angle: -56,
+                    cx: centerX + 37,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+                {
+                    id: 3,
+                    linkedTo: 2,
+                    angle: -90,
+                    cx: centerX - 37,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+                {
+                    id: 4,
+                    linkedTo: 3,
+                    angle: -138,
+                    cx: centerX - 110,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+
+                {
+                    id: 5,
+                    linkedTo: 4,
+                    angle: -173,
+                    cx: centerX - 183,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+            ],
+
+            // The planetary gearbox
+            [
+                {
+                    id: 0,
+                    role: 'driver',
+                    cx: centerX,
+                    cy: centerY,
+                    r: 80,
+                    numberOfTeeth: 28,
+                    tootheHeight: 13,
+                }, 
+
+                {
+                    id: 1,
+                    linkedTo: 0,
+                    cx: centerX - 98,
+                    cy: centerY + 73,
+                    r: 50,
+                    numberOfTeeth: 15,
+                    tootheHeight: 14,
+                }, 
+
+                {
+                    id: 2,
+                    linkedTo: 0,
+                    cx: centerX + 99,
+                    cy: centerY + 72,
+                    r: 50,
+                    numberOfTeeth: 15,
+                    tootheHeight: 14,
+                }, 
+
+                {
+                    id: 3,
+                    linkedTo: 0,
+                    cx: centerX,
+                    cy: centerY - 122,
+                    r: 50,
+                    numberOfTeeth: 15,
+                    tootheHeight: 14,
+                }, 
+
+                {
+                    id: 4,
+                    linkedTo: 0,
+                    cx: centerX,
+                    cy: centerY,
+                    r: 176,
+                    toothing: 'internal',
+                    numberOfTeeth: 55, // 55 ok!
+                    tootheHeight: 14,
+                }, 
+            ],
         ];
 
-        console.log(gears);
+        // prepare a preset variable to make the active preset globally available...
+        // ...in the body of the “code” in the future
+        let activePreset = null;
 
-        // some dynamic values (updates in 'mousemove' event)
-        let mousePos = {x: false, y: false};
-        let isMouseDown = false;
-        let isMoseMoving = false;
-        let angle = 0;
+        /**
+         * N.B.:
+         * I didn’t want to mix the logic of the scene itself with external control elements
+         * so I added a little reactivity
+         * here we figuratively “subscribe” to changes in the external data source
+         * we don’t care what and how the settings object is modified in another part of the project
+         * we will simply be notified about a change in the settings object (class UI StatesManager) 
+         * and receive the data through callback arg of settings.subscribe().
+         */
+        settings.subscribe((key, newValue, oldValue) => {
+            // Checking what exactly has changed in the settings object
+            // if preset is changed
+            if(key == 'selectedPreset'){
+                // reset 'activePreset'
+                activePreset = [];
 
-        // main function
+                // going through the presetS array - preset = presets[selected preset's index]
+                presets[newValue].forEach(gearObject => {
+                    // setting gear direction of rotation
+                    let linkedGear =  presets[newValue].find(item => item.id == gearObject.linkedTo);
+                    gearObject.direction = gearObject.role == 'driver' ? 1 : linkedGear.direction * -1; 
+                    
+                    // linking context to gear's objects
+                    gearObject.renderer = context;
+
+                    /**
+                     * Each time we create a new instance of the class, 
+                     * this is necessary for isolation between preset changes, 
+                     * otherwise some subsequent reactions will be duplicated several times, 
+                     * which is unacceptable
+                     */
+                    let gear = new Gear(gearObject);
+
+                    /**
+                     * adding custom event to each gear
+                     * this will allow us to record the moment of each complete rotation of the gear
+                     * for further output of some interesting statistical information 
+                     */
+                    gear.addEventListener('fullRotation', () => {
+                        gear.rotations += 1;
+                    });
+
+                    // updating 'activePreset' array
+                    // It stores already completely finished instances of Gear class.
+                    activePreset.push(gear);
+                });
+            }
+        });
+
+        // Some trick to set first (index 0) preset as default preset
+        settings.setState('selectedPreset', 0);
+
+        // Main function
         let loop = () => {
             context.clearRect(
                 0, 0,
@@ -73,31 +310,21 @@ let spinningGears = new Scene({
             drawBlueprintBG(context, {
                 canvasWidth: width,
                 canvasHeight: height,
-                devMode: settings.dev,
+                devMode: settings.getState('dev'),
             });
 
-            gears.forEach((gear, i) => {
-                // is first main gear - pev gear not existed
-                let prevGear = false;
-
-                if(i > 0) prevGear = gears[i - 1];
-                
+            // Make some actions with each gear
+            activePreset.forEach((gear, i) => {
                 // render each gear
-                gear.render(settings.dev);
+                gear.render(settings.getState('dev'));
 
-                if(isMoseMoving === true && isMouseDown === true) {
-                    // if is main drive gear - rotate in regular way
-                    if(gear.role == 'drive'){
-                        gear.rotate(angle);
+                // getting delta angle of rotation
+                let deltaAngle = settings.getState('rotationSpeed') / 10;
 
-                    // if is driven slave gear 
-                    // rotate backwards usinn ratio coeff
-                    } else if(gear.role == 'slave'){
-                        let ratioCoefficient = prevGear.numberOfTeeth / gear.numberOfTeeth;
-                        // rotate using ration coeff
-                        if(prevGear) gear.rotate(prevGear.angle * -1 * ratioCoefficient);
-                    }
-                }
+                // getting speed of rotation
+                let speed = gear.getRotationSpeed(activePreset);
+
+                gear.rotate(deltaAngle * speed);
             });
 
             requestAnimationFrame(loop);
@@ -105,40 +332,6 @@ let spinningGears = new Scene({
 
         // animate
         requestAnimationFrame(loop);
-        
-        // updating mousedown state
-        root.addEventListener('mousedown', event => {
-            isMouseDown = true;
-        });
-
-        // updating mouseup state
-        root.addEventListener('mouseup', event => {
-            isMouseDown = false;
-            isMoseMoving = false;
-        });
-
-        let masterGear = gears.find(gear => gear.role == 'drive');
-
-        masterGear.addEventListener('rotate', () => {
-
-        });
-
-        // main event handler
-        root.addEventListener('mousemove', event => {
-            // Updated values pnly when mouse left button is presse
-            // Without pressed left button - gear will stay without rotating!
-            if(isMouseDown === true) {
-                if(masterGear == undefined) {
-                    throw new Error('Drive gear not found!')
-                } else {
-                    // update global angle var and mousePos
-                    angle = getAngleBetweenTwoPoints(masterGear.cx, masterGear.cy, mousePos.x, mousePos.y);
-                    mousePos = getMousePos(canvas, event);
-                    isMoseMoving = true;
-                }
-
-            }
-        });
     }
 });
 
@@ -169,201 +362,6 @@ class SynteticEventTarget {
     }
 }
 
-class GearHandle extends SynteticEventTarget {
-    /**
-     * 
-    * @param {CanvasRenderingContext2D} renderer - 2d context of target canvas
-    * @param {number} param.cx - gear's handle center x pos
-    * @param {number} param.cy - gear's handle center y pos
-    * @param {object} param.connectedWith - which gear connected with this handle
-    * @param {number} param.angle - angle of gear
-    * @param {length} param.length - length of handle
-    * @param {number} param.borderLineWidth - gear's border line width/thickness
-    * @param {string} param.borderColor - gears's border color
-    * @param {string} param.fillColor - gear's inner color
-     */
-    constructor({
-        renderer, cx, cy, length, angle = 0, 
-        connectedWith, fillColor = 'rgba(255, 255, 255, 0.1', 
-        borderColor = 'white', borderLineWidth = 2
-    }){
-        super();
-
-        length = typeof length == 'number' ? length : connectedWith.r + 35;
-
-        this.cx = cx;
-        this.cy = cy;
-        this.length = length;
-
-        this.connectedWith = connectedWith;
-
-        // joint - circle that connects gear center and handle
-        this.joint = {
-            cx: this.connectedWith.cx,
-            cy: this.connectedWith.cy,
-            r: this.connectedWith.r / 3,
-        }
-
-        // points of handle connection to joint
-        this.joint.connectingPoints = [
-            {x: this.joint.cx, y: this.joint.cy + this.joint.r},
-            {x: this.joint.cx, y: this.joint.cy - this.joint.r},
-        ];
-
-        // joint fixator element points
-        this.joint.fixatorPoints = [
-            {x: this.joint.cx, y: this.joint.cy - this.joint.r},
-            {x: this.joint.cx, y: this.joint.cy - this.joint.r - 5},
-        ];
-
-        // circle at handle end (tail)
-        this.tail = {
-            cx: cx + length,
-            cy: cy,
-            r: this.connectedWith.r / 6,
-            angle: angle,
-        };
-        
-        this.fillColor = fillColor;
-        this.borderColor = borderColor;
-        this.borderLineWidth = borderLineWidth;
-
-        this.renderer = renderer;
-    }
-
-
-
-    /**
-     * Updates angle of handle ant recalculate positions using delta angle
-     * @param {number} angle - new angle value
-     */
-    rotate(angle){
-        // delta of old angle and new angle
-        let delta = this.tail.angle - angle;
-        
-        // recalculate position of tail
-        let rotatedTailPos = rotatePoint(this.joint.cx, this.joint.cy, this.tail.cx, this.tail.cy, -delta);
-
-        // recalculate position of handle connections
-        let rotatetConnectiongPoints = this.joint.connectingPoints.map(point => {
-            return rotatePoint(this.joint.cx, this.joint.cy, point.x, point.y, -delta);
-        });
-
-        let rotatedFixatorPoint = this.joint.fixatorPoints.map(point => {
-            return rotatePoint(this.joint.cx, this.joint.cy, point.x, point.y, -delta);
-        });
-
-        
-        // updatiing value
-        this.tail.angle = angle;
-        this.tail.cx = rotatedTailPos.x;
-        this.tail.cy = rotatedTailPos.y;
-        this.joint.connectingPoints = rotatetConnectiongPoints;
-        this.joint.fixatorPoints = rotatedFixatorPoint;
-    }
-
-
-
-    /**
-     * Draws joint of handle
-     */
-    #renderJoint(devState){
-        drawCircle(this.renderer, {
-            cx: this.connectedWith.cx,
-            cy: this.connectedWith.cy,
-            r: this.connectedWith.r / 3,
-
-            fillColor: this.fillColor,
-            borderColor: this.borderColor,
-            borderThickness: this.borderLineWidth,
-        });
-    }
-
-
-
-    /**
-     * Renders handle joint fixator element
-     */
-    #renderJointFixator() {
-        drawLine(this.renderer, {
-            x1: this.joint.fixatorPoints[0].x,
-            y1: this.joint.fixatorPoints[0].y,
-            x2: this.joint.fixatorPoints[1].x,
-            y2: this.joint.fixatorPoints[1].y,
-            thickness: 8,
-            color: this.borderColor,
-        })
-    }
-
-
-
-    /**
-     * Draws lines from the junction to the end of the handle 
-     */
-    #renderConnections(){
-        for(let connectingPoint of this.joint.connectingPoints) {
-            drawLine(this.renderer, {
-                x1: connectingPoint.x,
-                y1: connectingPoint.y,
-                x2: this.tail.cx,
-                y2: this.tail.cy,
-                thickness: this.borderLineWidth,
-                color: this.borderColor,
-            });  
-        }
-    }
-
-
-
-    /**
-     * Renders of tail circle of handle
-     */
-    #renderTail(){
-        drawCircle(this.renderer, {
-            cx: this.tail.cx,
-            cy: this.tail.cy,
-            r: this.tail.r,
-
-            fillColor: this.fillColor,
-            borderColor: this.borderColor,
-            borderThickness: this.borderLineWidth,
-        });
-    }
-
-
-
-    /**
-     * Renders handle.
-     */
-    render(devState){
-        // draw a main joint circle
-        this.#renderJoint(devState);
-
-
-        // draw a handler's fixator
-        this.#renderJointFixator();
-
-        // draw a handler sides (lines from joint to tail)
-        this.#renderConnections();
-
-        // draw a circle at handle tail
-        this.#renderTail();
-
-        // dev option
-        if(devState === true) {
-            drawLine(this.renderer, {
-                x1: this.joint.cx,
-                y1: this.joint.cy,
-                x2: this.tail.cx,
-                y2: this.tail.cy,
-                thickness: 2,
-                color: 'black',
-            });
-        }
-    }
-}
-
-
 
 class Gear extends SynteticEventTarget {
     /**
@@ -372,8 +370,9 @@ class Gear extends SynteticEventTarget {
     * @param {number} param.cx - gear center x pos
     * @param {number} param.cy - gear center y pos
     * @param {number} param.r - gear radius
-    * @param {number} [param.angle=0] - angle of gear
-    * @param {number} [param.role='slave'] - is gear driver or driven
+    * @param {number} [param.angle=0.001] - angle of gear
+    * @param {number} [param.role='slave'] - is gear driverr or drivern
+    * @param {number|null} param.linkedTo - The id of the gear to which this gear is attached. If null, this gear is not attached to any other gear.
     * @param {number} param.numberOfTeeth - gear's number of teeth 
     * @param {number} param.tootheHeight - gear's single tooth height
     * @param {number} [param.borderLineWidth=2] - gear's border line width/thickness
@@ -381,18 +380,25 @@ class Gear extends SynteticEventTarget {
     * @param {string} [param.fillColor='rgba(255, 255, 255, 0.1'] - gear's inner color
      */
     constructor({
-        renderer, cx, cy, r, angle = 0, 
-        numberOfTeeth, tootheHeight, role = 'slave', 
+        id = null, renderer, 
+        cx, cy, r, angle = 0.001, direction = 1, linkedTo = null,
+        toothing = 'external', numberOfTeeth, tootheHeight, role = 'slave',
         fillColor = 'rgba(255, 255, 255, 0.1', 
         borderColor = 'white', borderLineWidth = 2,
     }){
         super();
-
+        this.id = id;
         this.cx = cx;
         this.cy = cy;
         this.r = r;
         this.angle = angle;
+        this.direction = direction,
+        this.rotations = 0;
 
+        this.role = role;
+        this.linkedTo = role == 'driverr' ? null : linkedTo;
+
+        this.toothing = toothing;
         this.numberOfTeeth = numberOfTeeth;
         this.tootheHeight = tootheHeight;
         
@@ -401,47 +407,92 @@ class Gear extends SynteticEventTarget {
         this.borderLineWidth = borderLineWidth;
 
         this.renderer = renderer;
-
-        this.role = role;
-        this.handle = role == 'drive' ? new GearHandle({
-            renderer: this.renderer, connectedWith: this,
-            cx, cy, angle, fillColor, borderColor, borderLineWidth
-        }) : null;
     }
 
 
 
     /**
-     * 
-     * @param {*} angle 
+     * Calculating ration between two linked gears and return speed of rotation.
+     * @param {Gear[]} gears - array of all created gears
+     * @returns {number}
      */
-    rotate(angle){
-        this.angle = angle;
-
-        if(this.role == 'drive') {
-            // TODO
-            // now integrate
-            // rotation calc at render functions
-            this.handle.rotate(angle);
+    getRotationSpeed(gears){
+        // if linked gear === null - is driverr gear
+        if (this.linkedTo === null) {
+            return 1; 
         }
 
-        this.dispatchEvent('rotate');
+        // get the gear to which ours is connected 
+        const linkedGear = gears.find(gear => gear.id === this.linkedTo);
+
+        // calculate ration between two linked gears
+        const ratio = linkedGear.numberOfTeeth / this.numberOfTeeth;
+
+        // To take into account the direction of rotation, 
+        // multiply the ratio value by the direction eigenvalue (-1 or 1)
+        return ratio * this.direction;
     }
 
 
 
     /**
-     * 
+     * Rotates gear using delta angle, mutates gear.
+     * @param {number} angle - angle of rotaton
+     */
+    rotate(deltaAngle){
+        this.angle += deltaAngle;
+
+        // check is angle is bigger than 360
+        if(Math.abs(this.angle) >= 360) {
+            // normalize angle
+            this.angle = this.angle % 360;
+
+            // fire event 
+            this.dispatchEvent('fullRotation');
+        }
+    }
+
+
+
+    /**
+     * Draws joint circle to gear (only with to gears with external toothing)
      */
     #renderJoint(devState){
         drawCircle(this.renderer, {
             cx: this.cx,
             cy: this.cy,
             r: 10,
-            fillColor: this.fillColor,
+            fillColor: this.role == 'driver' ? 'white' : this.fillColor,
             borderColor: this.borderColor,
             borderThickness: this.borderLineWidth,
         });
+
+        if(this.role == 'driver') {
+            let r = this.r / 3;
+            let w = 10;
+            let h = 4;
+
+            let fixatorPos = {x: this.cx, y: this.cy - r - h};
+            let rotatedFixatorPos = rotatePoint(this.cx, this.cy, fixatorPos.x, fixatorPos.y, this.angle);
+
+            drawCircle(this.renderer, {
+                cx: this.cx,
+                cy: this.cy,
+                r: r,
+                fillColor: this.fillColor,
+                borderColor: this.borderColor,
+                borderThickness: this.borderLineWidth,
+            });
+
+            drawLine(this.renderer, {
+                x1: this.cx,
+                y1: this.cy,
+                x2: rotatedFixatorPos.x,
+                y2: rotatedFixatorPos.y,
+                thickness: w,
+                fillColor: this.borderColor,
+            });
+        }
 
 
         if(devState === true) {
@@ -462,14 +513,19 @@ class Gear extends SynteticEventTarget {
 
 
     /**
-     * Draws a gear with given teeth and radius from instance.
+     * N.B:
+     * I separated old renderExtenralGear to two functions - 'drawGearContour' and 'renderExtenralGear'.
+     * At this way I improve code modularity and maintainability.
+     * By doing this, we isolated the logic responsible for drawing the specific contour shape of the gear teeth.
+     * This approach allows us to reuse the gear contour drawing logic in different contexts, 
+     * such as rendering internal and external gears.
      */
-    #renderGear() {
-        // Set fill color and stroke properties
-        this.renderer.fillStyle = this.fillColor;
-        this.renderer.lineWidth = this.borderLineWidth;
-        this.renderer.strokeStyle = this.borderColor;
 
+    /**
+     * Separated the function that draw gear contour ONLY. 
+     * @param {boolean} closePath - do u need to close the path contour? it need to draw external/internal gear
+     */
+    #drawGearContour(closePath = true) {
         let radiusMinusTeeth = this.r - this.tootheHeight;
 
         // Array representing the radii for vertices
@@ -484,8 +540,6 @@ class Gear extends SynteticEventTarget {
         let verticesPerTooth = distancesOfVerticesFromCenter.length;
         let numberOfVertices = this.numberOfTeeth * verticesPerTooth;
 
-        this.renderer.beginPath();
-
         for (let v = 0; v < numberOfVertices; v++) {
             let angleInRadians = Math.PI * 2 * v / numberOfVertices;
             let vModded = v % verticesPerTooth;
@@ -493,7 +547,7 @@ class Gear extends SynteticEventTarget {
             let drawPosX = this.cx + distanceOfVertexFromCenter * Math.cos(angleInRadians);
             let drawPosY = this.cy + distanceOfVertexFromCenter * Math.sin(angleInRadians);
 
-            let rotatedPos = rotatePoint(this.cx, this.cy, drawPosX, drawPosY, this.angle)
+            let rotatedPos = rotatePoint(this.cx, this.cy, drawPosX, drawPosY, this.angle);
 
             // Move to the first vertex, then line to the rest
             if (v == 0) {
@@ -503,9 +557,69 @@ class Gear extends SynteticEventTarget {
             }
         }
 
-        this.renderer.closePath();
+        if(closePath === true) {
+            this.renderer.closePath();
+        }
+    }
+
+    
+
+    /**
+     * Draws a gear with external toothing.
+     */
+    #renderExternalGear() {
+        this.renderer.beginPath();
+        // Draw gear contour
+        this.#drawGearContour();
+    
+        // Set fill color and stroke properties
+        this.renderer.fillStyle = this.fillColor;
+        this.renderer.lineWidth = this.borderLineWidth;
+        this.renderer.strokeStyle = this.borderColor;
+    
         this.renderer.fill();
         this.renderer.stroke();
+        this.renderer.closePath();
+    }
+    
+
+
+    /**
+     * Draws a gear with internal toothing.
+     * @param {*} devState 
+     */
+    #renderInternalGear(devState) {
+        this.renderer.beginPath();
+
+        // Draw outer circle
+        this.renderer.arc(this.cx, this.cy, this.r + 8, 0, Math.PI * 2);
+    
+        // Draw inner gear contour (teeth)
+        this.#drawGearContour();
+    
+        // Use 'evenodd' fill rule to create a hollow center
+        this.renderer.closePath();
+        this.renderer.fillStyle = this.fillColor;
+        this.renderer.fill('evenodd');
+    
+        // Draw the border of the gear
+        this.renderer.lineWidth = this.borderLineWidth;
+        this.renderer.strokeStyle = this.borderColor;
+        this.renderer.stroke();
+
+        if(devState) {
+            let helperLineConnectiongPoint = {x: this.cx, y: this.cy + this.r};
+            let rotated = rotatePoint(this.cx, this.cy, helperLineConnectiongPoint.x, helperLineConnectiongPoint.y, this.angle);
+
+            drawLine(this.renderer, {
+                x1: this.cx, 
+                y1: this.cy,
+                x2: rotated.x,
+                y2: rotated.y,
+                thickness: this.borderLineWidth,
+                color: 'black',
+            });
+        }
     }
 
 
@@ -514,14 +628,16 @@ class Gear extends SynteticEventTarget {
      * 
      */
     render(devState = false) {
-        this.#renderJoint(devState);
-        this.#renderGear();
-
-        if(this.role == 'drive') {
-            this.handle.render(devState);
+        if(this.toothing == 'external') {
+            this.#renderJoint(devState);
+            this.#renderExternalGear();
+        } else if(this.toothing == 'internal') {
+            this.#renderInternalGear(devState);
         }
     }
 }
+
+
 
 /**
  * Draws a background in 'blueprint' paper style (with grid).

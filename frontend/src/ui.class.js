@@ -4,7 +4,7 @@ class UI {
         this.html = html;
 
         // storing some pure values for later use inside the SCENE code
-        this.states = {};
+        this.states = new StateManager();
     }
 
 
@@ -27,10 +27,10 @@ class UI {
             checkbox.classList.add('controls__checkbox-checkbox');
             checkbox.checked = elementObject.state;
 
-        this.states[elementName] = elementObject.state;
-        
+        this.states.setState(elementName, elementObject.state);
+
         checkbox.addEventListener('click', event => {
-            this.states[elementName] = checkbox.checked; 
+            this.states.setState(elementName, checkbox.checked);
         });
 
         element.appendChild(label);
@@ -48,6 +48,10 @@ class UI {
      * @returns {HTMLDivElement} - ready for appending UI element
      */
     #renderInput(elementName, elementObject){
+        // fixing bug with values less than min value when minValue is undefined
+        elementObject.minValue = typeof elementObject.minValue == 'number' 
+            ? elementObject.minValue : elementObject.defaultValue;
+
         let element = document.createElement('div');
             element.id = elementName;
 
@@ -58,19 +62,57 @@ class UI {
         let input = document.createElement('input');
             input.classList.add('controls__input-input');
             input.type = 'number';
-            input.min = elementObject.defaultValue;
+            input.min = elementObject.minValue;
             input.max = elementObject.maxValue;
             input.placeholder = 'max ' + elementObject.maxValue;
             input.value = elementObject.defaultValue;
 
-        this.states[elementName] = elementObject.defaultValue;    
+        // this.states[elementName] = elementObject.defaultValue;
+        this.states.setState(elementName, elementObject.defaultValue);    
 
         input.addEventListener('change', event => {
-            this.states[elementName] = Number(input.value);
+            this.states.setState(elementName, Number(input.value));
         });
 
         element.appendChild(label);
         element.appendChild(input);
+
+        return element;
+    }
+
+
+    /**
+     * Renders toggle-select list, click activates only one of presets.
+     * @param {*} elementName 
+     * @param {*} elementObject 
+     * @returns 
+     */
+    #renderPresetPicker(elementName, elementObject){
+        let element = document.createElement('div');
+            element.id = elementName;
+
+        let label = document.createElement('span');
+            label.classList.add('controls__preset-picker-label');
+            label.innerText = elementObject.label + ': ';
+
+        let presetsContainer = document.createElement('div');
+        elementObject.presetNames.forEach((presetName, i) => {
+            let button = document.createElement('button');
+                button.classList.add('controls__preset-picker-button');
+                button.textContent = presetName;
+                button.setAttribute('data-preset-num', i);
+
+            button.addEventListener('click', ()=>{
+                this.states.setState(elementName, Number(i));    
+            });
+
+            presetsContainer.appendChild(button);
+        });
+
+        this.states.setState(elementName, elementObject.defaultValue);    
+
+        element.appendChild(label);
+        element.appendChild(presetsContainer);
 
         return element;
     }
@@ -82,12 +124,16 @@ class UI {
      */
     render(uiStructureTree){
         if(uiStructureTree){
+            // reset inner of #controls container of UI
+            this.html.innerHTML = '';
+
             let keys = Object.keys(uiStructureTree);
             for(let key of keys) {
                 let element = uiStructureTree[key];
 
                 if(element.type == 'checkbox') element = this.#renderCheckbox(key, element);
                 if(element.type == 'input') element = this.#renderInput(key, element);
+                if(element.type == 'preset-picker') element = this.#renderPresetPicker(key, element);
 
                 if(element.constructor.name.match('HTML')) {
                     // add new element to ui root element
