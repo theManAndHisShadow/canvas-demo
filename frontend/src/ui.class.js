@@ -123,6 +123,9 @@ class UI {
      */
     render(uiStructureTree){
         if(uiStructureTree){
+            // reset inner of #controls container of UI
+            this.html.innerHTML = '';
+
             let keys = Object.keys(uiStructureTree);
             for(let key of keys) {
                 let element = uiStructureTree[key];
