@@ -12,8 +12,8 @@ let spinningGears = new Scene({
             type: 'input',
             label: 'Rotation speed',
             minValue: 0,
-            maxValue: 20,
-            defaultValue: 0,
+            maxValue: 100,
+            defaultValue: 7,
         },
 
         'selectedPreset': {
@@ -319,7 +319,7 @@ let spinningGears = new Scene({
                 gear.render(settings.getState('dev'));
 
                 // getting delta angle of rotation
-                let deltaAngle = settings.getState('rotationSpeed');
+                let deltaAngle = settings.getState('rotationSpeed') / 10;
 
                 // getting speed of rotation
                 let speed = gear.getRotationSpeed(activePreset);
@@ -436,14 +436,18 @@ class Gear extends SynteticEventTarget {
 
 
     /**
-     * 
-     * @param {*} angle 
+     * Rotates gear using delta angle, mutates gear.
+     * @param {number} angle - angle of rotaton
      */
     rotate(deltaAngle){
         this.angle += deltaAngle;
 
+        // check is angle is bigger than 360
         if(Math.abs(this.angle) >= 360) {
+            // normalize angle
             this.angle = this.angle % 360;
+
+            // fire event 
             this.dispatchEvent('fullRotation');
         }
     }
@@ -509,9 +513,19 @@ class Gear extends SynteticEventTarget {
 
 
     /**
-     * Draws a gear with external toothing.
+     * N.B:
+     * I separated old renderExtenralGear to two functions - 'drawGearContour' and 'renderExtenralGear'.
+     * At this way I improve code modularity and maintainability.
+     * By doing this, we isolated the logic responsible for drawing the specific contour shape of the gear teeth.
+     * This approach allows us to reuse the gear contour drawing logic in different contexts, 
+     * such as rendering internal and external gears.
      */
-    #renderExternalGear() {
+
+    /**
+     * Separated the function that draw gear contour ONLY. 
+     * @param {boolean} closePath - do u need to close the path contour? it need to draw external/internal gear
+     */
+    #drawGearContour(closePath = true) {
         let radiusMinusTeeth = this.r - this.tootheHeight;
 
         // Array representing the radii for vertices
@@ -526,8 +540,6 @@ class Gear extends SynteticEventTarget {
         let verticesPerTooth = distancesOfVerticesFromCenter.length;
         let numberOfVertices = this.numberOfTeeth * verticesPerTooth;
 
-        this.renderer.beginPath();
-
         for (let v = 0; v < numberOfVertices; v++) {
             let angleInRadians = Math.PI * 2 * v / numberOfVertices;
             let vModded = v % verticesPerTooth;
@@ -535,7 +547,7 @@ class Gear extends SynteticEventTarget {
             let drawPosX = this.cx + distanceOfVertexFromCenter * Math.cos(angleInRadians);
             let drawPosY = this.cy + distanceOfVertexFromCenter * Math.sin(angleInRadians);
 
-            let rotatedPos = rotatePoint(this.cx, this.cy, drawPosX, drawPosY, this.angle)
+            let rotatedPos = rotatePoint(this.cx, this.cy, drawPosX, drawPosY, this.angle);
 
             // Move to the first vertex, then line to the rest
             if (v == 0) {
@@ -545,30 +557,69 @@ class Gear extends SynteticEventTarget {
             }
         }
 
+        if(closePath === true) {
+            this.renderer.closePath();
+        }
+    }
+
+    
+
+    /**
+     * Draws a gear with external toothing.
+     */
+    #renderExternalGear() {
+        this.renderer.beginPath();
+        // Draw gear contour
+        this.#drawGearContour();
+    
         // Set fill color and stroke properties
         this.renderer.fillStyle = this.fillColor;
         this.renderer.lineWidth = this.borderLineWidth;
         this.renderer.strokeStyle = this.borderColor;
-
-        this.renderer.closePath();
+    
         this.renderer.fill();
         this.renderer.stroke();
-
+        this.renderer.closePath();
     }
+    
 
 
+    /**
+     * Draws a gear with internal toothing.
+     * @param {*} devState 
+     */
+    #renderInternalGear(devState) {
+        this.renderer.beginPath();
 
-    #renderInternalGear(){
-        drawCircle(this.renderer, {
-            cx: this.cx,
-            cy: this.cy,
-            r: this.r + 8,
-            borderColor: this.borderColor,
-            borderThickness: this.borderLineWidth,
-            fillColor: this.fillColor,
-        });
+        // Draw outer circle
+        this.renderer.arc(this.cx, this.cy, this.r + 8, 0, Math.PI * 2);
+    
+        // Draw inner gear contour (teeth)
+        this.#drawGearContour();
+    
+        // Use 'evenodd' fill rule to create a hollow center
+        this.renderer.closePath();
+        this.renderer.fillStyle = this.fillColor;
+        this.renderer.fill('evenodd');
+    
+        // Draw the border of the gear
+        this.renderer.lineWidth = this.borderLineWidth;
+        this.renderer.strokeStyle = this.borderColor;
+        this.renderer.stroke();
 
-        this.#renderExternalGear();
+        if(devState) {
+            let helperLineConnectiongPoint = {x: this.cx, y: this.cy + this.r};
+            let rotated = rotatePoint(this.cx, this.cy, helperLineConnectiongPoint.x, helperLineConnectiongPoint.y, this.angle);
+
+            drawLine(this.renderer, {
+                x1: this.cx, 
+                y1: this.cy,
+                x2: rotated.x,
+                y2: rotated.y,
+                thickness: this.borderLineWidth,
+                color: 'black',
+            });
+        }
     }
 
 
@@ -581,7 +632,7 @@ class Gear extends SynteticEventTarget {
             this.#renderJoint(devState);
             this.#renderExternalGear();
         } else if(this.toothing == 'internal') {
-            this.#renderInternalGear();
+            this.#renderInternalGear(devState);
         }
     }
 }
