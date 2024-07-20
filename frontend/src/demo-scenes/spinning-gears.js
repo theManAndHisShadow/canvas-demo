@@ -19,127 +19,168 @@ let spinningGears = new Scene({
         'selectedPreset': {
             type: 'preset-picker',
             label: 'Choose preset',
-            presetNames: ['small+big drive', 'big+small drive', 'two equal', 'superslow'],
+            presetNames: ['small+big drive', 'big+small drive', 'two equal', 'triple'],
             defaultValue: 0,
         },
     },
 
     code: (root, settings) => {
-        // describing basic variables
+        // describing basic canvas variables
         const canvas = root.querySelector('canvas');
         const width = 600;
         const height = 400;
         canvas.width = width;
         canvas.height = height;
 
+        // describing main variables
         const context = canvas.getContext('2d');
-
         const centerX = width / 2 + 1;
         const centerY = height / 2 + 0.5;
 
+
+        /**
+         * Preset is a kind of sketch for the future instance of the Gear classresets is some sort of 'skeleton' 
+         * This array contains several preset arrays, each nested array stores sketch info for Gear class.
+         */
         const presets = [
             [
-                new Gear({
+                {
                     role: 'drive',
                     cx: centerX + 60,
                     cy: centerY,
                     r: 170,
                     numberOfTeeth: 30,
                     tootheHeight: 25,
-                    renderer: context,
-                }),
+                },
     
-                new Gear({
+                {
                     cx: centerX - 132,
                     cy: centerY - 26,
                     r: 40,
                     numberOfTeeth: 5,
                     tootheHeight: 18,
-                    renderer: context,
-                })
+                }
             ],
             [
-                new Gear({
+                {
+                    role: 'drive',
                     cx: centerX + 168,
                     cy: centerY + 46,
-                    role: 'drive',
                     r: 40,
                     numberOfTeeth: 5,
                     tootheHeight: 18,
-                    renderer: context,
-                }),
+                },
 
-                new Gear({
+                {
                     cx: centerX,
                     cy: centerY,
                     r: 150,
                     numberOfTeeth: 25,
                     tootheHeight: 25,
-                    renderer: context,
-                }),
+                },
             ],
 
             [
-                new Gear({
+                {
                     role: 'drive',
                     cx: centerX + 92,
                     cy: centerY - 12,
                     r: 100,
                     numberOfTeeth: 19,
                     tootheHeight: 18,
-                    renderer: context,
-                }),
+                },
 
-                new Gear({
+                {
                     cx: centerX - 92,
                     cy: centerY + 12,
                     r: 100,
                     numberOfTeeth: 19,
                     tootheHeight: 18,
-                    renderer: context,
-                }),
+                },
             ],
 
             [
-                new Gear({
+                {
+                    role: 'drive',
                     cx: centerX + 183,
                     cy: centerY + 109,
-                    role: 'drive',
                     r: 40,
                     numberOfTeeth: 13,
                     tootheHeight: 10,
-                    renderer: context,
-                }),
+                },
 
-               new Gear({
+                {
                     cx: centerX + 105,
                     cy: centerY + 61,
                     r: 60,
                     numberOfTeeth: 24,
                     tootheHeight: 13,
-                    renderer: context,
-                }), 
+                }, 
 
-                new Gear({
+                {
                     cx: centerX - 75,
                     cy: centerY - 14,
                     r: 140,
                     numberOfTeeth: 50,
                     tootheHeight: 16,
-                    renderer: context,
-                }),
+                },
             ],
         ];
 
+        // prepare a preset variable to make the active preset globally available...
+        // ...in the body of the “code” in the future
+        let activePreset = null;
 
-        // setting selected preset index
-        let currentPresetIndex = settings.selectedPreset;
+        /**
+         * N.B.:
+         * I didn’t want to mix the logic of the scene itself with external control elements
+         * so I added a little reactivity
+         * here we figuratively “subscribe” to changes in the external data source
+         * we don’t care what and how the settings object is modified in another part of the project
+         * we will simply be notified about a change in the settings object (class UI StatesManager) 
+         * and receive the data through callback arg of settings.subscribe().
+         */
+        settings.subscribe((key, newValue, oldValue) => {
+            // Checking what exactly has changed in the settings object
+            // if preset is changed
+            if(key == 'selectedPreset'){
+                // reset 'activePreset'
+                activePreset = [];
 
-        // main function
+                // going through the presetS array - preset = presets[selected preset's index]
+                presets[newValue].forEach(gearObject => {
+                    // linking context to gear's objects
+                    gearObject.renderer = context;
+
+                    /**
+                     * Each time we create a new instance of the class, 
+                     * this is necessary for isolation between preset changes, 
+                     * otherwise some subsequent reactions will be duplicated several times, 
+                     * which is unacceptable
+                     */
+                    let gear = new Gear(gearObject);
+
+                    /**
+                     * adding custom event to each gear
+                     * this will allow us to record the moment of each complete rotation of the gear
+                     * for further output of some interesting statistical information 
+                     */
+                    gear.addEventListener('fullRotation', () => {
+                        gear.rotations += 1;
+                    });
+
+                    // updating 'activePreset' array
+                    // It stores already completely finished instances of Gear class.
+                    activePreset.push(gear);
+                });
+            }
+        });
+
+        // Some trick to set first (index 0) preset as default preset
+        settings.setState('selectedPreset', 0);
+
+        // Main function
         let loop = () => {
-            // update selected preset index
-            currentPresetIndex = settings.selectedPreset;
-
             context.clearRect(
                 0, 0,
                 width,
@@ -150,14 +191,15 @@ let spinningGears = new Scene({
             drawBlueprintBG(context, {
                 canvasWidth: width,
                 canvasHeight: height,
-                devMode: settings.dev,
+                devMode: settings.getState('dev'),
             });
 
-            presets[currentPresetIndex].forEach((gear, i) => {
+            // Make some actions with each gear
+            activePreset.forEach((gear, i) => {
                 // render each gear
-                gear.render(settings.dev);
+                gear.render(settings.getState('dev'));
 
-                let angle = settings.rotationSpeed;
+                let angle = settings.getState('rotationSpeed');
                 // if is main drive gear - rotate in regular way
                 if(gear.role == 'drive'){
                     gear.rotate(angle);
@@ -165,7 +207,7 @@ let spinningGears = new Scene({
                 // if is driven slave gear 
                 // rotate backwards usinп ratio coeff
                 } else if(gear.role == 'slave'){
-                    let ratioCoefficient = presets[currentPresetIndex][0].numberOfTeeth / gear.numberOfTeeth;
+                    let ratioCoefficient = activePreset[0].numberOfTeeth / gear.numberOfTeeth;
                     let direction = (i % 2 === 0) ? 1 : -1;
                     // rotate using ration coeff
                     gear.rotate(angle * direction * ratioCoefficient);
@@ -215,7 +257,7 @@ class Gear extends SynteticEventTarget {
     * @param {number} param.cx - gear center x pos
     * @param {number} param.cy - gear center y pos
     * @param {number} param.r - gear radius
-    * @param {number} [param.angle=0] - angle of gear
+    * @param {number} [param.angle=1] - angle of gear
     * @param {number} [param.role='slave'] - is gear driver or driven
     * @param {number} param.numberOfTeeth - gear's number of teeth 
     * @param {number} param.tootheHeight - gear's single tooth height
@@ -224,7 +266,7 @@ class Gear extends SynteticEventTarget {
     * @param {string} [param.fillColor='rgba(255, 255, 255, 0.1'] - gear's inner color
      */
     constructor({
-        renderer, cx, cy, r, angle = 0, 
+        renderer, cx, cy, r, angle = 1, 
         numberOfTeeth, tootheHeight, role = 'slave',
         fillColor = 'rgba(255, 255, 255, 0.1', 
         borderColor = 'white', borderLineWidth = 2,
@@ -234,6 +276,7 @@ class Gear extends SynteticEventTarget {
         this.cy = cy;
         this.r = r;
         this.angle = angle;
+        this.rotations = 0;
 
         this.numberOfTeeth = numberOfTeeth;
         this.tootheHeight = tootheHeight;
@@ -255,9 +298,11 @@ class Gear extends SynteticEventTarget {
      */
     rotate(deltaAngle){
         this.angle += deltaAngle;
-        this.angle = this.angle % 360;
 
-        this.dispatchEvent('rotate');
+        if(Math.abs(this.angle) >= 360) {
+            this.angle = this.angle % 360;
+            this.dispatchEvent('fullRotation');
+        }
     }
 
 
