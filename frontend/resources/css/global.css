@@ -125,6 +125,7 @@ main {
     opacity: 1;
 }
 
+[data-selected-preset="true"],
 .controls__preset-picker-button:hover {
     color: #0f35ff;
     border-color: #0f35ff;

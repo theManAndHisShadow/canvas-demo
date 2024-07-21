@@ -102,7 +102,16 @@ class UI {
                 button.textContent = presetName;
                 button.setAttribute('data-preset-num', i);
 
-            button.addEventListener('click', ()=>{
+            // select by default
+            if(i == 0) button.setAttribute('data-selected-preset', true)
+
+            button.addEventListener('click', () => {
+                // deselecting prev selected buttons
+                let prevSelected = Array.from(document.querySelectorAll('[data-selected-preset="true"]'));
+                if(prevSelected.length > 0) prevSelected.forEach(button => button.removeAttribute('data-selected-preset'));
+
+                // console.log(prevSelected);
+                button.setAttribute('data-selected-preset', true);
                 this.states.setState(elementName, Number(i));    
             });
 

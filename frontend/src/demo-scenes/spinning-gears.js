@@ -13,18 +13,19 @@ let spinningGears = new Scene({
             label: 'Rotation speed',
             minValue: 0,
             maxValue: 100,
-            defaultValue: 7,
+            defaultValue: 5,
         },
 
         'selectedPreset': {
             type: 'preset-picker',
             label: 'Choose preset',
             presetNames: [
-                'small+big driver', 
-                'big+small driver', 
-                'two equal', 
-                'multiple',
-                'planetary'
+                'Big driver gear', 
+                'Small driver gear', 
+                'Chain of equal gears',
+                'Chain 1:2:4',
+                'Smooth increase',
+                'Planetary gearbox'
             ],
             defaultValue: 0,
         },
@@ -72,13 +73,13 @@ let spinningGears = new Scene({
                 }
             ],
 
-            // big + small driverr gear
+            // big + small driver gear
             [
                 {
                     id: 0,
                     role: 'driver',
-                    cx: centerX + 169,
-                    cy: centerY + 43,
+                    cx: centerX - 132,
+                    cy: centerY - 26,
                     r: 40,
                     numberOfTeeth: 5,
                     tootheHeight: 18,
@@ -87,34 +88,11 @@ let spinningGears = new Scene({
                 {
                     id: 1,
                     linkedTo: 0,
-                    cx: centerX,
+                    cx: centerX + 60,
                     cy: centerY,
-                    r: 150,
-                    numberOfTeeth: 25,
+                    r: 170,
+                    numberOfTeeth: 30,
                     tootheHeight: 25,
-                },
-            ],
-
-            // two same sized gears, one of them is driverr
-            [
-                {
-                    id: 0,
-                    role: 'driver',
-                    cx: centerX + 92,
-                    cy: centerY - 12,
-                    r: 100,
-                    numberOfTeeth: 19,
-                    tootheHeight: 18,
-                },
-
-                {
-                    id: 1,
-                    linkedTo: 0,
-                    cx: centerX - 92,
-                    cy: centerY + 12,
-                    r: 100,
-                    numberOfTeeth: 19,
-                    tootheHeight: 18,
                 },
             ],
 
@@ -185,6 +163,92 @@ let spinningGears = new Scene({
                     numberOfTeeth: 13,
                     tootheHeight: 10,
                 },
+            ],
+
+            // three gears 4:2:1
+
+            [
+                {
+                    id: 0,
+                    role: 'driver',
+                    cx: centerX + 230,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+                {
+                    id: 1,
+                    linkedTo: 0,
+                    angle: -16,
+                    cx: centerX + 117,
+                    cy: centerY,
+                    r: 80,
+                    numberOfTeeth: 26,
+                    tootheHeight: 14,
+                },
+                
+                {
+                    id: 2,
+                    linkedTo: 1,
+                    angle: -32,
+                    cx: centerX - 112,
+                    cy: centerY,
+                    r: 160,
+                    numberOfTeeth: 52,
+                    tootheHeight: 14,
+                },
+                
+
+            ],
+
+            // test 2
+            [
+                {
+                    id: 0,
+                    role: 'driver',
+                    cx: centerX + 230,
+                    cy: centerY,
+                    r: 40,
+                    numberOfTeeth: 13,
+                    tootheHeight: 10,
+                },
+
+                {
+                    id: 1,
+                    linkedTo: 0,
+                    angle: 13,
+                    cx: centerX + 137,
+                    cy: centerY,
+                    r: 60,
+                    numberOfTeeth: 20,
+                    tootheHeight: 12,
+                },
+
+                {
+                    id: 2,
+                    linkedTo: 1,
+                    angle: 7,
+                    cx: centerX + 6,
+                    cy: centerY,
+                    r: 80,
+                    numberOfTeeth: 28,
+                    tootheHeight: 12,
+                },
+
+                {
+                    id: 3,
+                    linkedTo: 2,
+                    angle: 7,
+                    cx: centerX - 165,
+                    cy: centerY,
+                    r: 100,
+                    numberOfTeeth: 36,
+                    tootheHeight: 12,
+                },
+                
+
             ],
 
             // The planetary gearbox
@@ -425,12 +489,19 @@ class Gear extends SynteticEventTarget {
         // get the gear to which ours is connected 
         const linkedGear = gears.find(gear => gear.id === this.linkedTo);
 
-        // calculate ration between two linked gears
-        const ratio = linkedGear.numberOfTeeth / this.numberOfTeeth;
+        // calculate speed of linked gear
+        const linkedGearSpeed = linkedGear.getRotationSpeed(gears) * linkedGear.direction
 
+        // calculate ration between two linked gears
+        const ratio = (linkedGear.numberOfTeeth / this.numberOfTeeth);
+
+        // calculate speed ot this gear
         // To take into account the direction of rotation, 
         // multiply the ratio value by the direction eigenvalue (-1 or 1)
-        return ratio * this.direction;
+        const speed = ratio * this.direction;
+
+        // this gear speed: linked gear speed x this gear speed
+        return linkedGearSpeed * speed;
     }
 
 
