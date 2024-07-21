@@ -44,7 +44,6 @@ main {
 
 .section-block h2, h3, h4 {
     margin-top: 5px;
-    margin-bottom: 5px;
 }
 
 .section-block__inner {
@@ -104,34 +103,6 @@ main {
 
 .wide-block {
     width: 95%;
-}
-
-.controls__checkbox-checkbox {
-    margin: 0;
-    position: relative;
-    right: 1px;
-    top: 1px;
-    cursor: pointer;
-}
-
-.controls__preset-picker-button {
-    background: none;
-    border: 1px solid rgb(0 0 0 / 61%);
-    position: relative;
-    border-radius: 3px;
-    margin: 2px;
-    cursor: pointer;
-    transition: 0.3s ease;
-    opacity: 1;
-}
-
-.controls__preset-picker-button:hover {
-    color: #0f35ff;
-    border-color: #0f35ff;
-}
-
-.controls__preset-picker-button:active {
-    opacity: 0.3;
 }
 
 footer {
