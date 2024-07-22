@@ -9,6 +9,14 @@ html, body {
     text-align: center;
 }
 
+.hidden-block {
+    display: none;
+}
+
+.pale {
+    opacity: 0.3;
+}
+
 header, main, footer {
     position: relative;
     width: 100%;
@@ -95,7 +103,8 @@ main {
 .block {
     padding: 7px 15px;
     background-color: white;
-    margin: 0 auto;
+    margin: 0px auto;
+    margin-bottom: 20px;
 }
 
 .medium-block {
