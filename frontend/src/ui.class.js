@@ -20,7 +20,7 @@ class UI {
 
         let label = document.createElement('span');
             label.innerText = elementObject.label + ': ';
-            label.classList.add('controls__checkbox-label');
+            label.classList.add('controls__checkbox-label', 'controls__option-label');
 
         let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
@@ -56,7 +56,7 @@ class UI {
             element.id = elementName;
 
         let label = document.createElement('span');
-            label.classList.add('controls__input-label');
+            label.classList.add('controls__input-label', 'controls__option-label');
             label.innerText = elementObject.label + ': ';
 
         let input = document.createElement('input');
@@ -92,10 +92,12 @@ class UI {
             element.id = elementName;
 
         let label = document.createElement('span');
-            label.classList.add('controls__preset-picker-label');
+            label.classList.add('controls__preset-picker-label', 'controls__option-label');
             label.innerText = elementObject.label + ': ';
 
         let presetsContainer = document.createElement('div');
+            presetsContainer.classList.add('controls__buttons-container');
+
         elementObject.presetNames.forEach((presetName, i) => {
             let button = document.createElement('button');
                 button.classList.add('controls__preset-picker-button');

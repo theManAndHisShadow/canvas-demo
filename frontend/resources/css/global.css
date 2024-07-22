@@ -114,15 +114,24 @@ main {
     cursor: pointer;
 }
 
+.controls__buttons-container {
+    margin-top: 2px;
+}
+
 .controls__preset-picker-button {
     background: none;
     border: 1px solid rgb(0 0 0 / 61%);
     position: relative;
     border-radius: 3px;
-    margin: 2px;
+    margin-right: 2px;
+    margin-bottom: 2px;
     cursor: pointer;
     transition: 0.3s ease;
     opacity: 1;
+}
+
+.controls__option-label{
+    font-size: 15px;
 }
 
 [data-selected-preset="true"],
