@@ -14,6 +14,21 @@ function getArrayLast(array){
 
 
 /**
+*   Converts an index to its corresponding letter.
+*   @param {number} i - The target index.
+*   @param {boolean} [upperCase=false] - Indicates whether the letter should be in upper case.
+*   @returns {string} - The letter corresponding to the given index.
+*/
+function translateIndexToLetter(i, upperCase = false) {
+    let letter = String.fromCharCode(97 + i);
+
+    if(upperCase == true) letter = letter.toUpperCase();
+
+    return letter;
+}
+
+
+/**
  * Returns object full deep clone
  * @param {object} targetObject - target object
  * @returns {object} - clone of target object
