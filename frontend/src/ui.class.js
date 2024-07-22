@@ -71,6 +71,13 @@ class UI {
         this.states.setState(elementName, elementObject.defaultValue);    
 
         input.addEventListener('change', event => {
+            /**
+             * Without these lines, it is allowed to enter into the input line values ​​that clearly exceed 
+             * the maximum and minimum values ​​set in the elementObject - this behavior is strange and unacceptable.
+             */
+            if(Number(input.value) > elementObject.maxValue) input.value = elementObject.maxValue;
+            if(Number(input.value) < elementObject.minValue) input.value = elementObject.minValue;
+
             this.states.setState(elementName, Number(input.value));
         });
 
