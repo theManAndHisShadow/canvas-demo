@@ -2,6 +2,16 @@ let concentricCircles = new Scene({
     title: 'Concentric circles', 
 
     ui: {
+        'distance': {
+            type: 'display',
+            label: ' - distance to center',
+        },
+
+        'angle': {
+            type: 'display',
+            label: ' - angle of view',
+        },
+
         'dev': {
             type: 'checkbox',
             label: 'Show dev visual',
@@ -34,7 +44,6 @@ let concentricCircles = new Scene({
 
         // some dynamic values (updates in 'mousemove' event)
         let mousePos = {x: false, y: false};
-        let currentActiveQuarter = 0;
         let distance = null;
 
         let loop = () => {
@@ -52,11 +61,6 @@ let concentricCircles = new Scene({
                 lineThickness: 1,
                 lineColor: 'rgba(0, 0, 0, 0.0032)',
             });
-
-            if(settings.getState("dev") === true) {
-                // show active quarter area of canvas
-                paintTheQuarters(context, {width, height, currentActiveQuarter});
-            }
 
             // draw concetric circles
             for(let i = 0; i <= amount; i++) {
@@ -166,7 +170,10 @@ let concentricCircles = new Scene({
             // updating some values when mouse moves
             mousePos = getMousePos(canvas, event);
             distance = Math.round(getDistanseBetweenTwoPoint(mousePos.x, mousePos.y, centerX, centerY));
-            currentActiveQuarter = getQuarterWithMouse({x: centerX, y: centerY}, mousePos);
+
+            // add some additional info
+            display.updateValue('distance', distance + ' px.');
+            display.updateValue('angle', Math.round(getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y)) + ' °');
         });
     }
 });
@@ -186,90 +193,4 @@ window.exportedObjects.push(concentricCircles);
 */
 function getPersentOfDistance(distance, maxDistance) {
     return distance >= maxDistance ? 100 : Math.round((distance * 100) / maxDistance);
-}
-
-/**
-* Fill each quaerter area of canvas with semi-trasnparent color
-* @param {CanvasRenderingContext2D} context - 2d context of canvas
-* @param {number} param.width - width of canvas
-* @param {number} param.height - height of canvas
-* @param {number} param.currentActiveQuarter - number of active quarter to gain its color
-*/
-function paintTheQuarters(context, {width, height, currentActiveQuarter}) {
-    let opacity = 0.3;
-    let gain = 0.3;
-
-    // drawning quarter zones
-    // if mouse currently at this zone - set to 'fillColor' gained color using inline comparations:
-    // ->  if true, then add 'gain' value to 'opacity' value
-    // ->  else - set regular 'opacity' value
-
-    // drawn first quarter zone
-    drawRect(context, {
-        x: 0,
-        y: 0,
-        width: width / 2,
-        height: height / 2,
-        fillColor: `rgba(255, 0, 0, ${currentActiveQuarter == 1 ? opacity + gain : opacity})`,
-    });
-
-    // drawn second quarter zone
-    drawRect(context, {
-        x: width / 2,
-        y: 0,
-        width: width,
-        height: height / 2,
-        fillColor: `rgba(255, 255, 0, ${currentActiveQuarter == 2 ? opacity + gain : opacity})`,
-    });
-
-    // drawn fourth quarter zone
-    drawRect(context, {
-        x: 0,
-        y: height / 2,
-        width: width / 2,
-        height: height / 2,
-        fillColor: `rgba(0, 255, 0, ${currentActiveQuarter == 4 ? opacity + gain : opacity})`,
-    });
-
-    // drawn third quarter zone
-    drawRect(context, {
-        x: width / 2,
-        y: height / 2,
-        width: width,
-        height: height / 2,
-        fillColor: `rgba(0, 255, 255, ${currentActiveQuarter == 3 ? opacity + gain : opacity})`,
-    });
-}
-
-
-
-/**
-* Returns the number of the quarter of the canvas area in which the mouse is currently located.
-* @param {object} centerPos - object of circle center position
-* @param {object} mousePos - object of mouse center position
-* @returns {number} - number of quarter
-*/
-function getQuarterWithMouse(centerPos, mousePos) {
-    let centerX = centerPos.x;
-    let centerY = centerPos.y;
-    let angle = getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y);
-    let numeric = null;
-
-    if(angle < 0) {
-                                            // up
-        if(Math.abs(angle) >= 90) {
-            numeric = 1;                    // up-left
-        } else {
-            numeric = 2;                    // up-right
-        }
-    } else {
-                                            // down
-        if(Mat1h.abs(angle) >= 90) {
-            numeric = 4;                    // down-right
-        } else {
-            numeric = 3;                    // down-left
-        }
-    }
-
-    return numeric;
 }
