@@ -16,7 +16,7 @@ let concentricCircles = new Scene({
         },
     },
 
-    code: (root, settings) => {
+    code: (root, display, settings) => {
         const canvas = root.querySelector('canvas');
         const width = 600;
         const height = 400;

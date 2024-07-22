@@ -15,6 +15,7 @@ class Page {
     
     // html id of root element for scenes
     static #rootElementID = '#root';
+    static #displayContainerElementID = '#scene-info';
     static #controlsContainerElementID = '#controls';
 
     //location of demo scenes
@@ -28,13 +29,13 @@ class Page {
         this.root = Page.parseRoot();
 
         this.ui = new UI({
-            html: Page.parseUIContainer(),
+            display: Page.parseUIDisplay(),
+            controls: Page.parseUIControls(),
         });
 
         // get all finded links
         this.links = Page.parseLinks();
     }
-
 
 
     /**
@@ -60,12 +61,34 @@ class Page {
         return root;
     }
 
-    static parseUIContainer(){
-        let container = document.querySelector(`${Page.#controlsContainerElementID}`);
 
-        return container;
+    /**
+     * Parses document and return root node for 'Controls' html block
+     * @returns {HTMLElement}
+     */
+    static parseUIControls(){
+        let controls = document.querySelector(`${Page.#controlsContainerElementID}`);
+
+        return controls;
     }
 
+
+    /**
+     * Parses document and return root node for 'Scene Info' html block
+     * @returns {HTMLElement}
+     */
+    static parseUIDisplay(){
+        let display = document.querySelector(`${Page.#displayContainerElementID}`);
+
+        return display;
+    }
+
+
+    /**
+     * Creates and injects html 'script' element
+     * @param {*} scriptPath 
+     * @returns 
+     */
     static createSciptTag(scriptPath){
         let scriptElement = document.createElement('script'); 
         scriptElement.setAttribute('src', scriptPath);
@@ -75,10 +98,6 @@ class Page {
         return scriptElement;
     }
 
-    /**
-     * Some important notes about Page.loadScene() method:
-     * 
-     */
     
     /**
      * Asynchronously loads scene using scene file path string
@@ -182,6 +201,10 @@ class Page {
                         loadedScene.execute({
                             root: this.root,
                             baseTabTitle: this.windowTitle,
+
+                            // adding access to UIDisplay instance inside scene
+                            // more information here - 'scene.class.js'
+                            display: this.ui.display,
 
                             // put updated values to settings params
                             // it makes updated values available inside scene code

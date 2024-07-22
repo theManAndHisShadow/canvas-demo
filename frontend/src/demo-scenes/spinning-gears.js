@@ -8,6 +8,12 @@ let spinningGears = new Scene({
             state: true,
         },
 
+        'showAdditionalInfo': {
+            type: 'checkbox',
+            label: 'Show additional info',
+            state: true,
+        },
+
         'rotationSpeed': {
             type: 'input',
             label: 'Rotation speed',
@@ -31,7 +37,7 @@ let spinningGears = new Scene({
         },
     },
 
-    code: (root, settings) => {
+    code: (root, display, settings) => {
         // describing basic canvas variables
         const canvas = root.querySelector('canvas');
         const width = 600;
@@ -320,14 +326,21 @@ let spinningGears = new Scene({
          * and receive the data through callback arg of settings.subscribe().
          */
         settings.subscribe((key, newValue, oldValue) => {
+            if(key == 'showAdditionalInfo') {
+                if(newValue == true) display.show();
+                if(newValue == false) display.hide();
+            }
+
             // Checking what exactly has changed in the settings object
             // if preset is changed
             if(key == 'selectedPreset'){
                 // reset 'activePreset'
                 activePreset = [];
 
+                display.clearRoot();
+
                 // going through the presetS array - preset = presets[selected preset's index]
-                presets[newValue].forEach(gearObject => {
+                presets[newValue].forEach((gearObject, i) => {
                     // setting gear direction of rotation
                     let linkedGear =  presets[newValue].find(item => item.id == gearObject.linkedTo);
                     gearObject.direction = gearObject.role == 'driver' ? 1 : linkedGear.direction * -1; 
@@ -342,6 +355,24 @@ let spinningGears = new Scene({
                      * which is unacceptable
                      */
                     let gear = new Gear(gearObject);
+                    let gearLetter = translateIndexToLetter(i, true);
+                    let gearName = `gear_${gearLetter}`;
+
+                    if(presets[newValue].find(gear => gear.toothing == 'internal')) {
+                        let localPrefix = gear.toothing == 'external' ? 
+                            gear.role == 'driver' ? 'sun' : 'planet' 
+                            : 'ring';
+                            
+                        display.render(gearName, {
+                            type: 'display',
+                            label: `- ${localPrefix} gear ${gearLetter}${gear.numberOfTeeth}` ,
+                        });
+                    } else {
+                        display.render(gearName, {
+                            type: 'display',
+                            label: `- ${gear.role} gear ${gearLetter}${gear.numberOfTeeth}` ,
+                        });
+                    }
 
                     /**
                      * adding custom event to each gear
@@ -350,6 +381,8 @@ let spinningGears = new Scene({
                      */
                     gear.addEventListener('fullRotation', () => {
                         gear.rotations += 1;
+
+                        display.updateValue(gearName, `${gear.rotations} revs.`);
                     });
 
                     // updating 'activePreset' array
