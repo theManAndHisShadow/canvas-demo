@@ -5,7 +5,7 @@ let spinningGears = new Scene({
         'dev': {
             type: 'checkbox',
             label: 'Show dev visual',
-            state: true,
+            state: false,
         },
 
         'showAdditionalInfo': {
@@ -67,7 +67,7 @@ let spinningGears = new Scene({
                     numberOfTeeth: 30,
                     tootheHeight: 25,
                 },
-    
+                
                 {
                     id: 1,
                     linkedTo: 0,
@@ -348,6 +348,10 @@ let spinningGears = new Scene({
                     // linking context to gear's objects
                     gearObject.renderer = context;
 
+                    gearObject.devMode = settings.getState('dev');
+
+                    // gearObject.borderColor = settings.getState('dev') === true ? color : gearObject.borderColor;
+
                     /**
                      * Each time we create a new instance of the class, 
                      * this is necessary for isolation between preset changes, 
@@ -360,17 +364,16 @@ let spinningGears = new Scene({
 
                     if(presets[newValue].find(gear => gear.toothing == 'internal')) {
                         let localPrefix = gear.toothing == 'external' ? 
-                            gear.role == 'driver' ? 'sun' : 'planet' 
-                            : 'ring';
+                                gear.role == 'driver' ? 'sun' : 'planet' : 'ring';
                             
                         display.render(gearName, {
                             type: 'display',
-                            label: `- ${localPrefix} gear ${gearLetter}${gear.numberOfTeeth}` ,
+                            label: `- ${localPrefix} gear ${gearLetter}${gear.numberOfTeeth}</span>` ,
                         });
                     } else {
                         display.render(gearName, {
                             type: 'display',
-                            label: `- ${gear.role} gear ${gearLetter}${gear.numberOfTeeth}` ,
+                            label: `- ${gear.role} gear ${gearLetter}${gear.numberOfTeeth}</span>` ,
                         });
                     }
 
@@ -390,10 +393,17 @@ let spinningGears = new Scene({
                     activePreset.push(gear);
                 });
             }
+
+            if(key == 'dev') {
+                activePreset.forEach(gear => {
+                    return gear.devMode = newValue;
+                });
+            }
         });
 
         // Some trick to set first (index 0) preset as default preset
         settings.setState('selectedPreset', 0);
+        settings.setState('dev', false);
 
         // Main function
         let loop = () => {
@@ -413,7 +423,7 @@ let spinningGears = new Scene({
             // Make some actions with each gear
             activePreset.forEach((gear, i) => {
                 // render each gear
-                gear.render(settings.getState('dev'));
+                gear.render();
 
                 // getting delta angle of rotation
                 let deltaAngle = settings.getState('rotationSpeed') / 10;
@@ -473,17 +483,31 @@ class Gear extends SynteticEventTarget {
     * @param {number} param.numberOfTeeth - gear's number of teeth 
     * @param {number} param.tootheHeight - gear's single tooth height
     * @param {number} [param.borderLineWidth=2] - gear's border line width/thickness
-    * @param {string} [param.borderColor='white'] - gears's border color
-    * @param {string} [param.fillColor='rgba(255, 255, 255, 0.1'] - gear's inner color
+    * @param {string} [param.borderColor='rgba(255, 255, 255, 1)'] - gears's border color
+    * @param {string} param.alternativeBorderColor - border color for dev mode
+    * @param {string} param.alternativeFillColor - fill color for dev mode
+    * @param {string} param.fillColor - internal gear color. If color is not set manually - a semi-transparent version of the border color will be calculated
+    * @param {boolean} [param.devMode=false] - special optional param to show dev helper elements
      */
     constructor({
         id = null, renderer, 
         cx, cy, r, angle = 0.001, direction = 1, linkedTo = null,
         toothing = 'external', numberOfTeeth, tootheHeight, role = 'slave',
-        fillColor = 'rgba(255, 255, 255, 0.1', 
-        borderColor = 'white', borderLineWidth = 2,
-    }){
+        fillColor = 'rgba(255, 255, 255, 0.1)',  alternativeFillColor,
+        borderColor = 'rgba(255, 255, 255, 1)', alternativeBorderColor, borderLineWidth = 2,
+        devMode = false,
+    }){ 
+        // setting color based on gear role and gear type
+        alternativeFillColor = (typeof alternativeFillColor === 'string') 
+            ? alternativeFillColor 
+            : getColor(toothing, role, 0.4);
+        
+        alternativeBorderColor = (typeof alternativeBorderColor === 'string') 
+            ? alternativeBorderColor 
+            :  getColor(toothing, role, 1)
+
         super();
+
         this.id = id;
         this.cx = cx;
         this.cy = cy;
@@ -493,17 +517,21 @@ class Gear extends SynteticEventTarget {
         this.rotations = 0;
 
         this.role = role;
-        this.linkedTo = role == 'driverr' ? null : linkedTo;
+        this.linkedTo = role == 'driver' ? null : linkedTo;
 
         this.toothing = toothing;
         this.numberOfTeeth = numberOfTeeth;
         this.tootheHeight = tootheHeight;
         
         this.fillColor = fillColor;
+        this.alternativeFillColor = alternativeFillColor;
         this.borderColor = borderColor;
+        this.alternativeBorderColor = alternativeBorderColor;
         this.borderLineWidth = borderLineWidth;
 
         this.renderer = renderer;
+
+        this.devMode = devMode
     }
 
 
@@ -561,13 +589,16 @@ class Gear extends SynteticEventTarget {
     /**
      * Draws joint circle to gear (only with to gears with external toothing)
      */
-    #renderJoint(devState){
+    #renderJoint(){
+        const fillColor = this.devMode ? this.alternativeFillColor : this.fillColor;
+        const borderColor = this.devMode ? this.alternativeBorderColor : this.borderColor;
+
         drawCircle(this.renderer, {
             cx: this.cx,
             cy: this.cy,
             r: 10,
-            fillColor: this.role == 'driver' ? 'white' : this.fillColor,
-            borderColor: this.borderColor,
+            fillColor: this.role == 'driver' ? borderColor : fillColor,
+            borderColor: borderColor,
             borderThickness: this.borderLineWidth,
         });
 
@@ -583,8 +614,8 @@ class Gear extends SynteticEventTarget {
                 cx: this.cx,
                 cy: this.cy,
                 r: r,
-                fillColor: this.fillColor,
-                borderColor: this.borderColor,
+                fillColor: fillColor,
+                borderColor: borderColor,
                 borderThickness: this.borderLineWidth,
             });
 
@@ -594,13 +625,13 @@ class Gear extends SynteticEventTarget {
                 x2: rotatedFixatorPos.x,
                 y2: rotatedFixatorPos.y,
                 thickness: w,
-                fillColor: this.borderColor,
+                fillColor: borderColor,
             });
         }
 
 
-        if(devState === true) {
-            let helperLineconnectionPoint = {x: this.cx, y: this.cy - this.r + this.tootheHeight};
+        if(this.devMode === true) {
+            let helperLineconnectionPoint = {x: this.cx, y: this.cy - this.r + this.tootheHeight + 5};
             let rotated = rotatePoint(this.cx, this.cy, helperLineconnectionPoint.x, helperLineconnectionPoint.y, this.angle);
 
             drawLine(this.renderer, {
@@ -608,8 +639,8 @@ class Gear extends SynteticEventTarget {
                 y1: this.cy,
                 x2: rotated.x,
                 y2: rotated.y,
-                thickness: this.borderLineWidth,
-                color: 'black',
+                thickness: 3,
+                color: this.role == 'driver' ? 'red' : 'white',
             });
         }
     }
@@ -672,14 +703,17 @@ class Gear extends SynteticEventTarget {
      * Draws a gear with external toothing.
      */
     #renderExternalGear() {
+        const borderColor = this.devMode ? this.alternativeBorderColor : this.borderColor;
+        const fillColor = this.devMode ? this.alternativeFillColor : this.fillColor;
+
         this.renderer.beginPath();
         // Draw gear contour
         this.#drawGearContour();
     
         // Set fill color and stroke properties
-        this.renderer.fillStyle = this.fillColor;
+        this.renderer.fillStyle = fillColor;
+        this.renderer.strokeStyle = borderColor;
         this.renderer.lineWidth = this.borderLineWidth;
-        this.renderer.strokeStyle = this.borderColor;
     
         this.renderer.fill();
         this.renderer.stroke();
@@ -690,9 +724,11 @@ class Gear extends SynteticEventTarget {
 
     /**
      * Draws a gear with internal toothing.
-     * @param {*} devState 
      */
-    #renderInternalGear(devState) {
+    #renderInternalGear() {
+        const borderColor = this.devMode ? this.alternativeBorderColor: this.borderColor;
+        const fillColor = this.devMode ? this.alternativeFillColor : this.fillColor;
+
         this.renderer.beginPath();
 
         // Draw outer circle
@@ -703,15 +739,15 @@ class Gear extends SynteticEventTarget {
     
         // Use 'evenodd' fill rule to create a hollow center
         this.renderer.closePath();
-        this.renderer.fillStyle = this.fillColor;
+        this.renderer.fillStyle = fillColor;
         this.renderer.fill('evenodd');
     
         // Draw the border of the gear
         this.renderer.lineWidth = this.borderLineWidth;
-        this.renderer.strokeStyle = this.borderColor;
+        this.renderer.strokeStyle = borderColor;
         this.renderer.stroke();
 
-        if(devState) {
+        if(this.devMode) {
             let helperLineConnectiongPoint = {x: this.cx, y: this.cy + this.r};
             let rotated = rotatePoint(this.cx, this.cy, helperLineConnectiongPoint.x, helperLineConnectiongPoint.y, this.angle);
 
@@ -720,8 +756,8 @@ class Gear extends SynteticEventTarget {
                 y1: this.cy,
                 x2: rotated.x,
                 y2: rotated.y,
-                thickness: this.borderLineWidth,
-                color: 'black',
+                thickness: 3,
+                color: 'white',
             });
         }
     }
@@ -731,12 +767,12 @@ class Gear extends SynteticEventTarget {
     /**
      * 
      */
-    render(devState = false) {
+    render() {
         if(this.toothing == 'external') {
-            this.#renderJoint(devState);
+            this.#renderJoint();
             this.#renderExternalGear();
         } else if(this.toothing == 'internal') {
-            this.#renderInternalGear(devState);
+            this.#renderInternalGear();
         }
     }
 }
@@ -752,7 +788,7 @@ class Gear extends SynteticEventTarget {
  */
 function drawBlueprintBG(context, {canvasWidth, canvasHeight, devMode}){
     const secodnaryGridCellSize = 25;
-    const bluePrintColor = devMode === true ? '#5b55e1' : 'rgba(26, 134, 199, 1)';
+    const bluePrintColor = devMode === true ? '#212125' :  '#5b55e1';
     const freeBorderSpace = secodnaryGridCellSize;
 
     // fill bg with color
@@ -814,4 +850,24 @@ function drawBlueprintBG(context, {canvasWidth, canvasHeight, devMode}){
         height: canvasHeight,
         fillColor: bluePrintColor,
     });
+}
+
+
+/**
+ * Returns color to gear based on role, toothing
+ * @param {string} toothing - toothyng type, external or internal toothing
+ * @param {string} role - gear role, driver or slave
+ * @param {number} opacity - optional param to change result color opacity from 0 to 1
+ * @returns {string} - result color
+ */
+function getColor(toothing, role, opacity = 1) {
+    if (toothing === 'external') {
+        if (role === 'driver') {
+            return `rgba(255, 152, 0, ${opacity})`;
+        } else {
+            return `rgba(51, 127, 255, ${opacity})`;
+        }
+    } else {
+        return `rgba(158, 25, 45, ${opacity})`;
+    }
 }
