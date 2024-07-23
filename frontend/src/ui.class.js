@@ -267,7 +267,7 @@ class UIDisplay{
                 this.#elementCSS_SelectorPrefix + 'display-label', 
                 this.#elementCSS_SelectorPrefix + 'item-label'
             );
-            label.innerText = elementObject.label + ': ';
+            label.innerHTML = elementObject.label + ': ';
 
         let valueContainer = document.createElement('span');
             valueContainer.classList.add(
