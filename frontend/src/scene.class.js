@@ -23,9 +23,10 @@ class Scene {
      * Executes code of separate scene
      * @param {string} param.baseTabTitle - base part of tab title
      * @param {HTMLDivElement} param.root - ref to scene html root element
+     * @param {UIDisplay} param.display - ref to UIDisplay instance to control scene ui info display
      * @param {object} param.settings - scene settings
      */
-    execute({baseTabTitle, root, settings}){
+    execute({baseTabTitle, root, display, settings}){
         let callback = this.code;
 
         let titleElement = root.children[0];
@@ -33,22 +34,31 @@ class Scene {
         
         document.title = baseTabTitle + ' - ' + this.title;
 
-        // Some notes about 'settings' param:
-        // - Executing scene code with settings (dynamically set values values from HTML Control elements).
-        // - HTML Controls is result of UI class instance, that stored in Page.ui
-        // - When page loads some scene, it parses scene instance.ui 'structure tree'
-        // - ui structure tree presents as '...someSettingKey: {...value/state: value},...'
-        // - after tree is loaded Page.ui renders ui tree to html elements and add events to update values
-        // - updated values stored in Page.ui.states as simple pair 'someSettingKey: value/state'
-        // - finnaly inside load scene method puts 'Page.uis.tates' object to 'execute' method as param
-        // - and its available inside scene, just get settings.someKey
-        // circuit: 
-        //      sceneInstance.ui -> 
-        //      loadedScene.ui -> 
-        //      page.ui.render(loadedSceme.ui) -> 
-        //      page.ui.states -> 
-        //      [this method] sceneInstance.execute({...settings: Page.ui.states,...}) ->
-        //      sceneInstance.code(...settings..>)
-        callback(root, settings);
+        callback(
+            // ref to root element of canvas
+            root, 
+
+            /**
+             * Some notes about 'display' param:
+             * I decided to isolate the scene from accessing other parts of the HTML, 
+             * so I am providing limited access to the UIDisplay object. 
+             * Through its methods, you can additionally influence the state of 
+             * the "Scene Display" HTML block when necessary. Inside the scene, 
+             * you can update the data either automatically (by passing 'ui' as part of the parameter) 
+             * or manually (by calling 'ui.display.render()', 'ui.display.updateValue()' yourself).
+             */
+            display, 
+
+            /**
+             * Some notes about 'settings' param:
+             * - Updated from last changes:
+             * Access to the settings data is also provided by passing a reference to an instance of 
+             * the StateManager class, which is stored as a parameter in the UI and passed into 'loadedScene.execute({})' 
+             * when the scene is loaded within the Page class. Inside the scene, you can subscribe to setting changes using 
+             * the '.subscribe()' method or request data using '.getState()'. This way, a certain reactivity is achieved, 
+             * allowing the scene to know if someone has affected its settings (through the "Controls" HTML block) at any given moment.
+             */
+            settings
+        );
     }
 }

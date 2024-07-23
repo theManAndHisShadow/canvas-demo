@@ -3,6 +3,20 @@
  */
 
 
+
+/**
+ * Returns random integer from range (min, max)
+ * @param {number} min - range start value
+ * @param {number} max - range end value (including max value)
+ * @returns {number} - random number
+ */
+function getRandomNumber(min, max) {
+    let randomNUmber = min + Math.random() * (max + 1 - min);
+  
+    return Math.floor(randomNUmber);
+  }
+
+
 /**
  * Returns last item of array
  * @param {array} array - target array
@@ -10,6 +24,21 @@
  */
 function getArrayLast(array){
     return array[array.length - 1];
+}
+
+
+/**
+*   Converts an index to its corresponding letter.
+*   @param {number} i - The target index.
+*   @param {boolean} [upperCase=false] - Indicates whether the letter should be in upper case.
+*   @returns {string} - The letter corresponding to the given index.
+*/
+function translateIndexToLetter(i, upperCase = false) {
+    let letter = String.fromCharCode(97 + i);
+
+    if(upperCase == true) letter = letter.toUpperCase();
+
+    return letter;
 }
 
 
