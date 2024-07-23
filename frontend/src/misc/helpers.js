@@ -3,6 +3,20 @@
  */
 
 
+
+/**
+ * Returns random integer from range (min, max)
+ * @param {number} min - range start value
+ * @param {number} max - range end value (including max value)
+ * @returns {number} - random number
+ */
+function getRandomNumber(min, max) {
+    let randomNUmber = min + Math.random() * (max + 1 - min);
+  
+    return Math.floor(randomNUmber);
+  }
+
+
 /**
  * Returns last item of array
  * @param {array} array - target array
