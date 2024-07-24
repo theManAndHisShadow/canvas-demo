@@ -28,6 +28,7 @@ class UI {
                 let element = uiStructureTree[key];
 
                 if(element.type == 'display') this.display.render(key, element);
+                if(element.type == 'button') this.controls.renderButton(key, element);
                 if(element.type == 'checkbox') this.controls.renderCheckbox(key, element);
                 if(element.type == 'input') this.controls.renderInput(key, element);
                 if(element.type == 'preset-picker') this.controls.renderPresetPicker(key, element);
@@ -140,6 +141,34 @@ class UIControls {
 
         element.appendChild(label);
         element.appendChild(input);
+
+        this.appendToRoot(element);
+    }
+
+
+    /**
+     * Renders button, when clicked, returns the time the button was pressed
+     * @param {string} elementName - element id
+     * @param {object} elementObject - objects with element data (defaultValue, maxValue, state, label e.t.c)
+     */
+    renderButton(elementName, elementObject){
+        let element = document.createElement('div');
+            element.id = elementName;
+
+        let label = document.createElement('span');
+            label.innerHTML = elementObject.label + ': ';
+
+        let button = document.createElement('button');
+            button.classList.add('controls__button');
+            button.textContent = elementObject.text;
+
+            button.addEventListener('click', () => {
+                let timestamp = Date.now();
+                this.states.setState(elementName, timestamp);
+            });
+
+        element.appendChild(label);
+        element.appendChild(button);
 
         this.appendToRoot(element);
     }
