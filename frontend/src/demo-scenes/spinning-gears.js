@@ -434,11 +434,10 @@ let spinningGears = new Scene({
                 gear.rotate(deltaAngle * speed);
             });
 
-            requestAnimationFrame(loop);
         }
 
         // animate
-        requestAnimationFrame(loop);
+        window.runningAnimations.add(loop);
     }
 });
 

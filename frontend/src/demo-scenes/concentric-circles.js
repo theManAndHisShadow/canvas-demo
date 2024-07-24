@@ -159,12 +159,10 @@ let concentricCircles = new Scene({
                     }
                 }
             }
-
-            requestAnimationFrame(loop);
         }
 
         // animate
-        requestAnimationFrame(loop);
+        window.runningAnimations.add(loop);
 
         root.addEventListener('mousemove', event => {
             // updating some values when mouse moves
