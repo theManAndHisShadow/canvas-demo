@@ -276,5 +276,9 @@ class Page {
         // Modify all marked links by adding event listener 
         // and event hanlder which loads the demo scene using the address of the clicked link 
         this.#addEventsToLinks();
+
+        // load first scene by default
+        let firstLink = document.querySelectorAll('[data-link-to-demo]')[0];
+        firstLink.click();
     }
 }
