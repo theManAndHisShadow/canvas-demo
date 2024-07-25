@@ -27,6 +27,17 @@ let staticGadients = new Scene({
             defaultValue: 0,
         },
 
+        'gradientType': {
+            type: 'preset-picker',
+            label: 'Gradient type',
+            presetNames: [
+                'linear',
+                'radial',
+            ],
+
+            defaultValue: 0,
+        },
+
         'regenerate': {
             type: 'button',
             label: 'Action',
@@ -89,6 +100,7 @@ let staticGadients = new Scene({
         // default rendering method
         const defaultMethod = 0;
         settings.setState('gradientRenderingMethod', defaultMethod);
+        settings.setState('gradientType', 1);
 
         // first draw step (when scene is loaded)
         draw(settings.getState('gradientRenderingMethod'));
