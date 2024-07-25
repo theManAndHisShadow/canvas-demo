@@ -23,9 +23,9 @@ let spinningGears = new Scene({
         },
 
         'selectedPreset': {
-            type: 'preset-picker',
+            type: 'option-selector',
             label: 'Choose preset',
-            presetNames: [
+            optionNames: [
                 'Big driver gear', 
                 'Small driver gear', 
                 'Chain of equal gears',

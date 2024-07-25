@@ -18,9 +18,9 @@ let staticGadients = new Scene({
         },
 
         'gradientRenderingMethod': {
-            type: 'preset-picker',
+            type: 'option-selector',
             label: 'Gradient rendering method',
-            presetNames: [
+            optionNames: [
                 'pixel-by-pixel', 
                 'built-in', 
             ],
@@ -28,9 +28,9 @@ let staticGadients = new Scene({
         },
 
         'gradientType': {
-            type: 'preset-picker',
+            type: 'option-selector',
             label: 'Gradient type',
-            presetNames: [
+            optionNames: [
                 'linear',
                 'radial',
             ],

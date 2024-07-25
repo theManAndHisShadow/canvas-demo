@@ -128,7 +128,7 @@ main {
 }
 
 .controls__button, 
-.controls__preset-picker-button {
+.controls__option-selector-button {
     background: none;
     border: 1px solid rgb(0 0 0 / 61%);
     position: relative;
@@ -144,13 +144,13 @@ main {
     font-size: 15px;
 }
 
-[data-selected-preset="true"],
-.controls__preset-picker-button:hover {
+[data-selected-option="true"],
+.controls__option-selector-button:hover {
     color: #0f35ff;
     border-color: #0f35ff;
 }
 
-.controls__preset-picker-button:active {
+.controls__option-selector-button:active {
     opacity: 0.3;
 }
 

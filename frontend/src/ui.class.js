@@ -31,7 +31,7 @@ class UI {
                 if(element.type == 'button') this.controls.renderButton(key, element);
                 if(element.type == 'checkbox') this.controls.renderCheckbox(key, element);
                 if(element.type == 'input') this.controls.renderInput(key, element);
-                if(element.type == 'preset-picker') this.controls.renderPresetPicker(key, element);
+                if(element.type == 'option-selector') this.controls.renderOptionSelector(key, element);
             }
         }
     }
@@ -179,43 +179,43 @@ class UIControls {
      * @param {string} elementName 
      * @param {object} elementObject 
      */
-    renderPresetPicker(elementName, elementObject){
+    renderOptionSelector(elementName, elementObject){
         let element = document.createElement('div');
             element.id = elementName;
 
         let label = document.createElement('span');
-            label.classList.add('controls__preset-picker-label', 'controls__option-label');
+            label.classList.add('controls__option-selector-label', 'controls__option-label');
             label.innerText = elementObject.label + ': ';
 
-        let presetsContainer = document.createElement('div');
-            presetsContainer.classList.add('controls__buttons-container');
+        let optionContainer = document.createElement('div');
+            optionContainer.classList.add('controls__buttons-container');
 
-        elementObject.presetNames.forEach((presetName, i) => {
+        elementObject.optionNames.forEach((optionName, i) => {
             let button = document.createElement('button');
-                button.classList.add('controls__preset-picker-button');
-                button.textContent = presetName;
+                button.classList.add('controls__option-selector-button');
+                button.textContent = optionName;
                 button.setAttribute('data-preset-num', i);
 
             // select by default
-            if(i == 0) button.setAttribute('data-selected-preset', true);
+            if(i == 0) button.setAttribute('data-selected-option', true);
 
             button.addEventListener('click', () => {
-                // deselecting prev selected buttons
-                let prevSelected = Array.from(document.querySelectorAll('[data-selected-preset="true"]'));
-                if(prevSelected.length > 0) prevSelected.forEach(button => button.removeAttribute('data-selected-preset'));
+                // deselecting prev selected buttons INSIDE of this control menu element (element.querySelector)
+                let prevSelected = Array.from(element.querySelectorAll('[data-selected-option="true"]'));
+                if(prevSelected.length > 0) prevSelected.forEach(button => button.removeAttribute('data-selected-option'));
 
                 // console.log(prevSelected);
-                button.setAttribute('data-selected-preset', true);
+                button.setAttribute('data-selected-option', true);
                 this.states.setState(elementName, Number(i));    
             });
 
-            presetsContainer.appendChild(button);
+            optionContainer.appendChild(button);
         });
 
         this.states.setState(elementName, elementObject.defaultValue);    
 
         element.appendChild(label);
-        element.appendChild(presetsContainer);
+        element.appendChild(optionContainer);
 
         this.appendToRoot(element);
     }
