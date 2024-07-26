@@ -2,19 +2,15 @@ let staticGadients = new Scene({
     title: 'Static gradients', 
 
     ui: {
-        'colorsNumber': {
-            type: 'display',
-            label: 'Gradient',
+        'description': {
+            type: 'display-infobox',
+            label: 'Description',
+            text: 'Using built-in methods for drawing gradients obviously shows itself much better, compared to custom functions for rendering pixel by pixel.'
         },
 
         'executeTime': {
             type: 'display',
-            label: ' - rendered by',
-        },
-
-        'usedMethod': {
-            type: 'display',
-            label: ' - method used'
+            label: 'Gradient rendered in',
         },
 
         'gradientRenderingMethod': {
@@ -27,7 +23,7 @@ let staticGadients = new Scene({
             defaultValue: 0,
         },
 
-        'gradientType': {
+        'gradientTypeSelector': {
             type: 'option-selector',
             label: 'Gradient type',
             optionNames: [
@@ -94,9 +90,8 @@ let staticGadients = new Scene({
             );
 
             // send some data to UI Display
-            display.updateValue('colorsNumber', '2 colors');
-            display.updateValue('usedMethod', method == 0 ? 'pixel-by-pixel' : 'built-in');
-            display.updateValue('executeTime', time.toFixed(1) + ' ms.');
+            let className = time < 1 ? 'green-word-bubble' : 'yellow-word-bubble';
+            display.updateValue('executeTime', `<i class='${className}'>${time.toFixed(1)} ms.</i>`);
         }
 
         // default rendering method
@@ -105,15 +100,15 @@ let staticGadients = new Scene({
         
         // manually explicitly specify standard settings
         settings.setState('gradientRenderingMethod', defaultMethod);
-        settings.setState('gradientType', defaultType);
+        settings.setState('gradientTypeSelector', defaultType);
 
         // first draw step (when scene is loaded)
-        draw(settings.getState('gradientRenderingMethod'), settings.getState('gradientType'));
+        draw(settings.getState('gradientRenderingMethod'), settings.getState('gradientTypeSelector'));
         
         // adding handler to UI Controls
         settings.subscribe((key, newValue, oldValue) => {
             if(key == 'regenerate') {
-                draw(settings.getState('gradientRenderingMethod'), settings.getState('gradientType'));
+                draw(settings.getState('gradientRenderingMethod'), settings.getState('gradientTypeSelector'));
             }
         });
 
