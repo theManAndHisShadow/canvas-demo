@@ -28,6 +28,7 @@ class UI {
                 let element = uiStructureTree[key];
 
                 if(element.type == 'display') this.display.render(key, element);
+                if(element.type == 'display-infobox') this.display.renderInfoBox(key, element)
                 if(element.type == 'button') this.controls.renderButton(key, element);
                 if(element.type == 'checkbox') this.controls.renderCheckbox(key, element);
                 if(element.type == 'input') this.controls.renderInput(key, element);
@@ -278,6 +279,33 @@ class UIDisplay{
      */
     show(){
         this.#html.root.parentNode.classList.remove('hidden-block');
+    }
+
+    /**
+     * renders an infobox element at HTML info block with given param (elementObject). 
+     * @param {string} elementName 
+     * @param {object} elementObject 
+     */
+    renderInfoBox(elementName, elementObject){
+        let element = document.createElement('div');
+            element.id = this.#elementCSS_SelectorPrefix + elementName;
+            // specific class name to css highlighting
+            element.classList.add('display-infobox');
+
+        let label = document.createElement('span');
+            label.classList.add(
+                this.#elementCSS_SelectorPrefix + 'display-infobox-label', 
+                this.#elementCSS_SelectorPrefix + 'item-label'
+            );
+            label.innerHTML = '⇢ ' + elementObject.label;
+
+        let text = document.createElement('div');
+            text.innerText = elementObject.text;
+
+        element.appendChild(label);
+        element.appendChild(text);
+
+        this.appendToRoot(element);
     }
 
 

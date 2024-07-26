@@ -17,6 +17,22 @@ html, body {
     opacity: 0.3;
 }
 
+.green-word-bubble {
+    padding: 2px;
+    background-color: #b5df85;
+    border-radius: 3px;
+    color: #064b06;
+    font-size: 15px;
+}
+
+.yellow-word-bubble {
+    padding: 2px;
+    background-color: #f0de74;
+    border-radius: 3px;
+    color: #5a5a02;
+    font-size: 15px;
+}
+
 header, main, footer {
     position: relative;
     width: 100%;
@@ -113,6 +129,20 @@ main {
 
 .wide-block {
     width: 95%;
+}
+.display-infobox .scene-info__display-infobox-label {
+    font-weight: 700;
+}
+
+.display-infobox {
+    background: #c9d2e2;
+    padding: 9px 12px;
+    border-radius: 4px;
+    color: #052154;
+    margin-bottom: 6px;
+    font-size: 14.5px;
+    border: 1px solid #0521545c;
+    line-height: 17px;
 }
 
 .controls__checkbox-checkbox {
