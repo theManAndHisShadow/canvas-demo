@@ -287,6 +287,7 @@ class UIDisplay{
      * @param {object} elementObject 
      */
     renderInfoBox(elementName, elementObject){
+        console.log(elementObject);
         let element = document.createElement('div');
             element.id = this.#elementCSS_SelectorPrefix + elementName;
             // specific class name to css highlighting
@@ -304,7 +305,6 @@ class UIDisplay{
 
         element.appendChild(label);
         element.appendChild(text);
-
         this.appendToRoot(element);
     }
 
@@ -312,6 +312,7 @@ class UIDisplay{
     /**
      * renders an element at HTML info block with given param (elementObject). 
      * By default, parent UI class uses this method inside its automatic rendering method.
+     * This is the only method that currently returns the created element after mutation.
      * @param {string} elementName 
      * @param {object} elementObject 
      */
@@ -340,5 +341,11 @@ class UIDisplay{
         this.#html[elementName] = valueContainer;
 
         this.appendToRoot(element);
+
+        /**
+         * It was decided to return the element for greater flexibility in case dynamic generation 
+         * of interface elements occurs somewhere
+         */
+        return element;
     }
 }
