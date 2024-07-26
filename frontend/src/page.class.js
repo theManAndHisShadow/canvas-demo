@@ -8,6 +8,56 @@
  */
 window.exportedObjects = [];
 
+
+/**
+ * When switching scenes, the old rendering threads remained alive; 
+ * for cleanliness, it was decided to kill these rendering threads. 
+ * In addition, due to the different scenes (static scenes, scenes with dynamic rendering), 
+ * a mechanism was needed to stop previously running rendering threads. 
+ * With an execution queue in place, it's possible to manage multiple canvases at the same time.
+ */
+window.runningAnimations = {
+    queue: [],
+
+    /**
+     * Adding animation function (for exanple 'loop()', 'draw()' etc) 
+     * to animations quque for more flexible management.
+     * @param {Function} animationFunction 
+     * @param {boolean} [clearAll=false]
+     */
+    add: function(animationFunction, clearAll = true) {
+        if(clearAll == true) this.clearQueue();
+
+        // wrapping the required function for convenience
+        const wrappedFunction = (timestamp) => {
+            animationFunction(timestamp);
+            const id = requestAnimationFrame(wrappedFunction);
+            
+            // saving ID of requestAnimationFrame functions to canceling feature
+            wrappedFunction.id = id;
+        };
+
+        // Invoking wrapped original function
+        wrappedFunction();
+
+        // adding wrapped animationg function to queue
+        this.queue.push(wrappedFunction);
+    },
+
+    /**
+     * Stop all previously launched animation functions 
+     */
+    clearQueue: function() {
+        // stopping previously running functions
+        this.queue.forEach(wrappedFunction => {
+            window.cancelAnimationFrame(wrappedFunction.id);
+        });
+
+        // resetting queue
+        this.queue = [];
+    }
+};
+
 class Page {
     // some important attributes names
     static #linkDataAttribute = "data-link-to-demo";
@@ -226,5 +276,9 @@ class Page {
         // Modify all marked links by adding event listener 
         // and event hanlder which loads the demo scene using the address of the clicked link 
         this.#addEventsToLinks();
+
+        // load first scene by default
+        let firstLink = document.querySelectorAll('[data-link-to-demo]')[0];
+        firstLink.click();
     }
 }

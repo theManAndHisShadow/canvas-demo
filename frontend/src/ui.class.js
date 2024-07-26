@@ -28,9 +28,11 @@ class UI {
                 let element = uiStructureTree[key];
 
                 if(element.type == 'display') this.display.render(key, element);
+                if(element.type == 'display-infobox') this.display.renderInfoBox(key, element)
+                if(element.type == 'button') this.controls.renderButton(key, element);
                 if(element.type == 'checkbox') this.controls.renderCheckbox(key, element);
                 if(element.type == 'input') this.controls.renderInput(key, element);
-                if(element.type == 'preset-picker') this.controls.renderPresetPicker(key, element);
+                if(element.type == 'option-selector') this.controls.renderOptionSelector(key, element);
             }
         }
     }
@@ -146,47 +148,75 @@ class UIControls {
 
 
     /**
-     * Renders toggle-select list, click activates only one of presets.
-     * @param {string} elementName 
-     * @param {object} elementObject 
+     * Renders button, when clicked, returns the time the button was pressed
+     * @param {string} elementName - element id
+     * @param {object} elementObject - objects with element data (defaultValue, maxValue, state, label e.t.c)
      */
-    renderPresetPicker(elementName, elementObject){
+    renderButton(elementName, elementObject){
         let element = document.createElement('div');
             element.id = elementName;
 
         let label = document.createElement('span');
-            label.classList.add('controls__preset-picker-label', 'controls__option-label');
+            label.innerHTML = elementObject.label + ': ';
+
+        let button = document.createElement('button');
+            button.classList.add('controls__button');
+            button.textContent = elementObject.text;
+
+            button.addEventListener('click', () => {
+                let timestamp = Date.now();
+                this.states.setState(elementName, timestamp);
+            });
+
+        element.appendChild(label);
+        element.appendChild(button);
+
+        this.appendToRoot(element);
+    }
+
+
+    /**
+     * Renders toggle-select list, click activates only one of presets.
+     * @param {string} elementName 
+     * @param {object} elementObject 
+     */
+    renderOptionSelector(elementName, elementObject){
+        let element = document.createElement('div');
+            element.id = elementName;
+
+        let label = document.createElement('span');
+            label.classList.add('controls__option-selector-label', 'controls__option-label');
             label.innerText = elementObject.label + ': ';
 
-        let presetsContainer = document.createElement('div');
-            presetsContainer.classList.add('controls__buttons-container');
+        let optionContainer = document.createElement('div');
+            optionContainer.classList.add('controls__buttons-container');
 
-        elementObject.presetNames.forEach((presetName, i) => {
+        elementObject.optionNames.forEach((optionName, i) => {
             let button = document.createElement('button');
-                button.classList.add('controls__preset-picker-button');
-                button.textContent = presetName;
+                button.classList.add('controls__option-selector-button');
+                button.textContent = optionName;
                 button.setAttribute('data-preset-num', i);
 
             // select by default
-            if(i == 0) button.setAttribute('data-selected-preset', true);
+            if(i == 0) button.setAttribute('data-selected-option', true);
 
             button.addEventListener('click', () => {
-                // deselecting prev selected buttons
-                let prevSelected = Array.from(document.querySelectorAll('[data-selected-preset="true"]'));
-                if(prevSelected.length > 0) prevSelected.forEach(button => button.removeAttribute('data-selected-preset'));
+                // deselecting prev selected buttons INSIDE of this control menu element (element.querySelector)
+                let prevSelected = Array.from(element.querySelectorAll('[data-selected-option="true"]'));
+                if(prevSelected.length > 0) prevSelected.forEach(button => button.removeAttribute('data-selected-option'));
 
                 // console.log(prevSelected);
-                button.setAttribute('data-selected-preset', true);
+                button.setAttribute('data-selected-option', true);
                 this.states.setState(elementName, Number(i));    
             });
 
-            presetsContainer.appendChild(button);
+            optionContainer.appendChild(button);
         });
 
         this.states.setState(elementName, elementObject.defaultValue);    
 
         element.appendChild(label);
-        element.appendChild(presetsContainer);
+        element.appendChild(optionContainer);
 
         this.appendToRoot(element);
     }
@@ -251,10 +281,38 @@ class UIDisplay{
         this.#html.root.parentNode.classList.remove('hidden-block');
     }
 
+    /**
+     * renders an infobox element at HTML info block with given param (elementObject). 
+     * @param {string} elementName 
+     * @param {object} elementObject 
+     */
+    renderInfoBox(elementName, elementObject){
+        console.log(elementObject);
+        let element = document.createElement('div');
+            element.id = this.#elementCSS_SelectorPrefix + elementName;
+            // specific class name to css highlighting
+            element.classList.add('display-infobox');
+
+        let label = document.createElement('span');
+            label.classList.add(
+                this.#elementCSS_SelectorPrefix + 'display-infobox-label', 
+                this.#elementCSS_SelectorPrefix + 'item-label'
+            );
+            label.innerHTML = '⇢ ' + elementObject.label;
+
+        let text = document.createElement('div');
+            text.innerText = elementObject.text;
+
+        element.appendChild(label);
+        element.appendChild(text);
+        this.appendToRoot(element);
+    }
+
 
     /**
      * renders an element at HTML info block with given param (elementObject). 
      * By default, parent UI class uses this method inside its automatic rendering method.
+     * This is the only method that currently returns the created element after mutation.
      * @param {string} elementName 
      * @param {object} elementObject 
      */
@@ -283,5 +341,11 @@ class UIDisplay{
         this.#html[elementName] = valueContainer;
 
         this.appendToRoot(element);
+
+        /**
+         * It was decided to return the element for greater flexibility in case dynamic generation 
+         * of interface elements occurs somewhere
+         */
+        return element;
     }
 }

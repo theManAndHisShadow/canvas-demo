@@ -156,6 +156,32 @@ function getAngleBetweenTwoPoints(ax, ay, bx, by) {
 
 
 /**
+ * Calculates the normalized angle between two points.
+ * The angle is normalized to the range [0, 1], where 0 represents 0 degrees
+ * and 1 represents 360 degrees.
+ * 
+ * @param {number} x1 - x coordinate of the first point
+ * @param {number} y1 - y coordinate of the first point
+ * @param {number} x2 - x coordinate of the second point
+ * @param {number} y2 - y coordinate of the second point
+ * @returns {number} - The normalized angle between the two points
+ */
+function getNormalizedAngle(x1, y1, x2, y2) {
+    // Calculate the angle in radians between the two points
+    const angleInRadians = Math.atan2(y2 - y1, x2 - x1);
+
+    // Normalize the angle to the range [0, 2 * Math.PI]
+    const normalizedAngleInRadians = (angleInRadians + 2 * Math.PI) % (2 * Math.PI);
+
+    // Convert the normalized angle to the range [0, 1]
+    const normalizedAngle = normalizedAngleInRadians / (2 * Math.PI);
+
+    return normalizedAngle;
+}
+
+
+
+/**
  * Returns a distance value between two points
  * @param {number} ax - first point x pos
  * @param {number} ay - first point y pos

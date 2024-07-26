@@ -2,6 +2,12 @@ let concentricCircles = new Scene({
     title: 'Concentric circles', 
 
     ui: {
+        'description': {
+            type: 'display-infobox',
+            label: 'Description',
+            text: 'A simple scene, training with rotating shapes and interacting with mouse events.'
+        },
+
         'distance': {
             type: 'display',
             label: ' - distance to center',
@@ -159,12 +165,10 @@ let concentricCircles = new Scene({
                     }
                 }
             }
-
-            requestAnimationFrame(loop);
         }
 
         // animate
-        requestAnimationFrame(loop);
+        window.runningAnimations.add(loop);
 
         root.addEventListener('mousemove', event => {
             // updating some values when mouse moves
