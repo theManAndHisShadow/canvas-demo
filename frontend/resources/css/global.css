@@ -40,8 +40,8 @@ header, main, footer {
 }
 
 header {
-    /* background: #ffff0042; */
     background: white;
+    border-bottom: 1px solid #00000059;
 }
 
 #logo {
@@ -56,7 +56,7 @@ header {
 main {
     /* background: #dbc1db; */
     background-color: #dde2eb;
-    height: 85%;
+    height: 95%;
 }
 
 .section-block {
@@ -80,7 +80,7 @@ main {
 
 .left-section-block {
     /* background: #ff000040; */
-    width: 25%;
+    width: 23%;
 }
 
 .left-section-block .section-block__inner {
@@ -95,12 +95,12 @@ main {
 
 .center-section-block {
     /* background: #0000ff30; */
-    width: 45%;
+    min-width: 45%;
 }
 
 .right-section-block {
     /* background: #0080005c; */
-    width: 30%;
+    width: 27%;
 }
 
 .right-section-block .section-block__inner {
