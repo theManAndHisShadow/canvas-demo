@@ -29,6 +29,7 @@ let staticGadients = new Scene({
             optionNames: [
                 'linear',
                 'conical',
+                'radial',
             ],
 
             defaultValue: 1,
@@ -183,9 +184,13 @@ function drawGradient(context, {color1, color2, width, height, type, method = 1}
                 if(type == 0) {        
                     // Calculate the interpolation factor
                     factor = x / width;
-                } else {
+                } else if(type == 1){
                     // get normalized (from 0 to 1) angle between current point and canvas center
                     factor = getNormalizedAngle(width / 2, height / 2, x, y);
+                } else if(type == 2){
+                    // the farther the point of the second color is from the center, the dimmer it is
+                    let distance = getDistanseBetweenTwoPoint(width / 2, height / 2, x, y);
+                    factor = (distance * (height / 2)) / 100 / 100;
                 }
 
                 // Interpolate colors
@@ -208,8 +213,10 @@ function drawGradient(context, {color1, color2, width, height, type, method = 1}
 
         if(type == 0) {
             gradient = context.createLinearGradient(0, 0, width, 0);
-        } else {
+        } else if(type == 1){
             gradient = context.createConicGradient(0, width/2, height/2);
+        } else if(type == 2) {
+            gradient = context.createRadialGradient(width / 2, height / 2, 20, width / 2, height / 2, height / 2);
         }
         
         gradient.addColorStop(0, `rgba(${color1}, 1)`);
