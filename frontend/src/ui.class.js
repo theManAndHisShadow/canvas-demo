@@ -205,7 +205,6 @@ class UIControls {
                 let prevSelected = Array.from(element.querySelectorAll('[data-selected-option="true"]'));
                 if(prevSelected.length > 0) prevSelected.forEach(button => button.removeAttribute('data-selected-option'));
 
-                // console.log(prevSelected);
                 button.setAttribute('data-selected-option', true);
                 this.states.setState(elementName, Number(i));    
             });
@@ -287,7 +286,6 @@ class UIDisplay{
      * @param {object} elementObject 
      */
     renderInfoBox(elementName, elementObject){
-        console.log(elementObject);
         let element = document.createElement('div');
             element.id = this.#elementCSS_SelectorPrefix + elementName;
             // specific class name to css highlighting
