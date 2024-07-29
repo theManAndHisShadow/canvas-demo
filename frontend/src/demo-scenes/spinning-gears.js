@@ -421,8 +421,6 @@ let spinningGears = new Scene({
                     // It stores already completely finished instances of Gear class.
                     activePreset.push(gear);
                 });
-
-                console.log(dynamicllyRendered);
             }
 
             if(key == 'dev') {
