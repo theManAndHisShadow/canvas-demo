@@ -14,7 +14,7 @@ class Scene {
         // JS code of scene, code invokes inside 'execute' method as callback
         this.code = code;
 
-        // timestamp will be settled at load Scene method
+        // the timestamp will be set when the scene method is loaded
         this.timestamp = null;
     }
 
@@ -40,8 +40,8 @@ class Scene {
 
             /**
              * Some notes about 'display' param:
-             * I decided to isolate the scene from accessing other parts of the HTML, 
-             * so I am providing limited access to the UIDisplay object. 
+             * I decided to isolate full and broad access to html, 
+             * giving access only to the UI display object
              * Through its methods, you can additionally influence the state of 
              * the "Scene Display" HTML block when necessary. Inside the scene, 
              * you can update the data either automatically (by passing 'ui' as part of the parameter) 

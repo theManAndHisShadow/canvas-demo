@@ -33,6 +33,14 @@ html, body {
     font-size: 15px;
 }
 
+.hr-line-separator {
+    position: relative;
+    float: left;
+    width: 100%;
+    border-bottom: 1px solid #8e8e8e;
+    margin: 7px 0px;
+}
+
 header, main, footer {
     position: relative;
     width: 100%;
@@ -170,6 +178,22 @@ main {
     opacity: 1;
 }
 
+.controls__main-action-button {
+    background: none;
+    border: 1px solid #23369e;
+    position: relative;
+    border-radius: 3px;
+    margin: 0 auto;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: 0.3s ease;
+    opacity: 1;
+    display: block;
+    color: white;
+    background-color: #2243f7;
+    font-size: 14px;
+}
+
 .controls__option-label{
     font-size: 15px;
 }
@@ -180,7 +204,8 @@ main {
     border-color: #0f35ff;
 }
 
-.controls__option-selector-button:active {
+.controls__option-selector-button:active,
+.controls__main-action-button:active {
     opacity: 0.3;
 }
 

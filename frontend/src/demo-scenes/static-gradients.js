@@ -37,9 +37,8 @@ let staticGadients = new Scene({
         },
 
         'regenerate': {
-            type: 'button',
-            label: 'Action',
-            text: 'Generate',
+            type: 'main-action-button',
+            text: 'Generate gradient',
         },
     },
 
