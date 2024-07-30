@@ -1,6 +1,6 @@
 /**
  * Helper class for managing UI class states
- * Allows you to implement reactive behavior within other parts of the project
+ * implements reactive behavior in other parts of the project.
  */
 class StateManager {
     #states = {};
@@ -15,7 +15,7 @@ class StateManager {
 
 
     /**
-     * Allows you to set a callback function when the state of the main object of StateManager changes
+     * Allows to set a callback function when the state of the main object of StateManager changes
      * @param {Function} listener - callback function
      */
     subscribe(listener) {

@@ -40,7 +40,7 @@ window.runningAnimations = {
         // Invoking wrapped original function
         wrappedFunction();
 
-        // adding wrapped animationg function to queue
+        // adding wrapped animation function to queue
         this.queue.push(wrappedFunction);
     },
 
@@ -68,7 +68,7 @@ class Page {
     static #displayContainerElementID = '#scene-info';
     static #controlsContainerElementID = '#controls';
 
-    //location of demo scenes
+    // location of demo scenes
     static #scenesLocation = './src/demo-scenes/';
 
     constructor(){
