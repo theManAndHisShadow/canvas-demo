@@ -30,6 +30,7 @@ let staticGadients = new Scene({
                 'linear',
                 'conical',
                 'radial',
+                'multicolor'
             ],
 
             defaultValue: 1,
@@ -193,10 +194,49 @@ function drawGradient(context, {color1, color2, width, height, type, method = 1}
                     factor = (distance * (height / 2)) / 100 / 100;
                 }
 
-                // Interpolate colors
-                resultColor[0] = color1[0] + (rDelta * factor); // Red
-                resultColor[1] = color1[1] + (gDelta * factor); // Green
-                resultColor[2] = color1[2] + (bDelta * factor); // Blue
+                // if this is type 4 gradient - direct impact on the resulting color without intermediate fatcores
+                if(type == 3) {
+                    let angle = getNormalizedAngle(width/2, height/2, x, y);
+
+                    if (angle < 1 / 6) {
+                        // Interpolate from red to yellow
+                        resultColor[0] = 255;
+                        resultColor[1] = Math.round(angle * 6 * 255); // Green increases from 0 to 255
+                        resultColor[2] = 0;
+                    } else if (angle < 2 / 6) {
+                        // Interpolate from yellow to green
+                        resultColor[0] = Math.round(255 - (angle - 1 / 6) * 6 * 255); // Red decreases from 255 to 0
+                        resultColor[1] = 255;
+                        resultColor[2] = 0;
+                    } else if (angle < 3 / 6) {
+                        // Interpolate from green to cyan
+                        resultColor[0] = 0;
+                        resultColor[1] = 255;
+                        resultColor[2] = Math.round((angle - 2 / 6) * 6 * 255); // Blue increases from 0 to 255
+                    } else if (angle < 4 / 6) {
+                        // Interpolate from cyan to blue
+                        resultColor[0] = 0;
+                        resultColor[1] = Math.round(255 - (angle - 3 / 6) * 6 * 255); // Green decreases from 255 to 0
+                        resultColor[2] = 255;
+                    } else if (angle < 5 / 6) {
+                        // Interpolate from blue to violet
+                        resultColor[0] = Math.round((angle - 4 / 6) * 6 * 255); // Red increases from 0 to 255
+                        resultColor[1] = 0;
+                        resultColor[2] = 255;
+                    } else {
+                        // Interpolate from violet to red
+                        resultColor[0] = 255;
+                        resultColor[1] = 0;
+                        resultColor[2] = Math.round(255 - (angle - 5 / 6) * 6 * 255); // Blue decreases from 255 to 0
+                    } 
+                    
+                // if it is any of the first 3 types - the impact on the resulting color will be influenced by indirect factors
+                } else {
+                    // Interpolate colors
+                    resultColor[0] = color1[0] + (rDelta * factor); // Red
+                    resultColor[1] = color1[1] + (gDelta * factor); // Green
+                    resultColor[2] = color1[2] + (bDelta * factor); // Blue
+                }
 
                 // update colors using index and ofsset for diff channels
                 imageData.data[index    ] = resultColor[0]; // Red
@@ -218,9 +258,33 @@ function drawGradient(context, {color1, color2, width, height, type, method = 1}
         } else if(type == 2) {
             gradient = context.createRadialGradient(width / 2, height / 2, 20, width / 2, height / 2, height / 2);
         }
+
+        if(type == 3) {
+            // generated based on a pre-prepared array of colors
+            gradient = context.createConicGradient(300, width/2, height/2);
+            let colors = [ 
+                "red", 
+                "rgb(251, 0, 84)", 
+                "rgb(211, 0, 255)", 
+                "rgb(160, 0, 255)", 
+                "blue", 
+                "rgb(17, 130, 255)",
+                "rgb(34, 255, 10)", 
+                "yellow", 
+                "orange", 
+                "red"
+            ];
+
+            colors.forEach((color, i) => {
+                let pos = (1 / colors.length) * i;
+
+                gradient.addColorStop(pos, color);
+            })
+        } else {
+            gradient.addColorStop(0, `rgba(${color1}, 1)`);
+            gradient.addColorStop(1, `rgba(${color2}, 1)`);
+        }
         
-        gradient.addColorStop(0, `rgba(${color1}, 1)`);
-        gradient.addColorStop(1, `rgba(${color2}, 1)`);
         context.fillStyle = gradient;
         context.fillRect(0, 0, width, height);
     }
