@@ -28,7 +28,8 @@ class UI {
                 let element = uiStructureTree[key];
 
                 if(element.type == 'display') this.display.render(key, element);
-                if(element.type == 'display-infobox') this.display.renderInfoBox(key, element)
+                if(element.type == 'display-infobox') this.display.renderInfoBox(key, element);
+                if(element.type == 'main-action-button') this.controls.renderMainActionButton(key, element);
                 if(element.type == 'button') this.controls.renderButton(key, element);
                 if(element.type == 'checkbox') this.controls.renderCheckbox(key, element);
                 if(element.type == 'input') this.controls.renderInput(key, element);
@@ -173,6 +174,34 @@ class UIControls {
 
         this.appendToRoot(element);
     }
+
+        /**
+     * Renders button, when clicked, returns the time the button was pressed
+     * @param {string} elementName - element id
+     * @param {object} elementObject - objects with element data (defaultValue, maxValue, state, label e.t.c)
+     */
+        renderMainActionButton(elementName, elementObject){
+            let element = document.createElement('div');
+                element.id = elementName;
+
+            let separator = document.createElement('div');
+                separator.classList.add('hr-line-separator');
+    
+            let button = document.createElement('button');
+                button.classList.add('controls__main-action-button');
+                button.setAttribute('data-main-action-button', '');
+                button.textContent = elementObject.text;
+    
+                button.addEventListener('click', () => {
+                    let timestamp = Date.now();
+                    this.states.setState(elementName, timestamp);
+                });
+    
+            element.appendChild(separator);
+            element.appendChild(button);
+    
+            this.appendToRoot(element);
+        }
 
 
     /**
