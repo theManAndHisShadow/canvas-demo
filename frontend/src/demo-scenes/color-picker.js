@@ -23,6 +23,9 @@ let colorPicker = new Scene({
         // raduis of "spectrum" circle
         const radius = 150;
 
+        // clearing prev created animation threads
+        window.runningAnimations.clearQueue();
+
         // Drawing shading behind a circle
         drawShadow(context, {
             radius: radius * 2,

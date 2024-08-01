@@ -57,7 +57,7 @@ let staticGadients = new Scene({
 
         // main animating function
         let draw = (method, type) => {
-            // clearing prev created animatuon threads
+            // clearing prev created animation threads
             window.runningAnimations.clearQueue();
 
             // clearif prev canvas content
