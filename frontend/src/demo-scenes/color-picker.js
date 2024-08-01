@@ -7,6 +7,15 @@ let colorPicker = new Scene({
             label: 'Description',
             text: 'empty'
         },
+
+        'adjustment-slider': {
+            type: 'range-slider',
+            startLabel: 'Darker',
+            endLabel: 'Lighter',
+            minValue: 0,
+            maxValue: 100,
+            defaultValue: 50,
+        },
     },
 
     code: (root, display, settings) => {
@@ -26,36 +35,70 @@ let colorPicker = new Scene({
         // clearing prev created animation threads
         window.runningAnimations.clearQueue();
 
-        // Drawing shading behind a circle
-        drawShadow(context, {
-            radius: radius * 2,
-        });
+        // Main scene function
+        const draw = (opacity) => {
+            context.clearRect(
+                0, 0,
+                width,
+                height
+            );
 
-        // Drawing spectrum circle (using built-in methods)
-        drawSpectrum(context, {
-            radius: radius,
-        });
+            // Drawing shading behind a circle
+            drawShadow(context, {
+                radius: radius * 2,
+                opacity: opacity,
+            });
 
-        // Drawing color labels and angle labels
-        drawColorLabels(context, {
-            radius: radius,
-            /**
-             * N.B.:
-             * Due to the fact that the main step is 2 degrees, there may be a coincidence between the degrees of colors 
-             * and the degrees of angles. When adding colors, a bug may occur when all the color name labels disappear, 
-             * you just need to add colors further until everything gets better 
-             * (the result of dividing 360 by the number of colors will not be a multiple of 2 degrees)
-             */
-            colorOrder: [
-                {name: 'RED',         offset: 20}, 
-                {name: 'ORANGE',      offset: 30}, 
-                {name: 'GREEN',       offset: 35}, 
-                {name: 'CYAN',        offset: 25}, 
-                {name: 'INDIGO',      offset: 30}, 
-                {name: 'VIOLET',      offset: 30},
-            ],
-        });
+            // drawning special layer under spectrum circle
+            // layer color depends on 'darkerk-lighter' slider range at UI Controls panel
+            drawCircle(context, {
+                cx: canvas.width / 2,
+                cy: canvas.height / 2,
+                r: radius - 0.6,
+                fillColor: opacity > 0.5 ? 'rgb(255, 255, 255)' : 'rgb(0, 0, 0)',
+                borderColor: opacity > 0.5 ? 'rgb(255, 255, 255)' : 'rgb(0, 0, 0)',
+            });
 
+            // Drawing spectrum circle (using built-in methods)
+            drawSpectrum(context, {
+                radius: radius,
+                opacity: opacity,
+            });
+
+            // Drawing color labels and angle labels
+            drawColorLabels(context, {
+                radius: radius,
+                /**
+                 * N.B.:
+                 * Due to the fact that the main step is 2 degrees, there may be a coincidence between the degrees of colors 
+                 * and the degrees of angles. When adding colors, a bug may occur when all the color name labels disappear, 
+                 * you just need to add colors further until everything gets better 
+                 * (the result of dividing 360 by the number of colors will not be a multiple of 2 degrees)
+                 */
+                colorOrder: [
+                    {name: 'RED',         offset: 20}, 
+                    {name: 'ORANGE',      offset: 30}, 
+                    {name: 'GREEN',       offset: 35}, 
+                    {name: 'CYAN',        offset: 25}, 
+                    {name: 'INDIGO',      offset: 30}, 
+                    {name: 'VIOLET',      offset: 30},
+                ],
+
+                opacity: opacity,
+            });
+        }
+
+        // setting default values
+        let defaultValue = 0.5;
+        settings.setState('adjustment-slider', defaultValue);
+        draw(defaultValue);
+
+        settings.subscribe((key, newValue, oldValue) => {
+            let value = newValue / 100;
+
+            // redraw spectrum
+            draw(value);
+        });
     }
 });
 
@@ -71,8 +114,10 @@ window.exportedObjects.push(colorPicker);
  * Draws a color spectrum circle
  * @param {CanvasRenderingContext2D} context 
  * @param {Number} param.radius - radius of spectrum circle  
+ * @param {Object[]} param.colorOrder - order of color objects, where color object = {name: 'name, offset: 10}
+ * @param {opacity} param.opacity - opacity of colors
  */
-function drawColorLabels(context, {radius, colorOrder}){
+function drawColorLabels(context, {radius, colorOrder, opacity}){
     // center of canvas
     const centerX = context.canvas.width / 2;
     const centerY = context.canvas.height / 2;
@@ -133,11 +178,17 @@ function drawColorLabels(context, {radius, colorOrder}){
             // calc text pos
             let textPosition = rotatePoint(centerX, centerY, origin.x, origin.y - offset, angle);
 
+            let colorText = colorOrder[j].name;
+
+            // some special names for extreme values
+            if(opacity < 0.05) colorText = 'BLACK';
+            if(opacity > 0.99) colorText = 'WHITE';
+
             // update current color label angle
             currentMainAngle += mainAngleStep;
 
             // draw color label
-            context.fillText(colorOrder[j].name, textPosition.x, textPosition.y);
+            context.fillText(colorText, textPosition.x, textPosition.y);
         }
 
         angle += step;
@@ -176,12 +227,19 @@ function drawShadow(context, {radius}){
  * Draws a spectrum circle
  * @param {CanvasRenderingContext2D} context 
  * @param {Number} param.radius - radius of spectrum circle
+ * @param {Number} param.opacity - opacity of spectrum color (from 0 to 1)
  */
-function drawSpectrum(context, {radius = 120} = {}){
+function drawSpectrum(context, {radius = 120, opacity = 1} = {}){
     const width = context.canvas.width;
     const height = context.canvas.height;
     const centerX = width / 2;
-    const centerY = height / 2;
+    const centerY = height / 2
+    
+    // Range left side | Middle | Range right side 
+    // 0$................100%.....................0%
+    // <------------------()----------------------->
+    opacity = opacity > 0.5 ? 1 - opacity : opacity;
+    opacity = opacity * 2;
    
     /**
      * we adjust the colors manually, for seamlessness we duplicate the color of the beginning and end, 
@@ -189,19 +247,19 @@ function drawSpectrum(context, {radius = 120} = {}){
      */
     const gradient = context.createConicGradient(-20, width/2, height/2);
     const colors = [ 
-        "rgb(255, 0, 0)", // pure red
+        `rgba(255, 0, 0, ${opacity})`, // pure red
 
-        "rgb(255, 255, 0)", // mix
+        `rgba(255, 255, 0, ${opacity})`, // mix
 
-        "rgb(0, 255, 0)", // pure green
+        `rgba(0, 255, 0, ${opacity})`, // pure green
 
-        "rgb(0, 255, 255)", // mix
+        `rgba(0, 255, 255, ${opacity})`, // mix
 
-        "rgb(0, 0, 255)", // pure blue
+        `rgba(0, 0, 255, ${opacity})`, // pure blue
 
-        "rgb(155, 0, 255)", // mix
+        `rgba(155, 0, 255, ${opacity})`, // mix
 
-        "rgba(255, 0, 0)", // pure red
+        `rgba(255, 0, 0, ${opacity})`, // pure red
     ];
 
     // adding each color
