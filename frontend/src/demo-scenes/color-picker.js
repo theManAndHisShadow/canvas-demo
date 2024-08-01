@@ -123,7 +123,6 @@ function drawColorLabels(context, {radius, colorOrder}){
         if(angle == currentMainAngle) {
             // next color
             j++;
-            console.log('j updated', j, angle, currentMainAngle, colorOrder[j]);
 
             // offset of color label from line
             let offset = colorOrder.length > 0 ? colorOrder[j].offset : length;
