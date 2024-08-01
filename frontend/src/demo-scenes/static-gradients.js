@@ -155,16 +155,16 @@ function measurePerformance(tatrgetFunc, ...targetFuncArgs) {
 function drawGradient(context, {color1, color2, width, height, type, method = 1}){
     // 
     if(method == 0) {
+        // Create an ImageData object
         const imageData = context.createImageData(width, height);
 
         // Calculate the color difference between color1 and color2
         const rDelta = color2[0] - color1[0];
         const gDelta = color2[1] - color1[1];
         const bDelta = color2[2] - color1[2];
-
-        // Create an ImageData object
+        
         let resultColor = [0, 0, 0];
-
+        
         
         // Loop through each pixel
         for (let y = 0; y < height; y++) {
