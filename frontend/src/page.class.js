@@ -278,7 +278,8 @@ class Page {
         this.#addEventsToLinks();
 
         // load first scene by default
-        let firstLink = document.querySelectorAll('[data-link-to-demo]')[0];
+        // temporary selected 1 element
+        let firstLink = document.querySelectorAll('[data-link-to-demo]')[1];
         firstLink.click();
     }
 }
