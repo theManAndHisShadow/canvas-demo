@@ -24,8 +24,10 @@ let colorPicker = new Scene({
     },
 
     code: (root, display, settings) => {
+        // reset the element state to remove all previously applied event handlers
+        let canvas = resetElement(root.querySelector('canvas'));
+        
         // basic canvas values
-        const canvas = root.querySelector('canvas');
         const width = 600;
         const height = 400;
         canvas.width = width;

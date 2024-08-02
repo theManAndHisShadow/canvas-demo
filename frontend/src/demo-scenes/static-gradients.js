@@ -43,7 +43,9 @@ let staticGadients = new Scene({
     },
 
     code: (root, display, settings) => {
-        const canvas = root.querySelector('canvas');
+        // reset the element state to remove all previously applied event handlers
+        const canvas = resetElement(root.querySelector('canvas'));
+
         const width = 600;
         const height = 400;
         canvas.width = width;
