@@ -192,7 +192,7 @@ function drawGradient(context, {color1, color2, width, height, type, method = 1}
                 } else if(type == 2){
                     // the farther the point of the second color is from the center, the dimmer it is
                     let distance = getDistanseBetweenTwoPoint(width / 2, height / 2, x, y);
-                    factor = (distance * (height / 2)) / 100 / 100;
+                    factor = (distance * (height / 2)) / 100 / 200;
                 }
 
                 // if this is type 4 gradient - direct impact on the resulting color without intermediate fatcores
