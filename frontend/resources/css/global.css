@@ -161,6 +161,12 @@ main {
     cursor: pointer;
 }
 
+.controls__range-slider{
+    position: relative;
+    top: 3px;
+    cursor: col-resize;
+}
+
 .controls__buttons-container {
     margin-top: 2px;
 }

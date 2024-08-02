@@ -29,6 +29,8 @@ class UI {
 
                 if(element.type == 'display') this.display.render(key, element);
                 if(element.type == 'display-infobox') this.display.renderInfoBox(key, element);
+
+                if(element.type == 'range-slider') this.controls.renderRangeSlider(key, element);
                 if(element.type == 'main-action-button') this.controls.renderMainActionButton(key, element);
                 if(element.type == 'button') this.controls.renderButton(key, element);
                 if(element.type == 'checkbox') this.controls.renderCheckbox(key, element);
@@ -143,6 +145,45 @@ class UIControls {
 
         element.appendChild(label);
         element.appendChild(input);
+
+        this.appendToRoot(element);
+    }
+
+    /**
+     * Renders input range element and add 'change' event hanlder.
+     * @param {string} elementName - element id
+     * @param {object} elementObject - objects with element data (defaultValue, maxValue, state, startLabel, endLabel e.t.c)
+     */
+    renderRangeSlider(elementName, elementObject){
+        let element = document.createElement('div');
+            element.id = elementName;
+
+        let startLabel = document.createElement('span');
+            startLabel.innerText = elementObject.startLabel;
+            startLabel.classList.add('controls__range-slider-start-label', 'controls__option-label');
+
+        let range = document.createElement('input');
+            range.type = 'range';
+            range.min = elementObject.minValue;
+            range.max = elementObject.maxValue;
+            range.value = elementObject.defaultValue;
+            range.classList.add('controls__range-slider');
+            range.checked = elementObject.state;
+
+        let endLabel = document.createElement('span');
+            endLabel.innerText = elementObject.endLabel;
+            endLabel.classList.add('controls__range-slider-end-label', 'controls__option-label');
+
+        this.states.setState(elementName, elementObject.defaultValue);
+
+        range.addEventListener('click', event => {
+            range.title = range.value;
+            this.states.setState(elementName, range.value);
+        });
+
+        element.appendChild(startLabel);
+        element.appendChild(range);
+        element.appendChild(endLabel);
 
         this.appendToRoot(element);
     }
