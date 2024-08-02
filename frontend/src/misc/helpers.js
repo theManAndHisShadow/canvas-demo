@@ -287,3 +287,17 @@ function drawGrid(context, {cellSize, lineThickness, lineColor}){
         }
     }
 }
+
+
+/**
+ * Replace element with clone to reset all event listeners
+ * @param {HTMLElement} target 
+ * @returns {HTMLElement}
+ */
+function resetElement(target){
+    let clone = target.cloneNode(true);
+    target.parentNode.insertBefore(clone, target);
+    target.remove();
+
+    return clone;
+}
