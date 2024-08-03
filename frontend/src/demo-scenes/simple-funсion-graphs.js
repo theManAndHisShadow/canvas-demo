@@ -19,31 +19,65 @@ let simpleFunctionGraphs = new Scene({
         canvas.width = width;
         canvas.height = height;
 
-        
         const context = canvas.getContext('2d');
+
+        const field = new CartesianField({
+            renderer: context,
+            cx: width / 2,
+            cy: height / 2,
+            gridCellSize: 10,
+            gridLineColor: 'rgba(55, 55, 55, 0.35)',
+            gridLineThickness: 1,
+            axisColor: 'white',
+            fillColor: 'black',
+        });
+
+        field.render();
 
         // clearing prev created animation threads
         window.runningAnimations.clearQueue();
 
-        const loop = () => {
-            context.clearRect(
-                0, 0,
-                width,
-                height
-            );
+        let mouseIsDown = false;
+        let mouseIsUp = true;
 
-            /**
-             * TODO: add more flexibility to grid generation with diff cel sizes
-             */
-            drawCartesianGrid(context, {
-                fillColor: 'black',
-                axisColor: 'white',
-                gridLinesColor: 'rgba(165, 165, 165, 0.002)',
-            });
-        }
+        let downPos = false;
+        let deltaPos = {x: 0, y: 0}
 
-        // animate
-        window.runningAnimations.add(loop);
+        canvas.addEventListener('mousemove', (event) => {
+            if(mouseIsDown) {
+                let localPos = getMousePos(canvas, event);
+
+                deltaPos = {
+                    x: (downPos.x - localPos.x) * -1,
+                    y: (downPos.y - localPos.y) * -1,
+                }
+                field.move(deltaPos, 0.05);
+                field.render();
+            }
+        })
+
+        canvas.addEventListener('mousedown', (event) => {
+            mouseIsUp = false;
+            mouseIsDown = true;
+
+            let localPos = getMousePos(canvas, event);
+
+            downPos = {
+                x: localPos.x,
+                y: localPos.y,
+            }
+
+            // update cursor style
+            canvas.style.cursor = 'move'
+        });
+
+        canvas.addEventListener('mouseup', (event) => {
+            mouseIsDown = false;
+            mouseIsUp = true;
+
+            // update cursor style
+            canvas.style.cursor = 'inherit';
+        });
     }
 });
 
@@ -55,103 +89,197 @@ window.exportedObjects.push(simpleFunctionGraphs);
 * Scene file internal helper function defenitions
 */
 
-/**
- * 
- * @param {CanvasRenderingContext2D} context 
- * @param {Number} param.cellSize - cies of gred cell
- * @param {string} param.fillColor - color of background
- * @param {string} param.axisColor - color of x and y axis
- * @param {string} param.gridLinesColor - color of grid lines
- */
-function drawCartesianGrid(context, {cellSize = 12, fillColor = 'white', axisColor = 'black', gridLinesColor = 'rgba(0, 0, 0, 0.009)'}){
-    // canvas width and height
-    const width = context.canvas.width;
-    const height = context.canvas.height;
 
-    // center of canvas
-    const centerX = width / 2;
-    const centerY = height / 2;
+class CartesianField {
+    constructor({cx, cy, renderer, gridCellSize = 10, gridLineColor = 'black', gridLineThickness = 1, fillColor = 'white', axisColor = 'black'}){
+        this.cx = cx;
+        this.cy = cy;
 
-    // offset of y axis
-    const yOffset = 136;
+        this.renderer = renderer;
+        this.viewWidth = renderer.canvas.width;
+        this.viewHeight = renderer.canvas.height;
 
-    /**
-     * We use subpixel shifting (e.g., translating by 0.5 pixels) to improve the rendering quality of thin lines 
-     * and other graphical elements on canvas. This adjustment helps to align the graphics more precisely with 
-     * the pixel grid, reducing blurriness and visual artifacts caused by anti-aliasing. 
-     * Subpixel shifting can correct the display issues on high-resolution screens and ensure that lines 
-     * and shapes appear sharper and more defined. 
-     */
-    const subpixel = 0.5;
+        this.gridCellSize = gridCellSize;
+        this.gridLineColor = gridLineColor;
+        this.gridLineThickness = gridLineThickness;
 
-    // fill bg
-    drawRect(context, {
-        x: 0, y: 0,
-        width: width, height: height,
-        fillColor: fillColor,
-    });
+        this.axisColor = axisColor;
+        this.fillColor = fillColor;
 
-    // draw basic grid
-    drawGrid(context, {
-        cellSize: cellSize,
-        lineThickness:1,
-        lineColor: gridLinesColor,
-    });
-
-    // draw y axis
-    drawLine(context, {
-        x1: 0,
-        y1: centerY + yOffset + subpixel,
-        x2: width,
-        y2: centerY + yOffset + subpixel,
-        thickness: 1,
-        color: axisColor,
-    });
-
-    // draw x axis
-    drawLine(context, {
-        x1: centerX + subpixel,
-        y1: 0,
-        x2: centerX + subpixel,
-        y2: height,
-        thickness: 1,
-        axisColor: 'black',
-    });
-
-    // width of axis point marker (a line near number)
-    let axisMarksWidth = 4;
-
-    // some setting of text
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.font = '11px Arial';
-
-    // draw y axis markers and number labels for points
-    for(let y = 0, i = cellSize + 2; y < height; y += (cellSize * 4), i -= 2){
-        drawLine(context, {
-            x1: centerX - (axisMarksWidth / 2), 
-            y1: y + subpixel,
-            x2: centerX + (axisMarksWidth / 2) + 1, 
-            y2: y + subpixel,
-            color: axisColor,
-            thickness: 1,
-        });
-
-        context.fillText(i, centerX - 12, i == 0 ? y + 12 : y + 1);
+        /**
+         * We use subpixel shifting (e.g., translating by 0.5 pixels) to improve the rendering quality of thin lines 
+         * and other graphical elements on canvas. This adjustment helps to align the graphics more precisely with 
+         * the pixel grid, reducing blurriness and visual artifacts caused by anti-aliasing. 
+         * Subpixel shifting can correct the display issues on high-resolution screens and ensure that lines 
+         * and shapes appear sharper and more defined. 
+         */
+        this.subpixel = 0.5
     }
 
-    // draw x axis markers and number labels for points
-    for(let x = 0, i = cellSize; x < width; x += (cellSize * 4), i -= 2){
-        drawLine(context, {
-            x1: x + cellSize + subpixel, 
-            y1: centerY + yOffset - (axisMarksWidth / 2),
-            x2: x + cellSize + subpixel, 
-            y2: centerY + yOffset + (axisMarksWidth / 2) + 1,
-            color: axisColor,
-            thickness: 1,
-        });
 
-        // ignoring zero point label, beacuse we already use y axis zero point label
-        if(i !== 0) context.fillText(i, x + cellSize, centerY + yOffset + 12);
+    /**
+     * Moves field using offset object
+     * @param {object} offset - offset object {x, y}
+     * @param {number} sensitivity - sensitivity of mouse movements
+     */
+    move(offset, sensitivity = 1){
+        this.cx = this.cx + (offset.x * sensitivity);
+        this.cy = this.cy + (offset.y * sensitivity);
+    }
+
+
+    /**
+     * Draws a text at canvas. Just wrapper for default canvas methods.
+     * @param {Number} param.x - text x pos
+     * @param {Number} param.y - text y pos
+     * @param {string} param.text - text
+     * @param {string} param.fontFamily - text font family
+     * @param {string} param.fontSize - text font size
+     * @param {string} param.fontWeight - text font weight
+     * @param {string} param.align - text align (left, center, right)
+     * @param {string} param.baseline - text baseline
+     */
+    drawText({x, y, text, color ='white', fontFamily = 'Arial', fontSize = '12px', fontWeight = '', align = 'center', baseline = 'middle'}){
+        this.renderer.fillStyle = color;
+        this.renderer.font = `${fontWeight} ${fontSize} ${fontFamily}`; 
+        this.renderer.textAlign = align;
+        this.renderer.textBaseline = baseline;
+
+        this.renderer.fillText(text, x, y);
+    }
+
+
+    /**
+     * Draws scale elements on axes (numbers and little lines)
+     */
+    drawAxisPointMarks(){
+        this.renderer.strokeStyle = 'red' || this.axisColor;
+        this.renderer.lineWidth = 1;
+
+        let markLineWidth = 4;
+
+        // y-axis markers
+        this.renderer.beginPath();
+        for(let i = this.viewHeight - (this.gridCellSize*2), n = -1; i > 0; i -= this.gridCellSize * 4, n++) {
+            let correctionY = this.cy - (this.viewHeight / 2);
+            let y = correctionY + i - (this.subpixel + this.gridCellSize * 2) + 1;
+
+            this.drawText({
+                x: this.cx - (markLineWidth / 2) - 5,
+                y: n - 3 == 0 ? y + 11 : y,
+                text: n - 3,
+                color: 'red',
+            });
+
+            this.renderer.moveTo(this.cx - (markLineWidth / 2), y);
+            this.renderer.lineTo(this.cx + (markLineWidth / 2) + 2, y);
+        }
+        this.renderer.stroke();
+
+        // x-axis markers
+        this.renderer.strokeStyle = 'cyan' || this.axisColor;
+        this.renderer.beginPath();
+        for(let j = this.viewWidth - (this.gridCellSize * 2), n = -1; j > 0; j -= this.gridCellSize * 4, n++) {
+            let correctionX = (this.cx - (this.viewWidth / 2));
+            let x = correctionX + j + this.subpixel;
+
+            this.drawText({
+                x: x,
+                y: this.cy + (markLineWidth / 2) + 10,
+                text: n - 6 == 0 ? '' : (n - 6) * -1,
+                color: 'cyan',
+            });
+            
+            this.renderer.moveTo(x, this.cy - (markLineWidth / 2));
+            this.renderer.lineTo(x, this.cy + (markLineWidth / 2));
+        }
+        this.renderer.stroke();
+
+        this.renderer.closePath();
+
+    }
+
+
+    /**
+     * Draws a two axes
+     */
+    drawAxis(){
+        this.renderer.strokeStyle = this.axisColor;
+        this.renderer.lineWidth = 1;
+
+        // X
+        this.renderer.beginPath();
+        this.renderer.moveTo(0, this.cy + this.subpixel);
+        this.renderer.lineTo(this.viewWidth, this.cy + this.subpixel);
+        this.renderer.stroke();
+
+        // Y
+        this.renderer.beginPath();
+        this.renderer.moveTo(this.cx + this.subpixel, 0);
+        this.renderer.lineTo(this.cx + this.subpixel, this.viewHeight);
+        this.renderer.stroke();
+
+        this.renderer.closePath();
+    }
+    
+
+    /**
+     * Draws a field grid
+     */
+    drawGrid() {
+        const width = this.viewWidth;
+        const height = this.viewHeight;
+        this.renderer.strokeStyle = this.gridLineColor;
+        this.renderer.lineWidth = this.gridLineThickness;
+
+
+        /**
+         * I did not use a custom helper function to avoid multiple calls to the context 
+         * and not to worsen the already not excellent performance
+         */
+        this.renderer.beginPath();
+    
+        // Only draw lines that are within the visible area
+        const startX = Math.floor((this.cx % this.gridCellSize) - this.gridCellSize);
+        const startY = Math.floor((this.cy % this.gridCellSize) - this.gridCellSize);
+    
+        for (let x = startX; x < width; x += this.gridCellSize) {
+            this.renderer.moveTo(x + this.subpixel, 0);
+            this.renderer.lineTo(x + this.subpixel, height);
+        }
+    
+        for (let y = startY; y < height; y += this.gridCellSize) {
+            this.renderer.moveTo(0, y + this.subpixel);
+            this.renderer.lineTo(width, y + this.subpixel);
+        }
+    
+        this.renderer.closePath();
+        this.renderer.stroke();
+    }
+
+
+    /**
+     * Fill field bg with solid color
+     */
+    fill(){
+        // fill bg
+        drawRect(this.renderer, {
+            x: 0,
+            y: 0,
+            width: this.viewWidth, 
+            height: this.viewHeight,
+            fillColor: this.fillColor,
+        });
+    }
+
+
+    /**
+     * Renders field
+     */
+    render(){
+        this.fill();
+        this.drawGrid();
+        this.drawAxis();
+        this.drawAxisPointMarks();
     }
 }
