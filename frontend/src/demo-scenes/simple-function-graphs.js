@@ -8,11 +8,6 @@ let simpleFunctionGraphs = new Scene({
             text: 'Empty'
         },
 
-        'originCenter': {
-            type: 'display',
-            label: 'Center position',
-        },
-
         'centerViewAction': {
             type: 'button',
             text: 'reset',
@@ -37,7 +32,6 @@ let simpleFunctionGraphs = new Scene({
             cx: width / 2,
             cy: height / 2,
 
-            // check grid cell size bug when value is not 10
             gridCellSize: 10,
             gridLineColor: 'rgba(35, 35, 35, 0.35)',
             gridLineThickness: 1,
@@ -78,9 +72,6 @@ let simpleFunctionGraphs = new Scene({
 
                 // redraw 
                 field.render();
-
-                // show some info
-                display.updateValue('originCenter', `{x: ${field.globalOffset.x}, y: ${field.globalOffset.y}}`);
             }
         });
         
@@ -117,14 +108,23 @@ let simpleFunctionGraphs = new Scene({
             if(propertyName == 'centerViewAction') {
                 // reset pos
                 field.moveToOrigin();
-                
-                // update some info display
-                display.updateValue('originCenter', `{x: ${field.globalOffset.x}, y: ${field.globalOffset.y}}`);
 
                 // redraw all
                 field.render();
             }
         });
+
+        let points = [
+            [0, 0, 'yellow', 'O'],
+
+            [2, 2, 'crimson', 'A'],
+            [2, -2, 'lime', 'B'],
+            [-2, 2, 'cyan', 'C'],
+            [-2, -2, 'magenta', 'D'],
+        ];
+
+        field.drawPoints(points, display);
+        field.render();
     }
 });
 
@@ -166,6 +166,8 @@ class CartesianField {
          * and shapes appear sharper and more defined. 
          */
         this.subpixel = 0.5
+
+        this.children = [];
     }
 
 
@@ -183,6 +185,11 @@ class CartesianField {
 
         this.globalOffset.x = this.globalOffset.x + xOffset;
         this.globalOffset.y = this.globalOffset.y + yOffset;
+
+        this.children.forEach(item => {
+           item.x = item.x + xOffset;
+           item.y = item.y + yOffset;
+        });
     }
 
 
@@ -214,7 +221,12 @@ class CartesianField {
         this.cx = this.viewWidth / 2;
         this.cy = this.viewHeight / 2;
 
-        this.globalOffset = {
+        this.children.forEach(item => {
+            item.x = item.x - this.globalOffset.x;
+            item.y = item.y - this.globalOffset.y;
+        });
+
+         this.globalOffset = {
             x: 0, y: 0,
         };
     }
@@ -381,6 +393,29 @@ class CartesianField {
         }
     }
 
+    #addPoint(point){
+        this.children.push(point);
+    }
+
+    drawPoints(pointsArray, display){
+        pointsArray.forEach(point => {
+            // recalc the scale and center the coordinates of the point relative to the origin of the field coordinates
+            let x = this.cx + (point[0] * (this.gridCellSize * 2)) + this.globalOffset.x + this.subpixel;
+            let y = this.cy - (point[1] * (this.gridCellSize * 2)) + this.globalOffset.y + this.subpixel;
+
+            console.log(x, this.globalOffset)
+
+            let preparedPoint = {x: x, y: y, color: point[2], label: point[3]}
+
+            this.#addPoint(preparedPoint);
+            display.render(`point${preparedPoint.label}`, {
+                type: 'display',
+                label: `- point ${preparedPoint.label}`,
+                text: `(${point[0]}, ${point[1]})`,
+            });
+        });
+    }
+
 
     /**
      * Fill field bg with solid color
@@ -404,5 +439,26 @@ class CartesianField {
         this.fill();
         this.drawGrid();
         this.drawAxis();
+
+        if(this.children.length > 0) {
+            this.children.forEach(item => {
+                if(item.label) {
+                    this.drawText({
+                        x: item.x + 7,
+                        y: item.y -  7,
+                        text: item.label,
+                    });
+                }
+
+                // draw point
+                drawCircle(this.renderer, {
+                    cx: item.x,
+                    cy: item.y,
+                    fillColor: item.color,
+                    borderColor: item.color,
+                    r: 2,
+                });
+            });
+        }
     }
 }
