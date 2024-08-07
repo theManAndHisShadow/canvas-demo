@@ -50,7 +50,14 @@ let simpleFunctionGraphs = new Scene({
         // clearing prev created animation threads
         window.runningAnimations.clearQueue();
 
+        // very important scene var
         let mouseIsDown = false;
+
+        /**
+         * We use a separate variable to remember the place where the user pressed the left mouse button, 
+         * this will be the starting position of the moving process. When user releases the mouse button we store 'mouseUp' pos
+         * and recalculate delta of 'start' and 'stop' position.
+         */
         let downPos = { x: 0, y: 0 };
         let deltaPos = { x: 0, y: 0 };
         
