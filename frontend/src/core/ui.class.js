@@ -400,7 +400,7 @@ class UIDisplay{
                 this.#elementCSS_SelectorPrefix + 'display-value', 
                 this.#elementCSS_SelectorPrefix + 'item-value'
             );
-            valueContainer.innerHTML = '<i class="pale">no info</i>';
+            valueContainer.innerHTML = elementObject.text ? elementObject.text : '<i class="pale">no info</i>';
 
 
         element.appendChild(label);
