@@ -138,6 +138,11 @@ main {
 .wide-block {
     width: 95%;
 }
+
+#root canvas {
+    border-radius: 4px;
+}
+
 .display-infobox .scene-info__display-infobox-label {
     font-weight: 700;
 }
