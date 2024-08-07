@@ -7,6 +7,17 @@ let simpleFunctionGraphs = new Scene({
             label: 'Description',
             text: 'Empty'
         },
+
+        'originCenter': {
+            type: 'display',
+            label: 'Center position',
+        },
+
+        'centerViewAction': {
+            type: 'button',
+            text: 'reset',
+            label: 'Center view',
+        },
     },
 
     code: (root, display, settings) => {
@@ -40,45 +51,72 @@ let simpleFunctionGraphs = new Scene({
         window.runningAnimations.clearQueue();
 
         let mouseIsDown = false;
-        let mouseIsUp = true;
-
-        let downPos = false;
-        let deltaPos = {x: 0, y: 0}
-
+        let downPos = { x: 0, y: 0 };
+        let deltaPos = { x: 0, y: 0 };
+        
+        // All redraw and move actions only at 'mouseIsDown' == true and when mouse is moving
         canvas.addEventListener('mousemove', (event) => {
-            if(mouseIsDown) {
+            if (mouseIsDown) {
                 let localPos = getMousePos(canvas, event);
-
+        
                 deltaPos = {
-                    x: (downPos.x - localPos.x) * -1,
-                    y: (downPos.y - localPos.y) * -1,
-                }
-                field.move(deltaPos, 0.05);
+                    x: localPos.x - downPos.x,
+                    y: localPos.y - downPos.y
+                };
+        
+                downPos = localPos;
+        
+                // move using delta
+                field.move(deltaPos, 1);
+
+                // redraw 
                 field.render();
+
+                // show some info
+                display.updateValue('originCenter', `{x: ${field.globalOffset.x}, y: ${field.globalOffset.y}}`);
             }
-        })
-
+        });
+        
+        // Check is mouse clicked
         canvas.addEventListener('mousedown', (event) => {
-            mouseIsUp = false;
+            // set important value as true
             mouseIsDown = true;
-
+        
             let localPos = getMousePos(canvas, event);
-
+            
+            // update scene-global var
             downPos = {
                 x: localPos.x,
-                y: localPos.y,
-            }
-
+                y: localPos.y
+            };
+            
             // update cursor style
-            canvas.style.cursor = 'move'
+            canvas.style.cursor = 'grab';
+            setTimeout(() => {
+                canvas.style.cursor = 'grabbing';
+            }, 120);
+        });
+        
+        // if the user releases the mouse button
+        canvas.addEventListener('mouseup', () => {
+            // set important var as false
+            mouseIsDown = false;
+        
+            // Update cursor style
+            canvas.style.cursor = 'inherit';
         });
 
-        canvas.addEventListener('mouseup', (event) => {
-            mouseIsDown = false;
-            mouseIsUp = true;
+        settings.subscribe((propertyName, newValue, oldValue) => {
+            if(propertyName == 'centerViewAction') {
+                // reset pos
+                field.moveToOrigin();
+                
+                // update some info display
+                display.updateValue('originCenter', `{x: ${field.globalOffset.x}, y: ${field.globalOffset.y}}`);
 
-            // update cursor style
-            canvas.style.cursor = 'inherit';
+                // redraw all
+                field.render();
+            }
         });
     }
 });
@@ -159,6 +197,19 @@ class CartesianField {
         this.renderer.textBaseline = baseline;
 
         this.renderer.fillText(text, x, y);
+    }
+
+
+    /**
+     * Moving field to origin pos (centerX, centerY).
+     */
+    moveToOrigin(){
+        this.cx = this.viewWidth / 2;
+        this.cy = this.viewHeight / 2;
+
+        this.globalOffset = {
+            x: 0, y: 0,
+        };
     }
 
 
