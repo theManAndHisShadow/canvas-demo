@@ -13,6 +13,16 @@ let simpleFunctionGraphs = new Scene({
             text: 'reset',
             label: 'Center view',
         },
+
+        'selectedPreset': {
+            type: 'option-selector',
+            label: 'Choose preset',
+            optionNames: [
+                'Points 1', 
+                'Points 2'
+            ],
+            defaultValue: 0,
+        },
     },
 
     code: (root, display, settings) => {
@@ -112,19 +122,68 @@ let simpleFunctionGraphs = new Scene({
                 // redraw all
                 field.render();
             }
+
+            if(propertyName == 'selectedPreset') {
+                // reset pos
+                field.moveToOrigin();
+
+                // remove all other elements
+                field.clearContent();
+
+                // remove all display elements that generated dynamiclly
+                display.removeDynamicllyRendered();
+
+                if(newValue == 0) {
+                    // some points set 1
+                    let points1 = [
+                        {x: 0,  y: 0,  color: 'yellow',  label: 'O'},
+            
+                        {x: 2,  y: 2,  color: 'crimson', label: 'A'},
+                        {x: 2,  y: -2, color: 'lime',    label: 'B'},
+                        {x: -2, y: 2,  color: 'cyan',    label: 'C'},
+                        {x: -2, y: -2, color: 'magenta', label: 'D'},
+                    ];
+
+                    points1.forEach(point => {
+                        field.addPoint(point);
+
+                        display.dynamicRender(`point${point.label}`, {
+                            type: 'display',
+                            label: `- point ${point.label}`,
+                            text: `(${point.x}, ${point.y})`,
+                        });
+                    });
+            
+                } else if(newValue == 1) {
+                    // some points set 2
+                    let points2 = [
+                        {x: 0,  y: 0,  color: 'yellow',  label: 'O'},
+
+                        {x: 1,  y: 1,  color: 'red',      label: 'A'},
+                        {x: 2,  y: 2,  color: 'lime',     label: 'B'},
+                        {x: 3,  y: 3,  color: 'cyan',     label: 'C'},
+                        {x: 4,  y: 4,  color: 'magenta',  label: 'D'},
+                    ];
+
+                    points2.forEach(point => {
+                        field.addPoint(point);
+                        console.log(point);
+
+                        display.dynamicRender(`point${point.label}`, {
+                            type: 'display',
+                            label: `- point ${point.label}`,
+                            text: `(${point.x}, ${point.y})`,
+                        });
+                    });
+                }
+
+                field.render();
+            }
         });
 
-        let points = [
-            [0, 0, 'yellow', 'O'],
 
-            [2, 2, 'crimson', 'A'],
-            [2, -2, 'lime', 'B'],
-            [-2, 2, 'cyan', 'C'],
-            [-2, -2, 'magenta', 'D'],
-        ];
-
-        field.drawPoints(points, display);
-        field.render();
+        // Some trick to set first (index 0) preset as default preset
+        settings.setState('selectedPreset', 0);
     }
 });
 
@@ -138,6 +197,8 @@ window.exportedObjects.push(simpleFunctionGraphs);
 
 
 class CartesianField {
+    #children = [];
+
     constructor({cx, cy, renderer, gridCellSize = 10, gridLineColor = 'black', gridLineThickness = 1, fillColor = 'white', axisColor = 'black'}){
         this.cx = cx;
         this.cy = cy;
@@ -166,8 +227,6 @@ class CartesianField {
          * and shapes appear sharper and more defined. 
          */
         this.subpixel = 0.5
-
-        this.children = [];
     }
 
 
@@ -186,7 +245,7 @@ class CartesianField {
         this.globalOffset.x = this.globalOffset.x + xOffset;
         this.globalOffset.y = this.globalOffset.y + yOffset;
 
-        this.children.forEach(item => {
+        this.#children.forEach(item => {
            item.x = item.x + xOffset;
            item.y = item.y + yOffset;
         });
@@ -221,7 +280,7 @@ class CartesianField {
         this.cx = this.viewWidth / 2;
         this.cy = this.viewHeight / 2;
 
-        this.children.forEach(item => {
+        this.#children.forEach(item => {
             item.x = item.x - this.globalOffset.x;
             item.y = item.y - this.globalOffset.y;
         });
@@ -393,27 +452,30 @@ class CartesianField {
         }
     }
 
-    #addPoint(point){
-        this.children.push(point);
+
+    /**
+     * Adds point to field
+     * @param {object} pointObject - object with point params
+     */
+    addPoint(pointObject){
+        // recalc the scale and center the coordinates of the point relative to the origin of the field coordinates
+        let x = this.cx + (pointObject.x * (this.gridCellSize * 2)) + this.globalOffset.x + this.subpixel;
+        let y = this.cy - (pointObject.y * (this.gridCellSize * 2)) + this.globalOffset.y + this.subpixel;
+
+        let converted = {...pointObject};
+        converted.x = x;
+        converted.y = y;
+
+        this.#children.push(converted);
     }
 
-    drawPoints(pointsArray, display){
-        pointsArray.forEach(point => {
-            // recalc the scale and center the coordinates of the point relative to the origin of the field coordinates
-            let x = this.cx + (point[0] * (this.gridCellSize * 2)) + this.globalOffset.x + this.subpixel;
-            let y = this.cy - (point[1] * (this.gridCellSize * 2)) + this.globalOffset.y + this.subpixel;
 
-            console.log(x, this.globalOffset)
-
-            let preparedPoint = {x: x, y: y, color: point[2], label: point[3]}
-
-            this.#addPoint(preparedPoint);
-            display.render(`point${preparedPoint.label}`, {
-                type: 'display',
-                label: `- point ${preparedPoint.label}`,
-                text: `(${point[0]}, ${point[1]})`,
-            });
-        });
+    /**
+     * Clear all field content (except grid and axes).
+     */
+    clearContent(){
+        this.#children = [];
+        this.render();
     }
 
 
@@ -440,8 +502,8 @@ class CartesianField {
         this.drawGrid();
         this.drawAxis();
 
-        if(this.children.length > 0) {
-            this.children.forEach(item => {
+        if(this.#children.length > 0) {
+            this.#children.forEach(item => {
                 if(item.label) {
                     this.drawText({
                         x: item.x + 7,
