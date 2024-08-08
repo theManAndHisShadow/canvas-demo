@@ -299,6 +299,7 @@ class UIControls {
 class UIDisplay{
     #html;
     #elementCSS_SelectorPrefix= 'scene-info__';
+    #dynamicllyRenderedAttribute = 'data-dynamicllyrendered'
 
     constructor(html){
         this.#html = {
@@ -379,14 +380,17 @@ class UIDisplay{
 
     /**
      * renders an element at HTML info block with given param (elementObject). 
-     * By default, parent UI class uses this method inside its automatic rendering method.
-     * This is the only method that currently returns the created element after mutation.
-     * @param {string} elementName 
-     * @param {object} elementObject 
+     * @param {string} elementName -
+     * @param {object} elementObject -
+     * @param {boolean} markAsDynamicllyRendered -
      */
-    render(elementName, elementObject){
+    #__render(elementName, elementObject, markAsDynamicllyRendered = false){
         let element = document.createElement('div');
             element.id = this.#elementCSS_SelectorPrefix + elementName;
+            
+        if(markAsDynamicllyRendered === true) {
+            element.setAttribute(this.#dynamicllyRenderedAttribute, true);
+        }
 
         let label = document.createElement('span');
             label.classList.add(
@@ -409,11 +413,37 @@ class UIDisplay{
         this.#html[elementName] = valueContainer;
 
         this.appendToRoot(element);
+    }
 
-        /**
-         * It was decided to return the element for greater flexibility in case dynamic generation 
-         * of interface elements occurs somewhere
-         */
-        return element;
+
+    /**
+     * Pre-draws an element on the user interface display.
+     * @param {string} elementName - element name
+     * @param {object} elementObject - element object
+     */
+    render(elementName, elementObject){
+        this.#__render(elementName, elementObject, false);
+    }
+
+
+    /**
+     * Dynamiclly draws an element on UI display, marking it with a special attribute.
+     * @param {string} elementName - element name
+     * @param {object} elementObject - element object
+     */
+    dynamicRender(elementName, elementObject){
+        this.#__render(elementName, elementObject, true);
+    }
+
+
+    /**
+     * Removes all elements that has been rendered by '.dynamicRender()' method
+     */
+    removeDynamicllyRendered(){
+        let targets = Array.from(document.querySelectorAll(`[${this.#dynamicllyRenderedAttribute}]`));
+
+        targets.forEach(element => {
+            element.remove();
+        });
     }
 }
