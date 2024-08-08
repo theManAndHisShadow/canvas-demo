@@ -1,5 +1,5 @@
-let simpleFunctionGraphs = new Scene({
-    title: 'Simple funсion graphs', 
+let cartesianPlane = new Scene({
+    title: 'Cartesian plane demo', 
 
     ui: {
         'description': {
@@ -37,7 +37,7 @@ let simpleFunctionGraphs = new Scene({
 
         const context = canvas.getContext('2d');
 
-        const field = new CartesianField({
+        const plane = new CartesianPlane({
             renderer: context,
             cx: width / 2,
             cy: height / 2,
@@ -49,7 +49,7 @@ let simpleFunctionGraphs = new Scene({
             fillColor: 'black',
         });
 
-        field.render();
+        plane.render();
 
         // clearing prev created animation threads
         window.runningAnimations.clearQueue();
@@ -78,10 +78,10 @@ let simpleFunctionGraphs = new Scene({
                 downPos = localPos;
         
                 // move using delta
-                field.move(deltaPos, 1);
+                plane.move(deltaPos, 1);
 
                 // redraw 
-                field.render();
+                plane.render();
             }
         });
         
@@ -117,18 +117,18 @@ let simpleFunctionGraphs = new Scene({
         settings.subscribe((propertyName, newValue, oldValue) => {
             if(propertyName == 'centerViewAction') {
                 // reset pos
-                field.moveToOrigin();
+                plane.moveToOrigin();
 
                 // redraw all
-                field.render();
+                plane.render();
             }
 
             if(propertyName == 'selectedPreset') {
                 // reset pos
-                field.moveToOrigin();
+                plane.moveToOrigin();
 
                 // remove all other elements
-                field.clearContent();
+                plane.clearContent();
 
                 // remove all display elements that generated dynamiclly
                 display.removeDynamicllyRendered();
@@ -145,7 +145,7 @@ let simpleFunctionGraphs = new Scene({
                     ];
 
                     points1.forEach(point => {
-                        field.addPoint(point);
+                        plane.addPoint(point);
 
                         display.dynamicRender(`point${point.label}`, {
                             type: 'display',
@@ -166,8 +166,7 @@ let simpleFunctionGraphs = new Scene({
                     ];
 
                     points2.forEach(point => {
-                        field.addPoint(point);
-                        console.log(point);
+                        plane.addPoint(point);
 
                         display.dynamicRender(`point${point.label}`, {
                             type: 'display',
@@ -177,7 +176,7 @@ let simpleFunctionGraphs = new Scene({
                     });
                 }
 
-                field.render();
+                plane.render();
             }
         });
 
@@ -189,14 +188,14 @@ let simpleFunctionGraphs = new Scene({
 
 
 // Exproting scene
-window.exportedObjects.push(simpleFunctionGraphs);
+window.exportedObjects.push(cartesianPlane);
 
 /**
 * Scene file internal helper function defenitions
 */
 
 
-class CartesianField {
+class CartesianPlane {
     #children = [];
 
     constructor({cx, cy, renderer, gridCellSize = 10, gridLineColor = 'black', gridLineThickness = 1, fillColor = 'white', axisColor = 'black'}){
@@ -231,7 +230,7 @@ class CartesianField {
 
 
     /**
-     * Moves field using offset object
+     * Moves plane using offset object
      * @param {object} offset - offset object {x, y}
      * @param {number} sensitivity - sensitivity of mouse movements
      */
@@ -274,7 +273,7 @@ class CartesianField {
 
 
     /**
-     * Moving field to origin pos (centerX, centerY).
+     * Moving plane to origin pos (centerX, centerY).
      */
     moveToOrigin(){
         this.cx = this.viewWidth / 2;
@@ -315,7 +314,7 @@ class CartesianField {
     
 
     /**
-     * Draws a field grid.
+     * Draws a plane grid.
      */
     drawGrid(){
         // function basic values
@@ -454,11 +453,11 @@ class CartesianField {
 
 
     /**
-     * Adds point to field
+     * Adds point to plane
      * @param {object} pointObject - object with point params
      */
     addPoint(pointObject){
-        // recalc the scale and center the coordinates of the point relative to the origin of the field coordinates
+        // recalc the scale and center the coordinates of the point relative to the origin of the plane coordinates
         let x = this.cx + (pointObject.x * (this.gridCellSize * 2)) + this.globalOffset.x + this.subpixel;
         let y = this.cy - (pointObject.y * (this.gridCellSize * 2)) + this.globalOffset.y + this.subpixel;
 
@@ -471,7 +470,7 @@ class CartesianField {
 
 
     /**
-     * Clear all field content (except grid and axes).
+     * Clear all plane content (except grid and axes).
      */
     clearContent(){
         this.#children = [];
@@ -480,7 +479,7 @@ class CartesianField {
 
 
     /**
-     * Fill field bg with solid color
+     * Fill plane bg with solid color
      */
     fill(){
         // fill bg
@@ -495,7 +494,7 @@ class CartesianField {
 
 
     /**
-     * Renders field
+     * Renders plane
      */
     render(){
         this.fill();
