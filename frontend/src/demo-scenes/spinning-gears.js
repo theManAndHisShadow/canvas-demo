@@ -323,12 +323,6 @@ let spinningGears = new Scene({
         // prepare a preset variable to make the active preset globally available...
         // ...in the body of the “code” in the future
         let activePreset = null;
-        
-        /**
-         * An array designed to catch all elements that were generated dynamically.
-
-         */
-        let dynamicllyRendered = [];
 
         /**
          * N.B.:
@@ -351,24 +345,11 @@ let spinningGears = new Scene({
                 // reset 'activePreset'
                 activePreset = [];
 
+                display.removeDynamicllyRendered();
                 
-                /**
-                 * When switching a preset, some elements lose relevance. 
-                 * The solution is to collect all dynamically generated elements and, when changing a preset, 
-                 * delete only them, and not clear the root node of all elements. 
-                 * Then there will be no bugs with irrelevant elements or complete clearing of the contents of the node, 
-                 * including necessary and relevant elements. Of course, 
-                 * there is some discomfort that you still need to somehow interact with HTML nodes, 
-                 * but this is not such a bad solution as it could be :)
-                 */
-                if(dynamicllyRendered.length > 0) {
-                    dynamicllyRendered.forEach(element => {
-                        element.remove();
-                    });
-                }
-
                 // going through the presetS array - preset = presets[selected preset's index]
                 presets[newValue].forEach((gearObject, i) => {
+
                     // setting gear direction of rotation
                     let linkedGear =  presets[newValue].find(item => item.id == gearObject.linkedTo);
                     gearObject.direction = gearObject.role == 'driver' ? 1 : linkedGear.direction * -1; 
@@ -389,24 +370,21 @@ let spinningGears = new Scene({
                     let gear = new Gear(gearObject);
                     let gearLetter = translateIndexToLetter(i, true);
                     let gearName = `gear_${gearLetter}`;
-                    let UIelement;
 
                     if(presets[newValue].find(gear => gear.toothing == 'internal')) {
                         let localPrefix = gear.toothing == 'external' ? 
                                 gear.role == 'driver' ? 'sun' : 'planet' : 'ring';
                             
-                        UIelement = display.render(gearName, {
+                        display.dynamicRender(gearName, {
                             type: 'display',
                             label: `- ${localPrefix} gear ${gearLetter}${gear.numberOfTeeth}</span>` ,
                         });
                     } else {
-                        UIelement =  display.render(gearName, {
+                        display.dynamicRender(gearName, {
                             type: 'display',
                             label: `- ${gear.role} gear ${gearLetter}${gear.numberOfTeeth}</span>` ,
                         });
                     }
-
-                    dynamicllyRendered.push(UIelement);
 
                     /**
                      * adding custom event to each gear
