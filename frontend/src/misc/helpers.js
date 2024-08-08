@@ -290,6 +290,27 @@ function drawGrid(context, {cellSize, lineThickness, lineColor}){
 
 
 /**
+ * Draws a text at canvas.
+ * @param {Number} param.x - text x pos
+ * @param {Number} param.y - text y pos
+ * @param {string} param.text - text
+ * @param {string} param.fontFamily - text font family
+ * @param {number} param.fontSize - text font size
+ * @param {string} param.fontWeight - text font weight
+ * @param {string} param.align - text align (left, center, right)
+ * @param {string} param.baseline - text baseline
+ */
+function drawText(context, {x, y, text, color ='white', fontFamily = 'Arial', fontSize = 12, fontWeight = '', align = 'center', baseline = 'middle'}){
+    context.fillStyle = color;
+    context.font = `${fontWeight} ${fontSize}px ${fontFamily}`; 
+    context.textAlign = align;
+    context.textBaseline = baseline;
+
+    context.fillText(text, x, y);
+}
+
+
+/**
  * Replace element with clone to reset all event listeners
  * @param {HTMLElement} target 
  * @returns {HTMLElement}
