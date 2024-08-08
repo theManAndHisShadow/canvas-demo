@@ -18,10 +18,10 @@ let cartesianPlane = new Scene({
             type: 'option-selector',
             label: 'Choose preset',
             optionNames: [
-                'Points 1', 
-                'Points 2'
+                'Points', 
+                'Segments',
             ],
-            defaultValue: 0,
+            defaultValue: 1,
         },
     },
 
@@ -136,43 +136,59 @@ let cartesianPlane = new Scene({
                 if(newValue == 0) {
                     // some points set 1
                     let points1 = [
-                        new Point(0, 0, 'yellow', 'O'),
+                        new Point('O', 0, 0, 'white'),
             
-                        new Point(2, 2, 'crimson', 'A'),
-                        new Point(2, -2, 'lime', 'B'),
-                        new Point(-2, 2, 'cyan', 'C'),
-                        new Point(-2, -2, 'magenta', 'D'),
+                        new Point('A', 2, 2, 'crimson'),
+                        new Point('B', 2, -2, 'lime'),
+                        new Point('C', -2, 2, 'cyan'),
+                        new Point('D', -2, -2, 'magenta'),
                     ];
 
                     points1.forEach(point => {
-                        plane.addPoint(point);
+                        plane.add(point);
 
                         display.dynamicRender(`point${point.label}`, {
                             type: 'display',
-                            label: `- point ${point.label}`,
-                            text: `(${point.planeX}, ${point.planeY})`,
+                            label: `- point <span style="font-weight: bold">${point.label}</span>`,
+                            text: `<i style="font-size: 15px">(${point.planeX}, ${point.planeY})</i>`,
                         });
                     });
             
                 } else if(newValue == 1) {
-                    // some points set 2
-                    let points2 = [
-                        new Point(0, 0, 'yellow', 'O'),
+                    // some segments
+                    const thickness = 3;
+                    let array = [
+                        new Point('O', 0, 0, 'white' ),
 
-                        new Point(1, 1, 'red', 'A'),
-                        new Point(2, 2, 'lime', 'B'),
-                        new Point(3, 3, 'cyan', 'C'),
-                        new Point(4, 4, 'magenta', 'D'),
+                        new Segment(['A', -5.5, 2],  ['B', -1.5, 2], '#ff0000', thickness),
+                        new Segment(['B', -1.5, 2],  ['C', 0, 6], '#ff7f00', thickness),
+                        new Segment(['С', 0, 6],  ['D', 1.5, 2], '#ffff00', thickness),
+                        new Segment(['D', 1.5, 2],  ['E', 5.5, 2], '#7fff00', thickness),
+                        new Segment(['E', 5.5, 2],  ['F', 2, 0], 'cyan', thickness),
+                        new Segment(['F', 2, 0],  ['G', 3.5, -4], '#007fff', thickness),
+                        new Segment(['G', 3.5, -4],  ['H', 0, -2], 'blue', thickness),
+                        new Segment(['H', 0, -2],  ['I', -3.5, -4], 'indigo', thickness),
+                        new Segment(['I', -3.5, -4],  ['J', -2, 0], 'magenta', thickness),
+                        new Segment(['J', -2, 0],  ['A', -5.5, 2], 'crimson', thickness),
                     ];
 
-                    points2.forEach(point => {
-                        plane.addPoint(point);
+                    array.forEach(item => {
+                        plane.add(item);
+                        console.log(item);
 
-                        display.dynamicRender(`point${point.label}`, {
-                            type: 'display',
-                            label: `- point ${point.label}`,
-                            text: `(${point.planeX}, ${point.planeY})`,
-                        });
+                        if(item.constructor.name == 'Point') {
+                            display.dynamicRender(`point${item.label}`, {
+                                type: 'display',
+                                label: `- point <span style="font-weight: bold">${item.label}</span>`,
+                                text: `<i style="font-size: 15px">(${item.planeX}, ${item.planeY})</i>`,
+                            });
+                        } else {
+                            display.dynamicRender(`segment${item.startPoint.label + item.endPoint.label}`, {
+                                type: 'display',
+                                label: `- segment <span style="font-weight: bold; color: black; text-shadow: 0px 0px 3px  ${item.color}; border-radius: 3px;"> ${item.startPoint.label}${item.endPoint.label}</span>`,
+                                text: `[ <i style="font-size: 15px">(${item.startPoint.planeX}, ${item.startPoint.planeY}), (${item.endPoint.planeX}, ${item.endPoint.planeY})</i> ]`,
+                            });
+                        }
                     });
                 }
 
@@ -200,8 +216,27 @@ window.exportedObjects.push(cartesianPlane);
  * Base class for rendering. Contains the basis for the structure of other classes.
  */
 class PlanePrimitive {
-    constructor(x, y, color, label){
-        // position
+    constructor(renderer){
+        // N.B.: This property is null until it is manually configured during 'the add to context' step.
+        this.renderer = renderer || null;
+    }
+}
+
+
+
+/**
+ * Point element class.
+ */
+class Point extends PlanePrimitive {
+    /**
+     * 
+     * @param {string} label - label of point
+     * @param {number} x - x pos of point
+     * @param {number} y - y pos of point
+     * @param {string} color - color of point
+     */
+    constructor(label, x, y, color){
+        super();
 
         // The difference between property a and property b is that this property contains 
         // the initially transmitted coordinates that correspond to the graphic grid.
@@ -216,20 +251,6 @@ class PlanePrimitive {
         // styles
         this.color = color;
         this.label = label;
-    }
-}
-
-
-
-/**
- * Point element class.
- */
-class Point extends PlanePrimitive{
-    constructor(x, y, color, label){
-        super(x, y, color, label);
-
-        // N.B.: This property is null until it is manually configured during 'the add to context' step.
-        this.renderer = null;
     }
 
 
@@ -254,6 +275,51 @@ class Point extends PlanePrimitive{
             borderColor: this.color,
             r: 2,
         });
+    }
+}
+
+
+/**
+ * Segment element class.
+ */
+class Segment extends PlanePrimitive{
+    /**
+     * 
+     * @param {array} startPoint - ['label', x, y]
+     * @param {array} endPoint - ['label', x, y]
+     * @param {string} color - color of segment line
+     * @param {number} thickness - thickness of segment line
+     */
+    constructor(startPoint, endPoint, color, thickness = 2){
+        super();
+        
+        this.startPoint = new Point(startPoint[0], startPoint[1], startPoint[2], color);
+        this.endPoint = new Point(endPoint[0], endPoint[1], endPoint[2], color);
+
+        this.color = color;
+        this.thickness = thickness;
+        this.length = getDistanseBetweenTwoPoint(startPoint[1], startPoint[2], endPoint[1], endPoint[2]);
+    }
+
+
+    /**
+     * Draws a segment to context.
+     */
+    draw(){
+        drawLine(this.renderer, {
+            x1: this.startPoint.x,
+            y1: this.startPoint.y,
+
+            x2: this.endPoint.x,
+            y2: this.endPoint.y,
+
+            thickness: this.thickness,
+            color: this.startPoint.color,
+        });
+
+        this.startPoint.draw();
+        this.endPoint.draw();
+        
     }
 }
 
@@ -309,8 +375,15 @@ class CartesianPlane {
         this.globalOffset.y = this.globalOffset.y + yOffset;
 
         this.#children.forEach(item => {
-           item.x = item.x + xOffset;
-           item.y = item.y + yOffset;
+            if(item.constructor.name == 'Point') {
+                item.x = item.x + xOffset;
+                item.y = item.y + yOffset;
+            } else {
+                item.startPoint.x = item.startPoint.x + xOffset;
+                item.startPoint.y = item.startPoint.y + yOffset;
+                item.endPoint.x = item.endPoint.x + xOffset;
+                item.endPoint.y = item.endPoint.y + yOffset;
+            }
         });
     }
 
@@ -323,8 +396,15 @@ class CartesianPlane {
         this.cy = this.viewHeight / 2;
 
         this.#children.forEach(item => {
-            item.x = item.x - this.globalOffset.x;
-            item.y = item.y - this.globalOffset.y;
+            if(item.constructor.name == 'Point') {
+                item.x = item.x - this.globalOffset.x;
+                item.y = item.y - this.globalOffset.y;
+            } else {
+                item.startPoint.x = item.startPoint.x - this.globalOffset.x;
+                item.startPoint.y = item.startPoint.y - this.globalOffset.y;
+                item.endPoint.x = item.endPoint.x - this.globalOffset.x;
+                item.endPoint.y = item.endPoint.y - this.globalOffset.y;
+            }
         });
 
          this.globalOffset = {
@@ -497,21 +577,34 @@ class CartesianPlane {
 
     /**
      * Adds point to plane
-     * @param {object} pointObject - object with point params
+     * @param {object} object - object with point params
      */
-    addPoint(pointObject){
-        pointObject.renderer = this.renderer;
-        pointObject.planeX = pointObject.x;
-        pointObject.planeY = pointObject.y;
+    add(newItemObject){
+        newItemObject.renderer = this.renderer;
 
-        // recalc the scale and center the coordinates of the point relative to the origin of the plane coordinates
-        let x = this.cx + (pointObject.x * (this.gridCellSize * 2)) + this.globalOffset.x + this.subpixel;
-        let y = this.cy - (pointObject.y * (this.gridCellSize * 2)) + this.globalOffset.y + this.subpixel;
+        const transform = (object) => {
+            object.planeX = object.x;
+            object.planeY = object.y;
+    
+            // recalc the scale and center the coordinates of the point relative to the origin of the plane coordinates
+            let x = this.cx + (object.x * (this.gridCellSize * 2)) + this.globalOffset.x + this.subpixel;
+            let y = this.cy - (object.y * (this.gridCellSize * 2)) + this.globalOffset.y + this.subpixel;
+    
+            object.x = x;
+            object.y = y;
+        }
 
-        pointObject.x = x;
-        pointObject.y = y;
+        if(newItemObject.constructor.name == 'Point') {
+            transform(newItemObject);
+        } else {
+            newItemObject.startPoint.renderer = this.renderer;
+            transform(newItemObject.startPoint);
+            
+            newItemObject.endPoint.renderer = this.renderer;
+            transform(newItemObject.endPoint);
+        }
 
-        this.#children.push(pointObject);
+        this.#children.push(newItemObject);
     }
 
 
