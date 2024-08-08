@@ -136,12 +136,12 @@ let cartesianPlane = new Scene({
                 if(newValue == 0) {
                     // some points set 1
                     let points1 = [
-                        {x: 0,  y: 0,  color: 'yellow',  label: 'O'},
+                        new Point(0, 0, 'yellow', 'O'),
             
-                        {x: 2,  y: 2,  color: 'crimson', label: 'A'},
-                        {x: 2,  y: -2, color: 'lime',    label: 'B'},
-                        {x: -2, y: 2,  color: 'cyan',    label: 'C'},
-                        {x: -2, y: -2, color: 'magenta', label: 'D'},
+                        new Point(2, 2, 'crimson', 'A'),
+                        new Point(2, -2, 'lime', 'B'),
+                        new Point(-2, 2, 'cyan', 'C'),
+                        new Point(-2, -2, 'magenta', 'D'),
                     ];
 
                     points1.forEach(point => {
@@ -150,19 +150,19 @@ let cartesianPlane = new Scene({
                         display.dynamicRender(`point${point.label}`, {
                             type: 'display',
                             label: `- point ${point.label}`,
-                            text: `(${point.x}, ${point.y})`,
+                            text: `(${point.planeX}, ${point.planeY})`,
                         });
                     });
             
                 } else if(newValue == 1) {
                     // some points set 2
                     let points2 = [
-                        {x: 0,  y: 0,  color: 'yellow',  label: 'O'},
+                        new Point(0, 0, 'yellow', 'O'),
 
-                        {x: 1,  y: 1,  color: 'red',      label: 'A'},
-                        {x: 2,  y: 2,  color: 'lime',     label: 'B'},
-                        {x: 3,  y: 3,  color: 'cyan',     label: 'C'},
-                        {x: 4,  y: 4,  color: 'magenta',  label: 'D'},
+                        new Point(1, 1, 'red', 'A'),
+                        new Point(2, 2, 'lime', 'B'),
+                        new Point(3, 3, 'cyan', 'C'),
+                        new Point(4, 4, 'magenta', 'D'),
                     ];
 
                     points2.forEach(point => {
@@ -171,7 +171,7 @@ let cartesianPlane = new Scene({
                         display.dynamicRender(`point${point.label}`, {
                             type: 'display',
                             label: `- point ${point.label}`,
-                            text: `(${point.x}, ${point.y})`,
+                            text: `(${point.planeX}, ${point.planeY})`,
                         });
                     });
                 }
@@ -193,6 +193,70 @@ window.exportedObjects.push(cartesianPlane);
 /**
 * Scene file internal helper function defenitions
 */
+
+
+
+/**
+ * Base class for rendering. Contains the basis for the structure of other classes.
+ */
+class PlanePrimitive {
+    constructor(x, y, color, label){
+        // position
+
+        // The difference between property a and property b is that this property contains 
+        // the initially transmitted coordinates that correspond to the graphic grid.
+        // x -> processing some calculations: 
+        //       -> x (mutated x)
+        //       -> planeX (original x)
+        this.x = x;
+        this.y = y;
+        this.planeX = null;
+        this.planeY = null;
+
+        // styles
+        this.color = color;
+        this.label = label;
+    }
+}
+
+
+
+/**
+ * Point element class.
+ */
+class Point extends PlanePrimitive{
+    constructor(x, y, color, label){
+        super(x, y, color, label);
+
+        // N.B.: This property is null until it is manually configured during 'the add to context' step.
+        this.renderer = null;
+    }
+
+
+    /**
+     * Draws a point to target renderer context.
+     */
+    draw(){
+        if(this.label && this.label.length > 0) {
+            // draw text label
+            drawText(this.renderer, {
+                x: this.x + 7,
+                y: this.y -  7,
+                text: this.label,
+            });
+        }
+
+        // draw point
+        drawCircle(this.renderer, {
+            cx: this.x,
+            cy: this.y,
+            fillColor: this.color,
+            borderColor: this.color,
+            r: 2,
+        });
+    }
+}
+
 
 
 class CartesianPlane {
@@ -248,27 +312,6 @@ class CartesianPlane {
            item.x = item.x + xOffset;
            item.y = item.y + yOffset;
         });
-    }
-
-
-    /**
-     * Draws a text at canvas. Just wrapper for default canvas methods.
-     * @param {Number} param.x - text x pos
-     * @param {Number} param.y - text y pos
-     * @param {string} param.text - text
-     * @param {string} param.fontFamily - text font family
-     * @param {number} param.fontSize - text font size
-     * @param {string} param.fontWeight - text font weight
-     * @param {string} param.align - text align (left, center, right)
-     * @param {string} param.baseline - text baseline
-     */
-    drawText({x, y, text, color ='white', fontFamily = 'Arial', fontSize = 12, fontWeight = '', align = 'center', baseline = 'middle'}){
-        this.renderer.fillStyle = color;
-        this.renderer.font = `${fontWeight} ${fontSize}px ${fontFamily}`; 
-        this.renderer.textAlign = align;
-        this.renderer.textBaseline = baseline;
-
-        this.renderer.fillText(text, x, y);
     }
 
 
@@ -418,7 +461,7 @@ class CartesianPlane {
             drawPart(x, 'column');
 
             // draw a text with number of axis scale
-            this.drawText({
+            drawText(this.renderer, {
                 x: x + (majorStep / 2),
                 y: this.cy -10,
                 // hide '0' pos number label to x-axis
@@ -440,7 +483,7 @@ class CartesianPlane {
             drawPart(y, 'row');
 
             // draw a text with number of axis scale
-            this.drawText({
+            drawText(this.renderer, {
                 x: this.cx - 7,
                 // different spacing to '0' pos number label and other numbers
                 y: number == 0 ? y + 12 : y + 1,
@@ -457,15 +500,18 @@ class CartesianPlane {
      * @param {object} pointObject - object with point params
      */
     addPoint(pointObject){
+        pointObject.renderer = this.renderer;
+        pointObject.planeX = pointObject.x;
+        pointObject.planeY = pointObject.y;
+
         // recalc the scale and center the coordinates of the point relative to the origin of the plane coordinates
         let x = this.cx + (pointObject.x * (this.gridCellSize * 2)) + this.globalOffset.x + this.subpixel;
         let y = this.cy - (pointObject.y * (this.gridCellSize * 2)) + this.globalOffset.y + this.subpixel;
 
-        let converted = {...pointObject};
-        converted.x = x;
-        converted.y = y;
+        pointObject.x = x;
+        pointObject.y = y;
 
-        this.#children.push(converted);
+        this.#children.push(pointObject);
     }
 
 
@@ -503,22 +549,7 @@ class CartesianPlane {
 
         if(this.#children.length > 0) {
             this.#children.forEach(item => {
-                if(item.label) {
-                    this.drawText({
-                        x: item.x + 7,
-                        y: item.y -  7,
-                        text: item.label,
-                    });
-                }
-
-                // draw point
-                drawCircle(this.renderer, {
-                    cx: item.x,
-                    cy: item.y,
-                    fillColor: item.color,
-                    borderColor: item.color,
-                    r: 2,
-                });
+                item.draw(); 
             });
         }
     }
