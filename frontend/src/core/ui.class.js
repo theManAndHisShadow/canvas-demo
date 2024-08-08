@@ -379,10 +379,10 @@ class UIDisplay{
 
 
     /**
-     * renders an element at HTML info block with given param (elementObject). 
-     * @param {string} elementName -
-     * @param {object} elementObject -
-     * @param {boolean} markAsDynamicllyRendered -
+     * Renders an element at HTML info block with given param (elementObject). 
+     * @param {string} elementName - element name
+     * @param {object} elementObject - element object
+     * @param {boolean} markAsDynamicllyRendered - a way to mark dynamically rendered elements for a '.removeDynamicllyRendered()' method work.
      */
     #__render(elementName, elementObject, markAsDynamicllyRendered = false){
         let element = document.createElement('div');
@@ -437,7 +437,7 @@ class UIDisplay{
 
 
     /**
-     * Removes all elements that has been rendered by '.dynamicRender()' method
+     * Removes all elements that has been rendered by '.dynamicRender()' method.
      */
     removeDynamicllyRendered(){
         let targets = Array.from(document.querySelectorAll(`[${this.#dynamicllyRenderedAttribute}]`));
