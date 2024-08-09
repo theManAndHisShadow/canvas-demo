@@ -136,12 +136,16 @@ let cartesianPlane = new Scene({
                 if(newValue == 0) {
                     // some points set 1
                     let points1 = [
-                        new Point('O', 0, 0, 'white'),
-            
-                        new Point('A', 2, 2, 'crimson'),
-                        new Point('B', 2, -2, 'lime'),
-                        new Point('C', -2, 2, 'cyan'),
-                        new Point('D', -2, -2, 'magenta'),
+                        new Point('O', 0, 0, 'white' ),
+
+                        new Point("A", 0, 2.5, "orange", "red"),
+                        new Point("B", 1.7, 1.7, "orange", "red"),
+                        new Point("C", 2.5, 0, "orange", "red"),
+                        new Point("D", 1.7, -1.7, "orange", "red"),
+                        new Point("E", 0, -2.5, "orange", "red"),
+                        new Point("G", -1.7, -1.7, "orange", "red"),
+                        new Point("H", -2.5, 0, "orange", "red"),
+                        new Point("I", -1.7, 1.7, "orange", "red"),
                     ];
 
                     points1.forEach(point => {
@@ -234,8 +238,9 @@ class Point extends PlanePrimitive {
      * @param {number} x - x pos of point
      * @param {number} y - y pos of point
      * @param {string} color - color of point
+     * @param {string} labelColor - color of text label
      */
-    constructor(label, x, y, color){
+    constructor(label, x, y, color, labelColor = 'white'){
         super();
 
         // The difference between property a and property b is that this property contains 
@@ -251,6 +256,7 @@ class Point extends PlanePrimitive {
         // styles
         this.color = color;
         this.label = label;
+        this.labelColor = labelColor;
     }
 
 
@@ -264,6 +270,7 @@ class Point extends PlanePrimitive {
                 x: this.x + 7,
                 y: this.y -  7,
                 text: this.label,
+                color: this.labelColor,
             });
         }
 
