@@ -20,8 +20,9 @@ let cartesianPlane = new Scene({
             optionNames: [
                 'Points', 
                 'Segments',
+                'Test',
             ],
-            defaultValue: 1,
+            defaultValue: 2,
         },
     },
 
@@ -166,7 +167,7 @@ let cartesianPlane = new Scene({
 
                         new Segment(['A', -5.5, 2],  ['B', -1.5, 2], '#ff0000', thickness),
                         new Segment(['B', -1.5, 2],  ['C', 0, 6], '#ff7f00', thickness),
-                        new Segment(['С', 0, 6],  ['D', 1.5, 2], '#ffff00', thickness),
+                        new Segment(['C', 0, 6],  ['D', 1.5, 2], '#ffff00', thickness),
                         new Segment(['D', 1.5, 2],  ['E', 5.5, 2], '#7fff00', thickness),
                         new Segment(['E', 5.5, 2],  ['F', 2, 0], 'cyan', thickness),
                         new Segment(['F', 2, 0],  ['G', 3.5, -4], '#007fff', thickness),
@@ -178,7 +179,7 @@ let cartesianPlane = new Scene({
 
                     array.forEach(item => {
                         plane.add(item);
-                        console.log(item);
+                        console.log(item, item.constructor.name);
 
                         if(item.constructor.name == 'Point') {
                             display.dynamicRender(`point${item.label}`, {
@@ -186,13 +187,45 @@ let cartesianPlane = new Scene({
                                 label: `- point <span style="font-weight: bold">${item.label}</span>`,
                                 text: `<i style="font-size: 15px">(${item.planeX}, ${item.planeY})</i>`,
                             });
-                        } else {
+                        } else if(item.constructor.name == 'Segment'){
                             display.dynamicRender(`segment${item.startPoint.label + item.endPoint.label}`, {
                                 type: 'display',
                                 label: `- segment <span style="font-weight: bold; color: black; text-shadow: 0px 0px 3px  ${item.color}; border-radius: 3px;"> ${item.startPoint.label}${item.endPoint.label}</span>`,
                                 text: `[ <i style="font-size: 15px">(${item.startPoint.planeX}, ${item.startPoint.planeY}), (${item.endPoint.planeX}, ${item.endPoint.planeY})</i> ]`,
                             });
-                        }
+                        } 
+                    });
+                } else if(newValue == 2) {
+                    // some test lienar graphs
+                    const graphs = [
+                        new Graph('5-x', 'red'),
+                        new Graph('2x-5', 'cyan'),
+                        new Graph('x', 'lime'),
+                        new Graph('-x', 'orange'),
+                    ];
+
+                    // updating info about current visible area of plane
+                    display.dynamicRender('visibleArea', {
+                        type: 'display',
+                        label: 'Visible area',
+                        text: `x: ${plane.visibleArea.x}, y: ${plane.visibleArea.y}`,
+                    });
+
+                    // make actions with each graph
+                    graphs.forEach((graph, i) => {
+                        plane.add(graph);
+
+                        // show function formula to display UI
+                        display.dynamicRender('function-formula-' + i, {
+                            type: 'display',
+                            label: `- ${graph.type} function` ,
+                            text: `<span">${graph.formula}</span>`
+                        });
+                    });
+
+                    // adding 'move' event listener to plane for updating visible area info
+                    plane.addEventListener('move', () => {
+                        display.updateValue('visibleArea', `x: ${plane.visibleArea.x}, y: ${plane.visibleArea.y}`);
                     });
                 }
 
@@ -217,12 +250,52 @@ window.exportedObjects.push(cartesianPlane);
 
 
 /**
+ * Helper class for managing custom events
+ */
+class SynteticEventTarget2 {
+    constructor (){
+        this.events = {};
+    }
+
+    
+    /**
+     * Adds event to target
+     * @param {string} eventType - text name of custom event (move, rotate, create etc)
+     * @param {Function} callback - handler if event is triggered
+     */
+    addEventListener(eventType, callback) {
+        if (!this.events[eventType]) {
+            this.events[eventType] = [];
+        }
+
+        this.target = this;
+        this.events[eventType].push(callback);
+    }
+
+    
+    /**
+     * Method that triggers event
+     * @param {string} eventType - text name of custom event (move, rotate, create etc)
+     * @param {object} data - some event data, passed into event handler scope
+     */
+    dispatchEvent(eventType, data) {
+        if (this.events[eventType]) {
+            this.events[eventType].forEach(callback => callback(data));
+        }
+    }
+}
+
+
+
+/**
  * Base class for rendering. Contains the basis for the structure of other classes.
  */
 class PlanePrimitive {
     constructor(renderer){
         // N.B.: This property is null until it is manually configured during 'the add to context' step.
         this.renderer = renderer || null;
+
+        this.parent = null;
     }
 }
 
@@ -286,10 +359,11 @@ class Point extends PlanePrimitive {
 }
 
 
+
 /**
  * Segment element class.
  */
-class Segment extends PlanePrimitive{
+class Segment extends PlanePrimitive {
     /**
      * 
      * @param {array} startPoint - ['label', x, y]
@@ -330,12 +404,196 @@ class Segment extends PlanePrimitive{
     }
 }
 
+/**
+ * An auxiliary class that determines the type of a function and extracts the coefficients of its monomials
+ */
+class TinyMath {
+    constructor(){
+        /**
+         * The Cake is LIE
+         */
+    }
 
 
-class CartesianPlane {
+    /**
+     * Detects of function type.
+     * @param {string} formula - function formula
+     * @returns {string} - type of functon (linear, quadratic, etc)
+     */
+    detect(formula){
+        // if function type is not detected - set false value
+        let type = false;
+
+        /**
+         * Using regular expressions, we determine occurrences by various groups of characters - X signs, 
+         * exponentiation sign. However, these expressions were rewritten several times due to difficulties arising 
+         * in the form of a free order of monomial or, even more so, the absence of monomial (if this is possible). 
+         * At this stage more tests are required to ensure that the function type is defined correctly
+         */
+        if(/^(\-?([0-9]+)?x)?([0-9]+)?/gm.test(formula)){
+            type = "linear";
+        } else if(/x\^2/g.test(formula) && /((\-)?\d*x\^2)?([+-]?\d*x)?([+-]?\d+)?/gm.test(formula)){
+            type = "quadratic";
+        } 
+
+        return type;
+    }
+
+
+    /**
+     * Parses function monomial coefficients
+     * @param {string} formula - function formula
+     * @param {string} type - function type
+     * @returns {object} - parsed coefficients object {a, b, c...}
+     */
+    parse(formula, type){
+        let result = {};
+
+        // devides formula into groups based on math operators
+        let splitted = formula.split(/([+-])+/gm);
+
+        // It seems to me that this code needs refactoring
+        if(type == 'linear') {
+            let a = 0, b = 0;
+
+            splitted.forEach((item, i) => {
+                if (item.trim().length > 0 && !/[+-]/.test(item)) {
+                    // detect sign of 'monomial'
+                    let sign = i > 0 && splitted[i - 1] === '-' ? -1 : 1;
+
+                    if (/x/.test(item)) {
+                        // set minor monomial
+                        a = (item.split('x')[0] || 1) * sign;
+                    } else {
+                        // set radical
+                        b = Number(item) * sign;
+                    }
+                }
+            });
+
+            result = {a, b};
+        } else if(type == 'quadratic') {
+            let a = 0, b = 0, c = 0;
+
+            splitted.forEach((item, i) => {
+                // only for non-operator symbols and non-empty strings
+                if (item.trim().length > 0 && !/[+-]/.test(item)) {
+                    // detect sign of 'monomial'
+                    let sign = i > 0 && splitted[i - 1] === '-' ? -1 : 1;
+
+                    if (/x\^2/.test(item)) {
+                        // set major monomial
+                        a = (item.split('x')[0] || 1) * sign;
+                    } else if (/x/.test(item)) {
+                        // set minor monomial
+                        b = (item.split('x')[0] || 1) * sign;
+                    } else {
+                        // set radical
+                        c = Number(item) * sign;
+                    }
+                }
+            });
+
+            result = {a, b, c};
+        }
+
+        return result;
+    }
+
+    solveLinear(a, b){
+        let root = - b / a;
+        return [{x: root, y: 0}];
+    }
+}
+
+
+class Graph extends PlanePrimitive {
+    constructor(formula = null, color = 'red'){
+        super();
+
+        this.processor = new TinyMath();
+        this.parent = null;
+
+        this.formula = formula;
+        this.type = this.processor.detect(this.formula);
+        this.parsed = this.processor.parse(this.formula, this.type);
+
+        this.points = [];
+
+        this.color = color;
+    }
+
+
+    /**
+     * Draws a linear functon's graph to context.
+     * @param {number} step - Smoothness (resolution) of the graph - what step between points to set when drawing a graph of a function
+     */
+    #drawLinear(step = 1){
+        this.renderer.beginPath();
+        this.renderer.strokeStyle = this.color;
+        this.renderer.lineWidth = 1;
+
+
+        let firstPoint = true;
+        let prevX, prevY;
+
+        // Using info about visible area of plane draw only part of graph
+        for(let i = this.parent.visibleArea.x[0] - 3; i < this.parent.visibleArea.x[1] + 3; i += step){
+            let rawX = i;
+            let rawY = (this.parsed.a * rawX) + this.parsed.b;
+
+            let x = rawX * (this.parent.gridCellSize*2) + this.parent.subpixel;
+            let y = rawY * (this.parent.gridCellSize*2) + this.parent.subpixel;
+            
+            let transformed = {
+                x: this.parent.cx + x,
+                y: this.parent.cy - y
+            };
+    
+            if (firstPoint) {
+                this.renderer.moveTo(transformed.x, transformed.y);
+                firstPoint = false;
+            } else {
+                this.renderer.lineTo(transformed.x, transformed.y);
+            }
+    
+            // save current pos as prev pos for next itteration
+            prevX = transformed.x;
+            prevY = transformed.y; 
+        }
+
+        this.renderer.closePath();
+        this.renderer.stroke();
+    }
+
+
+    // function mockup
+    #drawQuadratic() {
+        // 
+    }
+
+    draw(){
+        if(this.type == 'linear') this.#drawLinear();
+        if(this.type == 'quadratic') this.#drawQuadratic();
+    }
+}
+
+
+
+/**
+* Since the code outside the scene is available everywhere, need to follow up:
+* - or move it inside the scene code
+* - or move this class into a separate helper class
+*
+* In this case, the SynteticEventTarget class is already present in another file, 
+* which causes a class declaration error. Temporarily I will leave it as SynteticEventTarget2
+*/
+class CartesianPlane extends SynteticEventTarget2 {
     #children = [];
 
     constructor({cx, cy, renderer, gridCellSize = 10, gridLineColor = 'black', gridLineThickness = 1, fillColor = 'white', axisColor = 'black'}){
+        super();
+
         this.cx = cx;
         this.cy = cy;
 
@@ -343,6 +601,15 @@ class CartesianPlane {
             x: 0,
             y: 0,
         };
+
+        /**
+         * n order not to draw the entire endless graph (yeah, like a computer could xD), 
+         * we need to understand what part of the plane is visible at the moment
+         */
+        this.visibleArea = {
+            x: [0, 0],
+            y: [0, 0],
+        }
 
         this.renderer = renderer;
         this.viewWidth = renderer.canvas.width;
@@ -385,13 +652,21 @@ class CartesianPlane {
             if(item.constructor.name == 'Point') {
                 item.x = item.x + xOffset;
                 item.y = item.y + yOffset;
-            } else {
+            } else if(item.constructor.name == 'Segment'){
                 item.startPoint.x = item.startPoint.x + xOffset;
                 item.startPoint.y = item.startPoint.y + yOffset;
+
                 item.endPoint.x = item.endPoint.x + xOffset;
                 item.endPoint.y = item.endPoint.y + yOffset;
+            } else if(item.constructor.name == 'Graph') {
+                item.points.forEach(point => {
+                    point.x = point.x + xOffset;
+                    point.y = point.y + yOffset;
+                });
             }
         });
+
+        this.dispatchEvent('move');
     }
 
 
@@ -406,11 +681,13 @@ class CartesianPlane {
             if(item.constructor.name == 'Point') {
                 item.x = item.x - this.globalOffset.x;
                 item.y = item.y - this.globalOffset.y;
-            } else {
+            } else if(item.constructor.name == 'Segment') {
                 item.startPoint.x = item.startPoint.x - this.globalOffset.x;
                 item.startPoint.y = item.startPoint.y - this.globalOffset.y;
                 item.endPoint.x = item.endPoint.x - this.globalOffset.x;
                 item.endPoint.y = item.endPoint.y - this.globalOffset.y;
+            } else if(item.constructor.name == 'Graph') {
+
             }
         });
 
@@ -538,7 +815,12 @@ class CartesianPlane {
 
         let originX = this.cx - (width / 2);
         let columnsOffset = Math.trunc(this.globalOffset.x / majorStep);
-        for (let i = -1 - columnsOffset; i < (width / majorStep) - columnsOffset; i++) {
+
+        // min and max x values
+        let xMin = -1 - columnsOffset;
+        let xMax = (width / majorStep) - columnsOffset;
+
+        for (let i = xMin; i < xMax; i++) {
             // column start x pos
             let x = originX + (i * majorStep);
             let number = (i - 7) * 2;
@@ -556,11 +838,20 @@ class CartesianPlane {
                 text: number == 0 ? '' : number,
                 fontSize: fontSize,
             });
+
+            // updating visibleArea value
+            if(i == -1 - columnsOffset) this.visibleArea.x[0] = number + 2;
+            if(i == xMax - 1) this.visibleArea.x[1] = number;
         }
         
         let originY = this.cy - (height / 2);
         let rowsOffset = Math.trunc(this.globalOffset.y / majorStep);
-        for (let j = -1 - rowsOffset; j < (height / majorStep) - rowsOffset + 1; j++) {
+
+        // min and max y values
+        let yMin = -1 - rowsOffset;
+        let yMax = (height / majorStep) - rowsOffset + 1;
+
+        for (let j = yMin; j < yMax; j++) {
             // row start y pos
             let y = originY + (j * majorStep);
             let number = (j - 5) * 2 * -1;
@@ -578,6 +869,10 @@ class CartesianPlane {
                 fontSize: fontSize,
                 align: 'right',
             });
+
+            // updating visibleArea value
+            if(j == yMin) this.visibleArea.y[0] = number - 2;
+            if(j == yMax - 1) this.visibleArea.y[1] = number;
         }
     }
 
@@ -589,6 +884,8 @@ class CartesianPlane {
     add(newItemObject){
         newItemObject.renderer = this.renderer;
 
+        // local helper function
+        // Perhaps it makes sense to transfer it to base class methods?
         const transform = (object) => {
             object.planeX = object.x;
             object.planeY = object.y;
@@ -603,12 +900,16 @@ class CartesianPlane {
 
         if(newItemObject.constructor.name == 'Point') {
             transform(newItemObject);
-        } else {
+        } else if(newItemObject.constructor.name == 'Segment') {
             newItemObject.startPoint.renderer = this.renderer;
             transform(newItemObject.startPoint);
             
             newItemObject.endPoint.renderer = this.renderer;
             transform(newItemObject.endPoint);
+
+            newItemObject.parent = this;
+        } else if(newItemObject.constructor.name == 'Graph') {
+            newItemObject.parent = this;
         }
 
         this.#children.push(newItemObject);
