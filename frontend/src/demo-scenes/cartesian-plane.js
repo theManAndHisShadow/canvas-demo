@@ -5,7 +5,7 @@ let cartesianPlane = new Scene({
         'description': {
             type: 'display-infobox',
             label: 'Description',
-            text: 'Empty'
+            text: 'Cartesian coordinate system in a plane is a coordinate system that specifies each point uniquely by a pair of real numbers called coordinates, which are the signed distances to the point from two fixed perpendicular oriented lines, called coordinate lines or coordinate axes.'
         },
 
         'centerViewAction': {
