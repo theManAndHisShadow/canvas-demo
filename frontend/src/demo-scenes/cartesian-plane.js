@@ -20,9 +20,10 @@ let cartesianPlane = new Scene({
             optionNames: [
                 'Points', 
                 'Segments',
-                'Test',
+                'Linear functions',
+                'Quadratic functions',
             ],
-            defaultValue: 2,
+            defaultValue: 0,
         },
     },
 
@@ -113,6 +114,11 @@ let cartesianPlane = new Scene({
         
             // Update cursor style
             canvas.style.cursor = 'inherit';
+        });
+
+        // adding 'move' event listener to plane for updating visible area info
+        plane.addEventListener('move', () => {
+            display.updateValue('visibleArea', `x: ${plane.visibleArea.x}, y: ${plane.visibleArea.y}`);
         });
 
         settings.subscribe((propertyName, newValue, oldValue) => {
@@ -222,10 +228,37 @@ let cartesianPlane = new Scene({
                             text: `<span">${graph.formula}</span>`
                         });
                     });
+                } else if(newValue == 3) {
+                    const graphs = [
+                        new Graph('x^2', 'yellow'),
+                        new Graph('0.5x^2', 'orange'),
 
-                    // adding 'move' event listener to plane for updating visible area info
-                    plane.addEventListener('move', () => {
-                        display.updateValue('visibleArea', `x: ${plane.visibleArea.x}, y: ${plane.visibleArea.y}`);
+                        new Graph('-x^2', 'violet'),
+                        new Graph('-0.5x^2', 'indigo'),
+
+                        new Graph('0.3x^2', 'green'),
+                        new Graph('0.2x^2', 'lime'),
+                    ];
+
+                    // updating info about current visible area of plane
+                    display.dynamicRender('visibleArea', {
+                        type: 'display',
+                        label: 'Visible area',
+                        text: `x: ${plane.visibleArea.x}, y: ${plane.visibleArea.y}`,
+                    });
+
+                    // make actions with each graph
+                    graphs.forEach((graph, i) => {
+                        plane.add(graph);
+
+                        console.log(graph);
+
+                        // show function formula to display UI
+                        display.dynamicRender('function-formula-' + i, {
+                            type: 'display',
+                            label: `- ${graph.type} function` ,
+                            text: `<span">${graph.formula}</span>`
+                        });
                     });
                 }
 
@@ -235,7 +268,7 @@ let cartesianPlane = new Scene({
 
 
         // Some trick to set first (index 0) preset as default preset
-        settings.setState('selectedPreset', 0);
+        settings.setState('selectedPreset', 3);
     }
 });
 
@@ -430,7 +463,7 @@ class TinyMath {
          * in the form of a free order of monomial or, even more so, the absence of monomial (if this is possible). 
          * At this stage more tests are required to ensure that the function type is defined correctly
          */
-        if(/^(\-?([0-9]+)?x)?([0-9]+)?/gm.test(formula)){
+        if(!/x\^2/g.test(formula) && /^(\-?([0-9]+)?x)?([0-9]+)?/gm.test(formula)){
             type = "linear";
         } else if(/x\^2/g.test(formula) && /((\-)?\d*x\^2)?([+-]?\d*x)?([+-]?\d+)?/gm.test(formula)){
             type = "quadratic";
@@ -567,14 +600,64 @@ class Graph extends PlanePrimitive {
     }
 
 
-    // function mockup
-    #drawQuadratic() {
-        // 
+    /**
+     * Draws a quadratic functon's graph to context.
+     * @param {number} step - Smoothness (resolution) of the graph - what step between points to set when drawing a graph of a function
+     */
+    #drawQuadratic(step = 1) {
+        this.renderer.beginPath();
+        this.renderer.strokeStyle = this.color;
+        this.renderer.lineWidth = 1;
+
+        let segmentStarted = false;
+    
+        for(let i = this.parent.visibleArea.x[0] - 3 ; i < this.parent.visibleArea.x[1] + 3; i += step){
+            let rawX = i;
+            let rawY = (this.parsed.a * (rawX ** 2)) + (this.parsed.b * rawX) + this.parsed.c;
+    
+            let x = rawX * (this.parent.gridCellSize*2) + this.parent.subpixel;
+            let y = rawY * (this.parent.gridCellSize*2) + this.parent.subpixel;
+            
+            let transformed = {
+                x: this.parent.cx + x,
+                y: this.parent.cy - y
+            };
+            
+            if (transformed.x < 0 || transformed.x > this.parent.viewWidth) {
+                // If the current point of the parabola's tail is outside the visible screen area,
+                // we need to end the current segment to avoid drawing a line connecting
+                // visible and non-visible points.
+                
+                if (segmentStarted) {
+                    // If a segment was in progress, finalize it by stroking and closing the path.
+                    this.renderer.stroke();
+                    this.renderer.closePath();
+                    segmentStarted = false; // Mark the segment as not started.
+                }
+                
+                continue; // Skip to the next iteration since this point is out of bounds.
+            }
+            
+            if (!segmentStarted) {
+                // If no segment is in progress, begin a new path for the visible segment.
+                this.renderer.beginPath();
+                this.renderer.moveTo(transformed.x, transformed.y);
+                segmentStarted = true; // Mark that a new segment has started.
+            } else {
+                // If a segment is already in progress, continue drawing the line to the current point.
+                this.renderer.lineTo(transformed.x, transformed.y);
+            }
+        }
+    
+        if (segmentStarted) {
+            this.renderer.stroke();
+            this.renderer.closePath();
+        }
     }
 
     draw(){
-        if(this.type == 'linear') this.#drawLinear();
-        if(this.type == 'quadratic') this.#drawQuadratic();
+        if(this.type == 'linear') this.#drawLinear(0.1);
+        if(this.type == 'quadratic') this.#drawQuadratic(0.1);
     }
 }
 
