@@ -14,7 +14,67 @@ function getRandomNumber(min, max) {
     let randomNUmber = min + Math.random() * (max + 1 - min);
   
     return Math.floor(randomNUmber);
-  }
+}
+
+
+
+/**
+ * Converts decimal number to fraction a/b
+ * @param {number} decimal - original decimal value
+ * @returns - fraction from decimal
+ */
+function decimalToFraction(decimal) {
+    let numerator = decimal;
+    let denominator = 1;
+
+    while (Math.floor(numerator) !== numerator) {
+        numerator *= 10;
+        denominator *= 10;
+    }
+
+    // Greatest common divisor
+    const gcd = (a, b) => {
+        return b ? gcd(b, a % b) : a;
+    };
+
+    const gcdValue = gcd(numerator, denominator);
+
+    return {
+        numerator: numerator / gcdValue,
+        denominator: denominator / gcdValue
+    };
+}
+
+
+
+/**
+ * 
+ * @param {string} fraction  - fraction to transform
+ * @returns {number} - converted fraction
+ */
+function fractionToDecimal(fraction) {
+    // deviding string by /
+    const parts = fraction.split('/');
+    
+    // Transforming string to num
+    const numerator = parseFloat(parts[0]);
+    const denominator = parseFloat(parts[1]);
+
+    // return result of devision
+    return numerator / denominator;
+}
+
+
+
+/**
+ * Checks is n is falot number
+ * @param {number} n - number for check
+ * @returns {boolean} - true or false
+ */
+function isFloat(n) {
+    return Number(n) === n && n % 1 !== 0;
+}
+
 
 
 /**
@@ -25,6 +85,7 @@ function getRandomNumber(min, max) {
 function getArrayLast(array){
     return array[array.length - 1];
 }
+
 
 
 /**
