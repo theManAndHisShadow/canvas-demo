@@ -17,6 +17,26 @@ html, body {
     opacity: 0.3;
 }
 
+.math-formula {
+    font-family: "STIX Two Text", serif;
+    font-optical-sizing: auto;
+    font-size: 17px;
+}
+
+.math-fraction {
+    display: inline-flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    bottom: 8px;
+    margin-top: 4px;
+}
+
+.math-fraction__denominator {
+    border-top: 1px solid black; 
+    width: 100%;
+}
+
 .green-word-bubble {
     padding: 2px;
     background-color: #b5df85;

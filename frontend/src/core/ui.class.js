@@ -379,6 +379,112 @@ class UIDisplay{
 
 
     /**
+     * Renders string formulas at display as correctly written mathematical formulas.
+     * @param {string} formula - formula string form
+     * @returns {string} - rendered formula container outer HTML
+     */
+    renderFormula(formula){
+        /**
+         * Iternal helper function.
+         * @param {number} base - fraction base form (2/3 or 0.6)
+         * @returns {string} - html elements string tree (outer html)
+         */
+        const formatFraction = (base) => {
+            let a = 1, b = 1, sign = '';
+            
+            // manual writed fraction
+            if(/\//g.test(base)) {
+                let splitted = base.split('/');
+                sign = splitted[0] == '-' ? '-' : '';
+                a = splitted[0];
+                b = splitted[1];
+            } else {
+                // converted from decimal
+                let fraction = decimalToFraction(base);
+                sign = fraction.denominator < 0 ? '-' : '';
+                a = fraction.numerator;
+                b = Math.abs(fraction.denominator);
+            }
+
+        
+            return `
+                ${sign ? '<span>' + sign + '</span>' : ''}
+                <div class="math-fraction">
+                    <div class="math-fraction__numerator">${a}</div>
+                    <div class="math-fraction__denominator">${b}</div>
+                </div>
+            `;
+        }
+
+        // Split by math operators and loop through array of groups
+        let groups = formula.split(/([+-]+)/gm).map(group => {
+                // work with only number + monomial
+                if(!/[+-]+/gm.test(group)) {
+                    // for group with x-monomials
+                    if(/x/gm.test(group)) {
+                        // for group with n-power
+                        if(/\^/gm.test(group)) {
+                            // split to left side and right side
+                            let splitted = group.split(/(\^)/);
+        
+                            // temp buffer var
+                            let buffer = splitted.map((symbol, i) => {
+                                if(symbol == '^') {
+                                    // left side of n^k
+                                    let base = splitted[i - 1].replace('x', '');
+                                    let baseNum = base == '-' ? 1 : base == '' ? 1 : base;
+
+                                    // right side of n^k
+                                    let degree = splitted[i + 1];
+            
+                                    // render left side as fraction if is uses '/' symbol
+                                    if(/\//g.test(baseNum)) {
+                                       base = formatFraction(baseNum);
+                                    }
+                                    
+                                    // compose
+                                    return `<span>${base}x<sup>${degree}</sup></span>`;
+                                }
+                            });
+        
+                            // return as joined string
+                            return buffer.join('');
+
+                        // for those groups with just 'x' without power operation
+                        } else {
+                            let num = group.replace('x', '');
+                            if(/\//g.test(num)) {
+                                num = formatFraction(num);
+                            }
+
+                            // if ax = 1x - show only x
+                            return num == 1 ? 'x' : num + 'x ';
+                        }
+
+                    // for those groups with just num symbol
+                    } else {
+                        return /\//g.test(group) 
+                            ? formatFraction(group) 
+                            : group == '' ? '' : Number(group);
+                    }
+                }
+                
+                // return MUTATED group
+                return group;
+            });
+
+        // compose formula back
+        formula = groups.join('');
+
+        let formulaContainer = document.createElement('span');
+            formulaContainer.innerHTML = formula;
+            formulaContainer.classList.add('math-formula');
+
+        return formulaContainer.outerHTML;
+    }
+
+
+    /**
      * Renders an element at HTML info block with given param (elementObject). 
      * @param {string} elementName - element name
      * @param {object} elementObject - element object
