@@ -208,7 +208,11 @@ let cartesianPlane = new Scene({
                         new Graph('2x-5', 'cyan'),
                         new Graph('x', 'lime'),
                         new Graph('-x', 'orange'),
+                        new Graph('0.3x-3/4', 'purple'),
+                        new Graph('2/3x', 'red')
                     ];
+
+                    console.log(graphs);
 
                     // updating info about current visible area of plane
                     display.dynamicRender('visibleArea', {
@@ -225,7 +229,7 @@ let cartesianPlane = new Scene({
                         display.dynamicRender('function-formula-' + i, {
                             type: 'display',
                             label: `- ${graph.type} function` ,
-                            text: `<span">${graph.formula}</span>`
+                            text: `${display.renderFormula(graph.formula)}`
                         });
                     });
                 } else if(newValue == 3) {
@@ -238,7 +242,11 @@ let cartesianPlane = new Scene({
 
                         new Graph('0.3x^2', 'green'),
                         new Graph('0.2x^2', 'lime'),
+
+                        new Graph('1/10x^2-5', 'red'),
                     ];
+
+                    console.log(graphs);
 
                     // updating info about current visible area of plane
                     display.dynamicRender('visibleArea', {
@@ -251,13 +259,11 @@ let cartesianPlane = new Scene({
                     graphs.forEach((graph, i) => {
                         plane.add(graph);
 
-                        console.log(graph);
-
                         // show function formula to display UI
                         display.dynamicRender('function-formula-' + i, {
                             type: 'display',
                             label: `- ${graph.type} function` ,
-                            text: `<span">${graph.formula}</span>`
+                            text: `${display.renderFormula(graph.formula)}`
                         });
                     });
                 }
@@ -485,6 +491,12 @@ class TinyMath {
         // devides formula into groups based on math operators
         let splitted = formula.split(/([+-])+/gm);
 
+        // internal helper function 
+        // if monomial uses / symbol - wrap as fraction elem
+        const normalizeNumber = (num) => {
+            return /\//g.test(num) ? Number(fractionToDecimal(num).toFixed(5)) : num;
+        }
+
         // It seems to me that this code needs refactoring
         if(type == 'linear') {
             let a = 0, b = 0;
@@ -496,10 +508,11 @@ class TinyMath {
 
                     if (/x/.test(item)) {
                         // set minor monomial
-                        a = (item.split('x')[0] || 1) * sign;
+                        a = (item.split('x')[0] || 1);
+                        a = normalizeNumber(a) * sign;
                     } else {
                         // set radical
-                        b = Number(item) * sign;
+                        b = normalizeNumber(item) * sign;
                     }
                 }
             });
@@ -516,13 +529,15 @@ class TinyMath {
 
                     if (/x\^2/.test(item)) {
                         // set major monomial
-                        a = (item.split('x')[0] || 1) * sign;
+                        a = (item.split('x')[0] || 1);
+                        a = normalizeNumber(a) * sign;
                     } else if (/x/.test(item)) {
                         // set minor monomial
-                        b = (item.split('x')[0] || 1) * sign;
+                        b = (item.split('x')[0] || 1);
+                        b = normalizeNumber(b) * sign;
                     } else {
                         // set radical
-                        c = Number(item) * sign;
+                        c = normalizeNumber(item) * sign;
                     }
                 }
             });
