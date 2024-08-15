@@ -155,6 +155,70 @@ function getMousePos(canvas, event) {
 }
 
 
+/**
+ * Returns RGBA color from string of color name
+ * @param {string} colorName - name of color
+ * @param {number} opacity - float number of color opacity
+ * @returns {string}
+ */
+function getColor(colorName, opacity = 1) {
+    // Color palette based on Material Design standards
+    const colors = {
+        red: [244, 67, 54],
+        pink: [233, 30, 99],
+        purple: [156, 39, 176],
+        deepPurple: [103, 58, 183],
+        indigo: [63, 81, 181],
+        blue: [33, 150, 243],
+        lightBlue: [3, 169, 244],
+        cyan: [0, 188, 212],
+        teal: [0, 150, 136],
+        green: [76, 175, 80],
+        lightGreen: [139, 195, 74],
+        lime: [205, 220, 57],
+        yellow: [255, 235, 59],
+        amber: [255, 193, 7],
+        orange: [255, 152, 0],
+        deepOrange: [255, 87, 34],
+        brown: [121, 85, 72],
+        grey: [158, 158, 158],
+        blueGrey: [96, 125, 139],
+        black: [0, 0, 0],
+        white: [255, 255, 255],
+        lightRed: [255, 205, 210],
+        lightPink: [248, 187, 208],
+        lightPurple: [225, 190, 231],
+        lightDeepPurple: [209, 196, 233],
+        lightIndigo: [197, 202, 233],
+        lightBlue: [187, 222, 251],
+        lightCyan: [178, 235, 242],
+        lightTeal: [178, 223, 219],
+        lightGreen: [220, 237, 200],
+        lightAmber: [255, 224, 178]
+    };
+
+    // Default to black if the color name is not found
+    const [r, g, b] = colors[colorName] || colors['black'];
+
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+
+
+/**
+ * Updates opacity of RGBA color
+ * @param {string} rgba - rgba string
+ * @param {number} newOpacity - float number
+ * @returns {string}
+ */
+function changeColorOpacity(rgba, newOpacity){
+    newOpacity = Math.max(0, Math.min(newOpacity, 1));
+
+    // split to components and change alpha component, then compose and return
+    return rgba.split(', ').map((c, i) => { if(i == 3) c = newOpacity + ')'; return c;}).join(', ');
+}
+
+
 
 /**
  * Draws a line from point A (x1, y1) to point B (x2, y2)
