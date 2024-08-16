@@ -160,8 +160,10 @@ function getMousePos(canvas, event) {
  * @param {string} colorName - name of color
  * @param {number} opacity - float number of color opacity
  * @returns {string}
- */
+ */ 
 function getColor(colorName, opacity = 1) {
+    opacity = Math.max(0, Math.min(opacity, 1));
+
     // Color palette based on Material Design standards
     const colors = {
         red: [244, 67, 54],
@@ -170,11 +172,9 @@ function getColor(colorName, opacity = 1) {
         deepPurple: [103, 58, 183],
         indigo: [63, 81, 181],
         blue: [33, 150, 243],
-        lightBlue: [3, 169, 244],
         cyan: [0, 188, 212],
         teal: [0, 150, 136],
         green: [76, 175, 80],
-        lightGreen: [139, 195, 74],
         lime: [205, 220, 57],
         yellow: [255, 235, 59],
         amber: [255, 193, 7],
