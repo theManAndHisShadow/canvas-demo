@@ -116,9 +116,18 @@ let cartesianPlane = new Scene({
             canvas.style.cursor = 'inherit';
         });
 
-        // adding 'move' event listener to plane for updating visible area info
-        plane.addEventListener('move', () => {
-            display.updateValue('visibleArea', `x: ${plane.visibleArea.x}, y: ${plane.visibleArea.y}`);
+        // adding 'redraw' event listener to plane for updating visible area info
+        let visibleAreaDisplayElement = ``;
+        plane.addEventListener('redraw', () => {
+            // format display item element
+            visibleAreaDisplayElement = `
+                <br/> 
+                - x-axis - [${plane.visibleArea.x}], <br/> 
+                - y-axis - [${plane.visibleArea.y}]
+            `;
+
+            // if element already created and existing
+            if(display.isExist('visibleArea')) display.updateValue('visibleArea', visibleAreaDisplayElement);
         });
 
         settings.subscribe((propertyName, newValue, oldValue) => {
@@ -159,7 +168,7 @@ let cartesianPlane = new Scene({
                         plane.add(point);
 
                         display.dynamicRender(`point${point.label}`, {
-                            type: 'display',
+                            type: 'display-item',
                             label: `- point <span style="font-weight: bold">${point.label}</span>`,
                             text: `<i style="font-size: 15px">(${point.planeX}, ${point.planeY})</i>`,
                         });
@@ -185,17 +194,16 @@ let cartesianPlane = new Scene({
 
                     array.forEach(item => {
                         plane.add(item);
-                        console.log(item, item.constructor.name);
 
                         if(item.constructor.name == 'Point') {
                             display.dynamicRender(`point${item.label}`, {
-                                type: 'display',
+                                type: 'display-item',
                                 label: `- point <span style="font-weight: bold">${item.label}</span>`,
                                 text: `<i style="font-size: 15px">(${item.planeX}, ${item.planeY})</i>`,
                             });
                         } else if(item.constructor.name == 'Segment'){
                             display.dynamicRender(`segment${item.startPoint.label + item.endPoint.label}`, {
-                                type: 'display',
+                                type: 'display-item',
                                 label: `- segment <span style="font-weight: bold; color: black; text-shadow: 0px 0px 3px  ${item.color}; border-radius: 3px;"> ${item.startPoint.label}${item.endPoint.label}</span>`,
                                 text: `[ <i style="font-size: 15px">(${item.startPoint.planeX}, ${item.startPoint.planeY}), (${item.endPoint.planeX}, ${item.endPoint.planeY})</i> ]`,
                             });
@@ -204,21 +212,31 @@ let cartesianPlane = new Scene({
                 } else if(newValue == 2) {
                     // some test lienar graphs
                     const graphs = [
-                        new Graph('5-x', 'red'),
-                        new Graph('2x-5', 'cyan'),
-                        new Graph('x', 'lime'),
-                        new Graph('-x', 'orange'),
-                        new Graph('0.3x-3/4', 'purple'),
-                        new Graph('2/3x', 'red')
+                        new Graph('x', getColor('red')),
+                        new Graph('-x', getColor('orange')),
+                        new Graph('1/3x', getColor('green')),
+                        new Graph('-1/3x', getColor('blue')),
+                        new Graph('3x', getColor('indigo')),
+                        new Graph('-3x', getColor('purple')),
                     ];
 
                     console.log(graphs);
 
                     // updating info about current visible area of plane
                     display.dynamicRender('visibleArea', {
-                        type: 'display',
-                        label: 'Visible area',
-                        text: `x: ${plane.visibleArea.x}, y: ${plane.visibleArea.y}`,
+                        type: 'display-item',
+                        label: 'Current visible area',
+                        text: visibleAreaDisplayElement,
+                    });
+
+                    display.dynamicRender('spacer', {
+                        type: 'display-spacer',
+                    });
+
+                    display.dynamicRender('function-list-title', {
+                        type: 'display-item',
+                        label: 'Function graphs drawn',
+                        text: graphs.length,
                     });
 
                     // make actions with each graph
@@ -227,32 +245,41 @@ let cartesianPlane = new Scene({
 
                         // show function formula to display UI
                         display.dynamicRender('function-formula-' + i, {
-                            type: 'display',
-                            label: `- ${graph.type} function` ,
-                            text: `${display.renderFormula(graph.formula)}`
+                            type: 'display-item',
+                            hideColon: true,
+                            label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
+                            text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
                         });
                     });
                 } else if(newValue == 3) {
                     const graphs = [
-                        new Graph('x^2', 'yellow'),
-                        new Graph('0.5x^2', 'orange'),
+                        new Graph('x^2', getColor('red')),
+                        new Graph('-x^2', getColor('purple')),
 
-                        new Graph('-x^2', 'violet'),
-                        new Graph('-0.5x^2', 'indigo'),
+                        new Graph('1/10x^2', getColor('green')),
+                        new Graph('-1/10x^2', getColor('cyan')),
 
-                        new Graph('0.3x^2', 'green'),
-                        new Graph('0.2x^2', 'lime'),
-
-                        new Graph('1/10x^2-5', 'red'),
+                        new Graph('0.25x^2-5', getColor('orange')),
+                        new Graph('-0.25x^2+5', getColor('indigo')),
                     ];
 
                     console.log(graphs);
 
                     // updating info about current visible area of plane
                     display.dynamicRender('visibleArea', {
-                        type: 'display',
-                        label: 'Visible area',
-                        text: `x: ${plane.visibleArea.x}, y: ${plane.visibleArea.y}`,
+                        type: 'display-item',
+                        label: 'Current visible area',
+                        text: visibleAreaDisplayElement,
+                    });
+
+                    display.dynamicRender('spacer', {
+                        type: 'display-spacer',
+                    });
+
+                    display.dynamicRender('function-list-title', {
+                        type: 'display-item',
+                        label: 'Function graphs drawn',
+                        text: graphs.length,
                     });
 
                     // make actions with each graph
@@ -261,12 +288,13 @@ let cartesianPlane = new Scene({
 
                         // show function formula to display UI
                         display.dynamicRender('function-formula-' + i, {
-                            type: 'display',
-                            label: `- ${graph.type} function` ,
-                            text: `${display.renderFormula(graph.formula)}`
+                            type: 'display-item',
+                            hideColon: true,
+                            label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
+                            text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
                         });
                     });
-                }
+                } 
 
                 plane.render();
             }
@@ -274,7 +302,7 @@ let cartesianPlane = new Scene({
 
 
         // Some trick to set first (index 0) preset as default preset
-        settings.setState('selectedPreset', 3);
+        settings.setState('selectedPreset', 2);
     }
 });
 
@@ -480,7 +508,7 @@ class TinyMath {
 
 
     /**
-     * Parses function monomial coefficients
+     * Parses functioяn monomial coefficients
      * @param {string} formula - function formula
      * @param {string} type - function type
      * @returns {object} - parsed coefficients object {a, b, c...}
@@ -565,9 +593,8 @@ class Graph extends PlanePrimitive {
         this.formula = formula;
         this.type = this.processor.detect(this.formula);
         this.parsed = this.processor.parse(this.formula, this.type);
-
         this.points = [];
-
+        
         this.color = color;
     }
 
@@ -763,8 +790,6 @@ class CartesianPlane extends SynteticEventTarget2 {
                 });
             }
         });
-
-        this.dispatchEvent('move');
     }
 
 
@@ -1051,5 +1076,7 @@ class CartesianPlane extends SynteticEventTarget2 {
                 item.draw(); 
             });
         }
+
+        this.dispatchEvent('redraw');
     }
 }
