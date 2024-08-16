@@ -9,7 +9,7 @@ let colorPicker = new Scene({
         },
 
         'currentColor': {
-            type: 'display',
+            type: 'display-item',
             label: 'Current color',
         },
 
