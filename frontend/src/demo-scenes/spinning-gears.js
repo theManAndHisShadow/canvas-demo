@@ -14,12 +14,6 @@ let spinningGears = new Scene({
             state: false,
         },
 
-        'showAdditionalInfo': {
-            type: 'checkbox',
-            label: 'Show additional info',
-            state: true,
-        },
-
         'rotationSpeed': {
             type: 'input',
             label: 'Rotation speed',
@@ -334,11 +328,6 @@ let spinningGears = new Scene({
          * and receive the data through callback arg of settings.subscribe().
          */
         settings.subscribe((key, newValue, oldValue) => {
-            if(key == 'showAdditionalInfo') {
-                if(newValue == true) display.show();
-                if(newValue == false) display.hide();
-            }
-
             // Checking what exactly has changed in the settings object
             // if preset is changed
             if(key == 'selectedPreset'){
@@ -376,12 +365,12 @@ let spinningGears = new Scene({
                                 gear.role == 'driver' ? 'sun' : 'planet' : 'ring';
                             
                         display.dynamicRender(gearName, {
-                            type: 'display',
+                            type: 'display-item',
                             label: `- ${localPrefix} gear ${gearLetter}${gear.numberOfTeeth}</span>` ,
                         });
                     } else {
                         display.dynamicRender(gearName, {
-                            type: 'display',
+                            type: 'display-item',
                             label: `- ${gear.role} gear ${gearLetter}${gear.numberOfTeeth}</span>` ,
                         });
                     }
@@ -508,11 +497,11 @@ class Gear extends SynteticEventTarget {
         // setting color based on gear role and gear type
         alternativeFillColor = (typeof alternativeFillColor === 'string') 
             ? alternativeFillColor 
-            : getColor(toothing, role, 0.4);
+            : getGearColor(toothing, role, 0.4);
         
         alternativeBorderColor = (typeof alternativeBorderColor === 'string') 
             ? alternativeBorderColor 
-            :  getColor(toothing, role, 1)
+            :  getGearColor(toothing, role, 1)
 
         super();
 
@@ -868,7 +857,7 @@ function drawBlueprintBG(context, {canvasWidth, canvasHeight, devMode}){
  * @param {number} opacity - optional param to change result color opacity from 0 to 1
  * @returns {string} - result color
  */
-function getColor(toothing, role, opacity = 1) {
+function getGearColor(toothing, role, opacity = 1) {
     if (toothing === 'external') {
         if (role === 'driver') {
             return `rgba(255, 152, 0, ${opacity})`;
