@@ -27,7 +27,8 @@ class UI {
             for(let key of keys) {
                 let element = uiStructureTree[key];
 
-                if(element.type == 'display') this.display.render(key, element);
+                if(element.type == 'display-item') this.display.renderDisplayItem(key, element);
+                if(element.type == 'display-spacer') this.display.renderSpacer();
                 if(element.type == 'display-infobox') this.display.renderInfoBox(key, element);
 
                 if(element.type == 'range-slider') this.controls.renderRangeSlider(key, element);
@@ -299,13 +300,12 @@ class UIControls {
 class UIDisplay{
     #html;
     #elementCSS_SelectorPrefix= 'scene-info__';
-    #dynamicllyRenderedAttribute = 'data-dynamicllyrendered'
+    #dynamicllyRenderedAttribute = 'data-dynamiclly-rendered'
 
     constructor(html){
         this.#html = {
             root: html,
         };
-
     }
 
 
@@ -352,7 +352,7 @@ class UIDisplay{
     }
 
     /**
-     * renders an infobox element at HTML info block with given param (elementObject). 
+     * Renders an infobox element at HTML info block with given param (elementObject). 
      * @param {string} elementName 
      * @param {object} elementObject 
      */
@@ -458,7 +458,7 @@ class UIDisplay{
                             }
 
                             // if ax = 1x - show only x
-                            return num == 1 ? 'x' : num + 'x ';
+                            return num == 1 ? 'x' : num + 'x';
                         }
 
                     // for those groups with just num symbol
@@ -485,25 +485,46 @@ class UIDisplay{
 
 
     /**
-     * Renders an element at HTML info block with given param (elementObject). 
+     * Renders a space (empty line).
+     * Can be called inside '.dynamicRender()'.
+     * @returns {HTMLBRElement}
+     */
+    renderSpacer() {
+        let spacerContainer = document.createElement('br');
+        spacerContainer.classList.add('display-spacer');
+
+        this.appendToRoot(spacerContainer);
+
+        return spacerContainer;
+    }
+
+
+    /**
+     * Checks is element with given name is exist at display
+     * @param {string} elementName 
+     * @returns {boolean}
+     */
+    isExist(elementName) {
+        return this.#html[elementName] !== undefined ? true : false;
+    }
+
+
+    /**
+     * Draws an element on the user interface display.
+     * Can be called inside '.dynamicRender()'.
      * @param {string} elementName - element name
      * @param {object} elementObject - element object
-     * @param {boolean} markAsDynamicllyRendered - a way to mark dynamically rendered elements for a '.removeDynamicllyRendered()' method work.
      */
-    #__render(elementName, elementObject, markAsDynamicllyRendered = false){
+    renderDisplayItem(elementName, elementObject){
         let element = document.createElement('div');
             element.id = this.#elementCSS_SelectorPrefix + elementName;
-            
-        if(markAsDynamicllyRendered === true) {
-            element.setAttribute(this.#dynamicllyRenderedAttribute, true);
-        }
 
         let label = document.createElement('span');
             label.classList.add(
                 this.#elementCSS_SelectorPrefix + 'display-label', 
                 this.#elementCSS_SelectorPrefix + 'item-label'
             );
-            label.innerHTML = elementObject.label + ': ';
+            label.innerHTML = elementObject.hideColon  === true ? elementObject.label : elementObject.label + ': ';
 
         let valueContainer = document.createElement('span');
             valueContainer.classList.add(
@@ -519,16 +540,8 @@ class UIDisplay{
         this.#html[elementName] = valueContainer;
 
         this.appendToRoot(element);
-    }
 
-
-    /**
-     * Pre-draws an element on the user interface display.
-     * @param {string} elementName - element name
-     * @param {object} elementObject - element object
-     */
-    render(elementName, elementObject){
-        this.#__render(elementName, elementObject, false);
+        return element;
     }
 
 
@@ -538,7 +551,12 @@ class UIDisplay{
      * @param {object} elementObject - element object
      */
     dynamicRender(elementName, elementObject){
-        this.#__render(elementName, elementObject, true);
+        let dynamicllyRendered;
+
+        if(elementObject.type == 'display-item') dynamicllyRendered = this.renderDisplayItem(elementName, elementObject);
+        if(elementObject.type == 'display-spacer') dynamicllyRendered = this.renderSpacer();
+
+        if(dynamicllyRendered) dynamicllyRendered.setAttribute(this.#dynamicllyRenderedAttribute, true);
     }
 
 
