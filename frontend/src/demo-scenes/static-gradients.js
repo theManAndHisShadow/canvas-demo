@@ -9,7 +9,7 @@ let staticGadients = new Scene({
         },
 
         'executeTime': {
-            type: 'display',
+            type: 'display-item',
             label: 'Gradient rendered in',
         },
 

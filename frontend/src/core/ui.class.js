@@ -27,7 +27,8 @@ class UI {
             for(let key of keys) {
                 let element = uiStructureTree[key];
 
-                if(element.type == 'display') this.display.render(key, element);
+                if(element.type == 'display-item') this.display.renderDisplayItem(key, element);
+                if(element.type == 'display-spacer') this.display.renderSpacer();
                 if(element.type == 'display-infobox') this.display.renderInfoBox(key, element);
 
                 if(element.type == 'range-slider') this.controls.renderRangeSlider(key, element);
@@ -299,13 +300,12 @@ class UIControls {
 class UIDisplay{
     #html;
     #elementCSS_SelectorPrefix= 'scene-info__';
-    #dynamicllyRenderedAttribute = 'data-dynamicllyrendered'
+    #dynamicllyRenderedAttribute = 'data-dynamiclly-rendered'
 
     constructor(html){
         this.#html = {
             root: html,
         };
-
     }
 
 
@@ -352,7 +352,7 @@ class UIDisplay{
     }
 
     /**
-     * renders an infobox element at HTML info block with given param (elementObject). 
+     * Renders an infobox element at HTML info block with given param (elementObject). 
      * @param {string} elementName 
      * @param {object} elementObject 
      */
@@ -379,25 +379,152 @@ class UIDisplay{
 
 
     /**
-     * Renders an element at HTML info block with given param (elementObject). 
+     * Renders string formulas at display as correctly written mathematical formulas.
+     * @param {string} formula - formula string form
+     * @returns {string} - rendered formula container outer HTML
+     */
+    renderFormula(formula){
+        /**
+         * Iternal helper function.
+         * @param {number} base - fraction base form (2/3 or 0.6)
+         * @returns {string} - html elements string tree (outer html)
+         */
+        const formatFraction = (base) => {
+            let a = 1, b = 1, sign = '';
+            
+            // manual writed fraction
+            if(/\//g.test(base)) {
+                let splitted = base.split('/');
+                sign = splitted[0] == '-' ? '-' : '';
+                a = splitted[0];
+                b = splitted[1];
+            } else {
+                // converted from decimal
+                let fraction = decimalToFraction(base);
+                sign = fraction.denominator < 0 ? '-' : '';
+                a = fraction.numerator;
+                b = Math.abs(fraction.denominator);
+            }
+
+        
+            return `
+                ${sign ? '<span>' + sign + '</span>' : ''}
+                <div class="math-fraction">
+                    <div class="math-fraction__numerator">${a}</div>
+                    <div class="math-fraction__denominator">${b}</div>
+                </div>
+            `;
+        }
+
+        // Split by math operators and loop through array of groups
+        let groups = formula.split(/([+-]+)/gm).map(group => {
+                // work with only number + monomial
+                if(!/[+-]+/gm.test(group)) {
+                    // for group with x-monomials
+                    if(/x/gm.test(group)) {
+                        // for group with n-power
+                        if(/\^/gm.test(group)) {
+                            // split to left side and right side
+                            let splitted = group.split(/(\^)/);
+        
+                            // temp buffer var
+                            let buffer = splitted.map((symbol, i) => {
+                                if(symbol == '^') {
+                                    // left side of n^k
+                                    let base = splitted[i - 1].replace('x', '');
+                                    let baseNum = base == '-' ? 1 : base == '' ? 1 : base;
+
+                                    // right side of n^k
+                                    let degree = splitted[i + 1];
+            
+                                    // render left side as fraction if is uses '/' symbol
+                                    if(/\//g.test(baseNum)) {
+                                       base = formatFraction(baseNum);
+                                    }
+                                    
+                                    // compose
+                                    return `<span>${base}x<sup>${degree}</sup></span>`;
+                                }
+                            });
+        
+                            // return as joined string
+                            return buffer.join('');
+
+                        // for those groups with just 'x' without power operation
+                        } else {
+                            let num = group.replace('x', '');
+                            if(/\//g.test(num)) {
+                                num = formatFraction(num);
+                            }
+
+                            // if ax = 1x - show only x
+                            return num == 1 ? 'x' : num + 'x';
+                        }
+
+                    // for those groups with just num symbol
+                    } else {
+                        return /\//g.test(group) 
+                            ? formatFraction(group) 
+                            : group == '' ? '' : Number(group);
+                    }
+                }
+                
+                // return MUTATED group
+                return group;
+            });
+
+        // compose formula back
+        formula = groups.join('');
+
+        let formulaContainer = document.createElement('span');
+            formulaContainer.innerHTML = formula;
+            formulaContainer.classList.add('math-formula');
+
+        return formulaContainer.outerHTML;
+    }
+
+
+    /**
+     * Renders a space (empty line).
+     * Can be called inside '.dynamicRender()'.
+     * @returns {HTMLBRElement}
+     */
+    renderSpacer() {
+        let spacerContainer = document.createElement('br');
+        spacerContainer.classList.add('display-spacer');
+
+        this.appendToRoot(spacerContainer);
+
+        return spacerContainer;
+    }
+
+
+    /**
+     * Checks is element with given name is exist at display
+     * @param {string} elementName 
+     * @returns {boolean}
+     */
+    isExist(elementName) {
+        return this.#html[elementName] !== undefined ? true : false;
+    }
+
+
+    /**
+     * Draws an element on the user interface display.
+     * Can be called inside '.dynamicRender()'.
      * @param {string} elementName - element name
      * @param {object} elementObject - element object
-     * @param {boolean} markAsDynamicllyRendered - a way to mark dynamically rendered elements for a '.removeDynamicllyRendered()' method work.
      */
-    #__render(elementName, elementObject, markAsDynamicllyRendered = false){
+    renderDisplayItem(elementName, elementObject){
         let element = document.createElement('div');
             element.id = this.#elementCSS_SelectorPrefix + elementName;
-            
-        if(markAsDynamicllyRendered === true) {
-            element.setAttribute(this.#dynamicllyRenderedAttribute, true);
-        }
 
         let label = document.createElement('span');
             label.classList.add(
                 this.#elementCSS_SelectorPrefix + 'display-label', 
                 this.#elementCSS_SelectorPrefix + 'item-label'
             );
-            label.innerHTML = elementObject.label + ': ';
+            label.innerHTML = elementObject.hideColon  === true ? elementObject.label : elementObject.label + ': ';
 
         let valueContainer = document.createElement('span');
             valueContainer.classList.add(
@@ -413,16 +540,8 @@ class UIDisplay{
         this.#html[elementName] = valueContainer;
 
         this.appendToRoot(element);
-    }
 
-
-    /**
-     * Pre-draws an element on the user interface display.
-     * @param {string} elementName - element name
-     * @param {object} elementObject - element object
-     */
-    render(elementName, elementObject){
-        this.#__render(elementName, elementObject, false);
+        return element;
     }
 
 
@@ -432,7 +551,12 @@ class UIDisplay{
      * @param {object} elementObject - element object
      */
     dynamicRender(elementName, elementObject){
-        this.#__render(elementName, elementObject, true);
+        let dynamicllyRendered;
+
+        if(elementObject.type == 'display-item') dynamicllyRendered = this.renderDisplayItem(elementName, elementObject);
+        if(elementObject.type == 'display-spacer') dynamicllyRendered = this.renderSpacer();
+
+        if(dynamicllyRendered) dynamicllyRendered.setAttribute(this.#dynamicllyRenderedAttribute, true);
     }
 
 

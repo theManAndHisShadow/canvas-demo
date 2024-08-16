@@ -3,18 +3,18 @@ let concentricCircles = new Scene({
 
     ui: {
         'description': {
-            type: 'display-infobox',
+            type: 'display-item-infobox',
             label: 'Description',
             text: 'A simple scene, training with rotating shapes and interacting with mouse events.'
         },
 
         'distance': {
-            type: 'display',
+            type: 'display-item',
             label: ' - distance to center',
         },
 
         'angle': {
-            type: 'display',
+            type: 'display-item',
             label: ' - angle of view',
         },
 

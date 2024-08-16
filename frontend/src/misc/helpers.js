@@ -14,7 +14,67 @@ function getRandomNumber(min, max) {
     let randomNUmber = min + Math.random() * (max + 1 - min);
   
     return Math.floor(randomNUmber);
-  }
+}
+
+
+
+/**
+ * Converts decimal number to fraction a/b
+ * @param {number} decimal - original decimal value
+ * @returns - fraction from decimal
+ */
+function decimalToFraction(decimal) {
+    let numerator = decimal;
+    let denominator = 1;
+
+    while (Math.floor(numerator) !== numerator) {
+        numerator *= 10;
+        denominator *= 10;
+    }
+
+    // Greatest common divisor
+    const gcd = (a, b) => {
+        return b ? gcd(b, a % b) : a;
+    };
+
+    const gcdValue = gcd(numerator, denominator);
+
+    return {
+        numerator: numerator / gcdValue,
+        denominator: denominator / gcdValue
+    };
+}
+
+
+
+/**
+ * 
+ * @param {string} fraction  - fraction to transform
+ * @returns {number} - converted fraction
+ */
+function fractionToDecimal(fraction) {
+    // deviding string by /
+    const parts = fraction.split('/');
+    
+    // Transforming string to num
+    const numerator = parseFloat(parts[0]);
+    const denominator = parseFloat(parts[1]);
+
+    // return result of devision
+    return numerator / denominator;
+}
+
+
+
+/**
+ * Checks is n is falot number
+ * @param {number} n - number for check
+ * @returns {boolean} - true or false
+ */
+function isFloat(n) {
+    return Number(n) === n && n % 1 !== 0;
+}
+
 
 
 /**
@@ -25,6 +85,7 @@ function getRandomNumber(min, max) {
 function getArrayLast(array){
     return array[array.length - 1];
 }
+
 
 
 /**
@@ -91,6 +152,70 @@ function getMousePos(canvas, event) {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top
     };
+}
+
+
+/**
+ * Returns RGBA color from string of color name
+ * @param {string} colorName - name of color
+ * @param {number} opacity - float number of color opacity
+ * @returns {string}
+ */ 
+function getColor(colorName, opacity = 1) {
+    opacity = Math.max(0, Math.min(opacity, 1));
+
+    // Color palette based on Material Design standards
+    const colors = {
+        red: [244, 67, 54],
+        pink: [233, 30, 99],
+        purple: [156, 39, 176],
+        deepPurple: [103, 58, 183],
+        indigo: [63, 81, 181],
+        blue: [33, 150, 243],
+        cyan: [0, 188, 212],
+        teal: [0, 150, 136],
+        green: [76, 175, 80],
+        lime: [205, 220, 57],
+        yellow: [255, 235, 59],
+        amber: [255, 193, 7],
+        orange: [255, 152, 0],
+        deepOrange: [255, 87, 34],
+        brown: [121, 85, 72],
+        grey: [158, 158, 158],
+        blueGrey: [96, 125, 139],
+        black: [0, 0, 0],
+        white: [255, 255, 255],
+        lightRed: [255, 205, 210],
+        lightPink: [248, 187, 208],
+        lightPurple: [225, 190, 231],
+        lightDeepPurple: [209, 196, 233],
+        lightIndigo: [197, 202, 233],
+        lightBlue: [187, 222, 251],
+        lightCyan: [178, 235, 242],
+        lightTeal: [178, 223, 219],
+        lightGreen: [220, 237, 200],
+        lightAmber: [255, 224, 178]
+    };
+
+    // Default to black if the color name is not found
+    const [r, g, b] = colors[colorName] || colors['black'];
+
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+
+
+/**
+ * Updates opacity of RGBA color
+ * @param {string} rgba - rgba string
+ * @param {number} newOpacity - float number
+ * @returns {string}
+ */
+function changeColorOpacity(rgba, newOpacity){
+    newOpacity = Math.max(0, Math.min(newOpacity, 1));
+
+    // split to components and change alpha component, then compose and return
+    return rgba.split(', ').map((c, i) => { if(i == 3) c = newOpacity + ')'; return c;}).join(', ');
 }
 
 
