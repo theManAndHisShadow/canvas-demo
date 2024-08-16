@@ -22,6 +22,7 @@ let cartesianPlane = new Scene({
                 'Segments',
                 'Linear functions',
                 'Quadratic functions',
+                'Cubic functions'
             ],
             defaultValue: 0,
         },
@@ -294,7 +295,46 @@ let cartesianPlane = new Scene({
                             text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
                         });
                     });
-                } 
+                } else if(newValue == 4) {
+                    const graphs = [
+                        new Graph('1/100x^3', getColor('red')),
+                        new Graph('-1/100x^3', getColor('blue')),
+                        new Graph('x^3+3x^2-6', getColor('amber')),
+                        new Graph('-x^3-3x^2+6', getColor('purple')),
+                    ];
+
+                    console.log(graphs);
+
+                     // updating info about current visible area of plane
+                     display.dynamicRender('visibleArea', {
+                        type: 'display-item',
+                        label: 'Current visible area',
+                        text: visibleAreaDisplayElement,
+                    });
+
+                    display.dynamicRender('spacer', {
+                        type: 'display-spacer',
+                    });
+
+                    display.dynamicRender('function-list-title', {
+                        type: 'display-item',
+                        label: 'Function graphs drawn',
+                        text: graphs.length,
+                    });
+
+                    // make actions with each graph
+                    graphs.forEach((graph, i) => {
+                        plane.add(graph);
+
+                        // show function formula to display UI
+                        display.dynamicRender('function-formula-' + i, {
+                            type: 'display-item',
+                            hideColon: true,
+                            label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
+                            text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
+                        });
+                    });
+                }
 
                 plane.render();
             }
@@ -302,7 +342,7 @@ let cartesianPlane = new Scene({
 
 
         // Some trick to set first (index 0) preset as default preset
-        settings.setState('selectedPreset', 2);
+        settings.setState('selectedPreset', 4);
     }
 });
 
@@ -489,19 +529,18 @@ class TinyMath {
      */
     detect(formula){
         // if function type is not detected - set false value
-        let type = false;
+        let type = 'unknown';
 
         /**
-         * Using regular expressions, we determine occurrences by various groups of characters - X signs, 
-         * exponentiation sign. However, these expressions were rewritten several times due to difficulties arising 
-         * in the form of a free order of monomial or, even more so, the absence of monomial (if this is possible). 
-         * At this stage more tests are required to ensure that the function type is defined correctly
+         * Using regular expressions to determine type of function
          */
-        if(!/x\^2/g.test(formula) && /^(\-?([0-9]+)?x)?([0-9]+)?/gm.test(formula)){
-            type = "linear";
-        } else if(/x\^2/g.test(formula) && /((\-)?\d*x\^2)?([+-]?\d*x)?([+-]?\d+)?/gm.test(formula)){
+        if(/x\^3/g.test(formula)){
+            type = "cubic";
+        } else if(/x\^2/g.test(formula)){
             type = "quadratic";
-        } 
+        } else {
+            type = "linear";
+        }
 
         return type;
     }
@@ -571,6 +610,35 @@ class TinyMath {
             });
 
             result = {a, b, c};
+        } else if(type == 'cubic') {
+            let a = 0, b = 0, c = 0, d = 0;
+
+            splitted.forEach((item, i) => {
+                // only for non-operator symbols and non-empty strings
+                if (item.trim().length > 0 && !/[+-]/.test(item)) {
+                    // detect sign of 'monomial'
+                    let sign = i > 0 && splitted[i - 1] === '-' ? -1 : 1;
+
+                    if (/x\^3/.test(item)) {
+                        // set major monomial
+                        a = (item.split('x')[0] || 1);
+                        a = normalizeNumber(a) * sign;
+                    } else if (/x\^2/.test(item)) {
+                        // set major monomial
+                        b = (item.split('x')[0] || 1);
+                        b = normalizeNumber(b) * sign;
+                    } else if (/x/.test(item)) {
+                        // set minor monomial
+                        c = (item.split('x')[0] || 1);
+                        c = normalizeNumber(c) * sign;
+                    } else {
+                        // set radical
+                        d = normalizeNumber(item) * sign;
+                    }
+                }
+            });
+
+            result = {a, b, c, d};
         }
 
         return result;
@@ -697,11 +765,71 @@ class Graph extends PlanePrimitive {
         }
     }
 
+    /**
+     * Draws a cubic functon's graph to context.
+     * @param {number} step - Smoothness (resolution) of the graph - what step between points to set when drawing a graph of a function
+     */
+    #drawCubic(step = 1) {
+        console.log(this);
+        this.renderer.beginPath();
+        this.renderer.strokeStyle = this.color;
+        this.renderer.lineWidth = 1;
+
+        let segmentStarted = false;
+    
+        for(let i = this.parent.visibleArea.x[0] - 3 ; i < this.parent.visibleArea.x[1] + 3; i += step){
+            let rawX = i;
+            let rawY = (this.parsed.a * (rawX ** 3)) + (this.parsed.b * (rawX ** 2)) + (this.parsed.c * rawX) + this.parsed.d;
+    
+            let x = rawX * (this.parent.gridCellSize*2) + this.parent.subpixel;
+            let y = rawY * (this.parent.gridCellSize*2) + this.parent.subpixel;
+            
+            let transformed = {
+                x: this.parent.cx + x,
+                y: this.parent.cy - y
+            };
+            
+            if (transformed.x < 0 || transformed.x > this.parent.viewWidth) {
+                // If the current point of the cubic parabola's tail is outside the visible screen area,
+                // we need to end the current segment to avoid drawing a line connecting
+                // visible and non-visible points.
+                
+                if (segmentStarted) {
+                    // If a segment was in progress, finalize it by stroking and closing the path.
+                    this.renderer.stroke();
+                    this.renderer.closePath();
+                    segmentStarted = false; // Mark the segment as not started.
+                }
+                
+                continue; // Skip to the next iteration since this point is out of bounds.
+            }
+            
+            if (!segmentStarted) {
+                // If no segment is in progress, begin a new path for the visible segment.
+                this.renderer.beginPath();
+                this.renderer.moveTo(transformed.x, transformed.y);
+                segmentStarted = true; // Mark that a new segment has started.
+            } else {
+                // If a segment is already in progress, continue drawing the line to the current point.
+                this.renderer.lineTo(transformed.x, transformed.y);
+            }
+        }
+    
+        if (segmentStarted) {
+            this.renderer.stroke();
+            this.renderer.closePath();
+        }
+    }
+
     draw(){
-        if(this.type == 'linear') this.#drawLinear(0.1);
-        if(this.type == 'quadratic') this.#drawQuadratic(0.1);
+        let defaultResolution = 0.1;
+
+        if(this.type == 'linear') this.#drawLinear(defaultResolution);
+        if(this.type == 'quadratic') this.#drawQuadratic(defaultResolution);
+        if(this.type == 'cubic') this.#drawCubic(defaultResolution);
     }
 }
+
 
 
 
