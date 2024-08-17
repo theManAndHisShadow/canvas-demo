@@ -22,7 +22,8 @@ let cartesianPlane = new Scene({
                 'Segments',
                 'Linear functions',
                 'Quadratic functions',
-                'Cubic functions'
+                'Cubic functions', 
+                'Hyperbola'
             ],
             defaultValue: 0,
         },
@@ -215,8 +216,8 @@ let cartesianPlane = new Scene({
                     const graphs = [
                         new Graph('x', getColor('red')),
                         new Graph('-x', getColor('orange')),
-                        new Graph('1/3x', getColor('green')),
-                        new Graph('-1/3x', getColor('blue')),
+                        new Graph('{1/3}x', getColor('green')),
+                        new Graph('{-1/3}x', getColor('blue')),
                         new Graph('3x', getColor('indigo')),
                         new Graph('-3x', getColor('purple')),
                     ];
@@ -246,7 +247,7 @@ let cartesianPlane = new Scene({
 
                         // show function formula to display UI
                         display.dynamicRender('function-formula-' + i, {
-                            type: 'display-item',
+                            type: 'display-float-item',
                             hideColon: true,
                             label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
                             text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
@@ -289,7 +290,7 @@ let cartesianPlane = new Scene({
 
                         // show function formula to display UI
                         display.dynamicRender('function-formula-' + i, {
-                            type: 'display-item',
+                            type: 'display-float-item',
                             hideColon: true,
                             label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
                             text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
@@ -328,7 +329,48 @@ let cartesianPlane = new Scene({
 
                         // show function formula to display UI
                         display.dynamicRender('function-formula-' + i, {
-                            type: 'display-item',
+                            type: 'display-float-item',
+                            hideColon: true,
+                            label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
+                            text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
+                        });
+                    });
+                } else if(newValue == 5) {
+                    const graphs = [
+                        new Graph('1/x', getColor('red')),
+                        new Graph('-1/x', getColor('purple')),
+                        new Graph('2/x', getColor('amber')),
+                        new Graph('-2/x', getColor('teal')),
+                        new Graph('3/x', getColor('green')),
+                        new Graph('-3/x', getColor('cyan')),
+                    ];
+
+                    console.log(graphs);
+
+                     // updating info about current visible area of plane
+                     display.dynamicRender('visibleArea', {
+                        type: 'display-item',
+                        label: 'Current visible area',
+                        text: visibleAreaDisplayElement,
+                    });
+
+                    display.dynamicRender('spacer', {
+                        type: 'display-spacer',
+                    });
+
+                    display.dynamicRender('function-list-title', {
+                        type: 'display-item',
+                        label: 'Function graphs drawn',
+                        text: graphs.length,
+                    });
+
+                    // make actions with each graph
+                    graphs.forEach((graph, i) => {
+                        plane.add(graph);
+
+                        // show function formula to display UI
+                        display.dynamicRender('function-formula-' + i, {
+                            type: 'display-float-item',
                             hideColon: true,
                             label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
                             text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
@@ -342,7 +384,7 @@ let cartesianPlane = new Scene({
 
 
         // Some trick to set first (index 0) preset as default preset
-        settings.setState('selectedPreset', 4);
+        settings.setState('selectedPreset', 0);
     }
 });
 
@@ -538,6 +580,8 @@ class TinyMath {
             type = "cubic";
         } else if(/x\^2/g.test(formula)){
             type = "quadratic";
+        } else if(/\/\d{0,}x/g.test(formula)) {
+            type = 'hyperbolic'
         } else {
             type = "linear";
         }
@@ -561,6 +605,10 @@ class TinyMath {
         // internal helper function 
         // if monomial uses / symbol - wrap as fraction elem
         const normalizeNumber = (num) => {
+            // remove helper brakets
+            num = /(\{|\})/gm.test(num) ? num.replace(/(\{|\})/gm, '') : num;
+
+            // normalize and return
             return /\//g.test(num) ? Number(fractionToDecimal(num).toFixed(5)) : num;
         }
 
@@ -576,7 +624,7 @@ class TinyMath {
                     if (/x/.test(item)) {
                         // set minor monomial
                         a = (item.split('x')[0] || 1);
-                        a = normalizeNumber(a) * sign;
+                        a = normalizeNumber(a) * sign; 
                     } else {
                         // set radical
                         b = normalizeNumber(item) * sign;
@@ -585,6 +633,29 @@ class TinyMath {
             });
 
             result = {a, b};
+        } else if(type == 'hyperbolic') {
+            let a = 0, b = 0, c = 0;
+
+            splitted.forEach((item, i) => {
+                if (item.trim().length > 0 && !/[+-]/.test(item)) {
+                    // detect sign of 'monomial'
+                    let sign = i > 0 && splitted[i - 1] === '-' ? -1 : 1;
+
+                    if (/\/\d{0,}x/.test(item)) {
+                        // set major monomial numerator
+                        a = Number((item.split('/')[0] || 1));
+
+                        // set major monomial denumerator
+                        b = (item.split('/')[1] || 1).replace('x', '')
+                        b = (b == '' ? 1 : Number(b)) * sign;
+                    } else {
+                        // set radical
+                        c = normalizeNumber(item) * sign;
+                    }
+                }
+            });
+            
+            result = {a, b, c};
         } else if(type == 'quadratic') {
             let a = 0, b = 0, c = 0;
 
@@ -624,7 +695,7 @@ class TinyMath {
                         a = (item.split('x')[0] || 1);
                         a = normalizeNumber(a) * sign;
                     } else if (/x\^2/.test(item)) {
-                        // set major monomial
+                        // set sub-major monomial
                         b = (item.split('x')[0] || 1);
                         b = normalizeNumber(b) * sign;
                     } else if (/x/.test(item)) {
@@ -770,7 +841,6 @@ class Graph extends PlanePrimitive {
      * @param {number} step - Smoothness (resolution) of the graph - what step between points to set when drawing a graph of a function
      */
     #drawCubic(step = 1) {
-        console.log(this);
         this.renderer.beginPath();
         this.renderer.strokeStyle = this.color;
         this.renderer.lineWidth = 1;
@@ -821,12 +891,129 @@ class Graph extends PlanePrimitive {
         }
     }
 
+
+    /**
+     * Draws a hyperbolic functon's graph to context.
+     * @param {number} step - Smoothness (resolution) of the graph - what step between points to set when drawing a graph of a function
+     */
+    #drawHyperbolic(step = 1){
+        /**
+         * Some notes about STEP:
+         * with values ​​below 0.001 the graph suddenly ends, but leaving 0.001 is also ineffective due 
+         * to the load on the processor. Maybe use adaptive change of this value?
+         */
+
+        this.renderer.beginPath();
+        this.renderer.strokeStyle = this.color;
+        this.renderer.lineWidth = 1;
+    
+        let segmentStarted = false;
+
+        /** 
+        * N.B:
+        *  We are separating the hyperbola into two branches (for x < 0 and x > 0)
+        * because a hyperbola consists of two distinct curves, one on either side of 
+        * the vertical asymptote (x = 0). If we were to draw the entire curve 
+        * without splitting the branches, the result would be a single connected curve
+        * that improperly crosses the y-axis, merging both branches into one continuous 
+        * line. This would visually distort the hyperbolic shape.
+        *
+        * By splitting the graph into two loops, we ensure that each branch is drawn 
+        * independently, stopping the rendering when x approaches zero to avoid 
+        * connecting points across the asymptote.
+        **/ 
+
+        // Drawing the left branch (x < 0)
+        for (let i = this.parent.visibleArea.x[0] - 3; i < this.parent.visibleArea.x[1] + 3; i += step) {
+            let rawX = i;
+        
+            // Skip points too close to the asymptote (x = 0)
+            if (Math.abs(rawX) < 0.001) {
+                continue;
+            }
+        
+            let rawY = (this.parsed.a / (this.parsed.b * rawX)) + this.parsed.c;
+            let x = rawX * (this.parent.gridCellSize * 2) + this.parent.subpixel;
+            let y = rawY * (this.parent.gridCellSize * 2) + this.parent.subpixel;
+        
+            let transformed = {
+                x: this.parent.cx + x,
+                y: this.parent.cy - y
+            };
+        
+            if (transformed.x < 0 || transformed.x > this.parent.viewWidth) {
+                if (segmentStarted) {
+                    this.renderer.stroke();
+                    this.renderer.closePath();
+                    segmentStarted = false;
+                }
+                continue;
+            }
+        
+            if (!segmentStarted) {
+                this.renderer.beginPath();
+                this.renderer.moveTo(transformed.x, transformed.y);
+                segmentStarted = true;
+            } else {
+                this.renderer.lineTo(transformed.x, transformed.y);
+            }
+        }
+        
+        if (segmentStarted) {
+            this.renderer.stroke();
+            this.renderer.closePath();
+        }
+    
+        segmentStarted = false;
+    
+        // Drawing the right branch (x > 0)
+        for(let i = step; i < this.parent.visibleArea.x[1] + 3; i += step){
+            let rawX = i;
+            let rawY = (this.parsed.a / (this.parsed.b * rawX)) + this.parsed.c;
+    
+            let x = rawX * (this.parent.gridCellSize * 2) + this.parent.subpixel;
+            let y = rawY * (this.parent.gridCellSize * 2) + this.parent.subpixel;
+    
+            let transformed = {
+                x: this.parent.cx + x,
+                y: this.parent.cy - y
+            };
+    
+            if (transformed.x < 0 || transformed.x > this.parent.viewWidth) {
+                if (segmentStarted) {
+                    this.renderer.stroke();
+                    this.renderer.closePath();
+                    segmentStarted = false;
+                }
+                continue;
+            }
+    
+            if (!segmentStarted) {
+                this.renderer.beginPath();
+                this.renderer.moveTo(transformed.x, transformed.y);
+                segmentStarted = true;
+            } else {
+                this.renderer.lineTo(transformed.x, transformed.y);
+            }
+        }
+    
+        if (segmentStarted) {
+            this.renderer.stroke();
+            this.renderer.closePath();
+        }
+    }
+
+
     draw(){
         let defaultResolution = 0.1;
 
         if(this.type == 'linear') this.#drawLinear(defaultResolution);
         if(this.type == 'quadratic') this.#drawQuadratic(defaultResolution);
         if(this.type == 'cubic') this.#drawCubic(defaultResolution);
+
+        // this method uses other default resolution value
+        // for more details check comment note inside method
+        if(this.type == 'hyperbolic') this.#drawHyperbolic(0.001);
     }
 }
 
