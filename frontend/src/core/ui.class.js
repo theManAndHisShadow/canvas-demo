@@ -28,6 +28,7 @@ class UI {
                 let element = uiStructureTree[key];
 
                 if(element.type == 'display-item') this.display.renderDisplayItem(key, element);
+                if(element.type == 'display-float-item') this.display.renderDisplayFloatItem(key, element);
                 if(element.type == 'display-spacer') this.display.renderSpacer();
                 if(element.type == 'display-infobox') this.display.renderInfoBox(key, element);
 
@@ -391,21 +392,26 @@ class UIDisplay{
          */
         const formatFraction = (base) => {
             let a = 1, b = 1, sign = '';
-            
+
             // manual writed fraction
             if(/\//g.test(base)) {
-                let splitted = base.split('/');
-                sign = splitted[0] == '-' ? '-' : '';
-                a = splitted[0];
-                b = splitted[1];
+                const splitted = base.split('/');
+
+                // clear values with {}
+                const clear = (stringNum) => {
+                    return /(\{|\})/.test(stringNum) ? Math.abs(Number(stringNum.replace(/(\{|\})/gm, ''))) : stringNum;
+                }
+
+                sign = /\-/gm.test(splitted[0]) == true ? '-' : '';
+                a = clear(splitted[0]);
+                b = clear(splitted[1]);
             } else {
                 // converted from decimal
-                let fraction = decimalToFraction(base);
+                const fraction = decimalToFraction(base);
                 sign = fraction.denominator < 0 ? '-' : '';
                 a = fraction.numerator;
                 b = Math.abs(fraction.denominator);
             }
-
         
             return `
                 ${sign ? '<span>' + sign + '</span>' : ''}
@@ -417,16 +423,16 @@ class UIDisplay{
         }
 
         // Split by math operators and loop through array of groups
-        let groups = formula.split(/([+-]+)/gm).map(group => {
+        let groups = formula.split(/(?<![\{])([+-])/gm).map(group => { 
                 // work with only number + monomial
-                if(!/[+-]+/gm.test(group)) {
+                if(!/(?<![\{])([+-])/gm.test(group)) {
                     // for group with x-monomials
                     if(/x/gm.test(group)) {
                         // for group with n-power
                         if(/\^/gm.test(group)) {
                             // split to left side and right side
                             let splitted = group.split(/(\^)/);
-        
+
                             // temp buffer var
                             let buffer = splitted.map((symbol, i) => {
                                 if(symbol == '^') {
@@ -451,6 +457,10 @@ class UIDisplay{
                             return buffer.join('');
 
                         // for those groups with just 'x' without power operation
+                        } else if(/\/\d{0,}x/g.test(group)) {
+                            let fractionWithX = formatFraction(group);
+
+                            return fractionWithX;
                         } else {
                             let num = group.replace('x', '');
                             if(/\//g.test(num)) {
@@ -468,7 +478,6 @@ class UIDisplay{
                             : group == '' ? '' : Number(group);
                     }
                 }
-                
                 // return MUTATED group
                 return group;
             });
@@ -518,6 +527,7 @@ class UIDisplay{
     renderDisplayItem(elementName, elementObject){
         let element = document.createElement('div');
             element.id = this.#elementCSS_SelectorPrefix + elementName;
+            element.classList.add('display-item');
 
         let label = document.createElement('span');
             label.classList.add(
@@ -545,6 +555,22 @@ class UIDisplay{
     }
 
 
+
+    /**
+     * Draws an float-left element on the user interface display.
+     * Can be called inside '.dynamicRender()'.
+     * @param {string} elementName - element name
+     * @param {object} elementObject - element object
+     */
+    renderDisplayFloatItem(elementName, elementObject){
+        let element = this.renderDisplayItem(elementName, elementObject);
+        element.classList.remove('display-item');
+        element.classList.add('display-float-item');
+
+        return element;
+    }
+
+
     /**
      * Dynamiclly draws an element on UI display, marking it with a special attribute.
      * @param {string} elementName - element name
@@ -554,6 +580,7 @@ class UIDisplay{
         let dynamicllyRendered;
 
         if(elementObject.type == 'display-item') dynamicllyRendered = this.renderDisplayItem(elementName, elementObject);
+        if(elementObject.type == 'display-float-item') dynamicllyRendered = this.renderDisplayFloatItem(elementName, elementObject);
         if(elementObject.type == 'display-spacer') dynamicllyRendered = this.renderSpacer();
 
         if(dynamicllyRendered) dynamicllyRendered.setAttribute(this.#dynamicllyRenderedAttribute, true);
