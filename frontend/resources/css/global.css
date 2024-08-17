@@ -150,6 +150,7 @@ main {
     background-color: white;
     margin: 0px auto;
     margin-bottom: 20px;
+    display: inline-block;
 }
 
 .medium-block {
@@ -167,6 +168,13 @@ main {
 .display-infobox .scene-info__display-infobox-label {
     font-weight: 700;
 }
+
+.display-float-item {
+    float: left;
+    padding: 8px 14px;
+    position: relative;
+}
+
 
 .display-infobox {
     background: #c9d2e2;
