@@ -125,12 +125,27 @@ let cartesianPlane = new Scene({
             visibleAreaDisplayElement = `
                 <br/> 
                 - x-axis - [${plane.visibleArea.x}], <br/> 
-                - y-axis - [${plane.visibleArea.y}]
+                - y-axis - [${plane.visibleArea.y[0] - 2}, ${plane.visibleArea.y[1]}].
             `;
 
             // if element already created and existing
             if(display.isExist('visibleArea')) display.updateValue('visibleArea', visibleAreaDisplayElement);
         });
+
+        // renders colored dot label near tile
+        const generateColorLabel = (color) => {
+            return `
+<span style="
+    background: ${changeColorOpacity(color, 0.75)}; 
+    border: 2px solid ${color}; 
+    border-radius: 100%;
+    right: 2px;
+    width: 8px;
+    display: block;
+    position: relative;
+    height: 8px;
+"></span>`
+        }
 
         settings.subscribe((propertyName, newValue, oldValue) => {
             if(propertyName == 'centerViewAction') {
@@ -247,9 +262,9 @@ let cartesianPlane = new Scene({
 
                         // show function formula to display UI
                         display.dynamicRender('function-formula-' + i, {
-                            type: 'display-float-item',
+                            type: 'display-float-tile',
                             hideColon: true,
-                            label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
+                            label: generateColorLabel(graph.color),
                             text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
                         });
                     });
@@ -290,9 +305,9 @@ let cartesianPlane = new Scene({
 
                         // show function formula to display UI
                         display.dynamicRender('function-formula-' + i, {
-                            type: 'display-float-item',
+                            type: 'display-float-tile',
                             hideColon: true,
-                            label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
+                            label: generateColorLabel(graph.color),
                             text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
                         });
                     });
@@ -329,9 +344,9 @@ let cartesianPlane = new Scene({
 
                         // show function formula to display UI
                         display.dynamicRender('function-formula-' + i, {
-                            type: 'display-float-item',
+                            type: 'display-float-tile',
                             hideColon: true,
-                            label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
+                            label: generateColorLabel(graph.color),
                             text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
                         });
                     });
@@ -370,9 +385,9 @@ let cartesianPlane = new Scene({
 
                         // show function formula to display UI
                         display.dynamicRender('function-formula-' + i, {
-                            type: 'display-float-item',
+                            type: 'display-float-tile',
                             hideColon: true,
-                            label: `<span style="background: ${changeColorOpacity(graph.color, 0.75)}; border: 2px solid ${graph.color}; border-radius: 100%; right: 1px; top: 1px; width: 6px; display: inline-table; position: relative; padding: 4px 1px;"></span>`,
+                            label: generateColorLabel(graph.color),
                             text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
                         });
                     });
