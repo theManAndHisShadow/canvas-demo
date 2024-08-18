@@ -23,7 +23,7 @@ let cartesianPlane = new Scene({
                 'Linear functions',
                 'Quadratic functions',
                 'Cubic functions', 
-                'Hyperbplic functions'
+                'Hyperbolic functions'
             ],
             defaultValue: 0,
         },
