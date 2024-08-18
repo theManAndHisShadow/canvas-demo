@@ -83,6 +83,8 @@ class Page {
             controls: Page.parseUIControls(),
         });
 
+        this.currentScene = null;
+
         // get all finded links
         this.links = Page.parseLinks();
     }
@@ -260,6 +262,8 @@ class Page {
                             // it makes updated values available inside scene code
                             settings: this.ui.states,
                         });
+
+                        this.currentScene = loadedScene;
                     }).catch(error => {
                         console.log(error);
                     }); 
