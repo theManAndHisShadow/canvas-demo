@@ -171,14 +171,14 @@ let cartesianPlane = new Scene({
                     let points1 = [
                         new Point('O', 0, 0, 'white' ),
 
-                        new Point("A", 0, 2.5, "orange", "red"),
-                        new Point("B", 1.7, 1.7, "orange", "red"),
-                        new Point("C", 2.5, 0, "orange", "red"),
-                        new Point("D", 1.7, -1.7, "orange", "red"),
-                        new Point("E", 0, -2.5, "orange", "red"),
-                        new Point("G", -1.7, -1.7, "orange", "red"),
-                        new Point("H", -2.5, 0, "orange", "red"),
-                        new Point("I", -1.7, 1.7, "orange", "red"),
+                        new Point("A", 0, 2.5, getColor("orange"), getColor("red")),
+                        new Point("B", 1.7, 1.7, getColor("orange"), getColor("red")),
+                        new Point("C", 2.5, 0, getColor("orange"), getColor("red")),
+                        new Point("D", 1.7, -1.7, getColor("orange"), getColor("red")),
+                        new Point("E", 0, -2.5, getColor("orange"), getColor("red")),
+                        new Point("G", -1.7, -1.7, getColor("orange"), getColor("red")),
+                        new Point("H", -2.5, 0, getColor("orange"), getColor("red")),
+                        new Point("I", -1.7, 1.7, getColor("orange"), getColor("red")),
                     ];
 
                     points1.forEach(point => {
@@ -193,9 +193,9 @@ let cartesianPlane = new Scene({
             
                 } else if(newValue == 1) {
                     // some segments
-                    const thickness = 3;
+                    const thickness = 1;
                     let array = [
-                        new Point('O', 0, 0, 'white' ),
+                        new Point('O', 0, 0, 'white'),
 
                         new Segment(['A', -5.5, 2],  ['B', -1.5, 2], '#ff0000', thickness),
                         new Segment(['B', -1.5, 2],  ['C', 0, 6], '#ff7f00', thickness),
@@ -226,18 +226,49 @@ let cartesianPlane = new Scene({
                             });
                         } 
                     });
-                } else if(newValue == 2) {
-                    // some test lienar graphs
-                    const graphs = [
-                        new Graph('x', getColor('red')),
-                        new Graph('-x', getColor('orange')),
-                        new Graph('{1/3}x', getColor('green')),
-                        new Graph('{-1/3}x', getColor('blue')),
-                        new Graph('3x', getColor('indigo')),
-                        new Graph('-3x', getColor('purple')),
+                } else if(newValue >= 2 && newValue <= 5) {
+                    const index = newValue - 2;
+                    const functions = [
+                        [
+                            // some test lienar graphs
+                            new Graph('x', getColor('red')),
+                            new Graph('-x', getColor('orange')),
+                            new Graph('{1/3}x', getColor('green')),
+                            new Graph('{-1/3}x', getColor('blue')),
+                            new Graph('3x', getColor('indigo')),
+                            new Graph('-3x', getColor('purple')),
+                        ], 
+
+                        [
+                            // quadratic functions
+                            new Graph('x^2', getColor('red')),
+                            new Graph('-x^2', getColor('purple')),
+                            new Graph('1/10x^2', getColor('green')),
+                            new Graph('-1/10x^2', getColor('cyan')),
+                            new Graph('0.25x^2-5', getColor('orange')),
+                            new Graph('-0.25x^2+5', getColor('indigo')),
+                        ],
+
+                        [
+                            // qubic functions
+                            new Graph('1/100x^3', getColor('red')),
+                            new Graph('-1/100x^3', getColor('blue')),
+                            new Graph('x^3+3x^2-6', getColor('amber')),
+                            new Graph('-x^3-3x^2+6', getColor('purple')),
+                        ],
+
+                        [
+                            // hyperbolic
+                            new Graph('1/x', getColor('red')),
+                            new Graph('-1/x', getColor('purple')),
+                            new Graph('2/x', getColor('amber')),
+                            new Graph('-2/x', getColor('teal')),
+                            new Graph('3/x', getColor('green')),
+                            new Graph('-3/x', getColor('cyan')),
+                        ]
                     ];
 
-                    console.log(graphs);
+                    console.log(functions[index]);
 
                     // updating info about current visible area of plane
                     display.dynamicRender('visibleArea', {
@@ -253,11 +284,11 @@ let cartesianPlane = new Scene({
                     display.dynamicRender('function-list-title', {
                         type: 'display-item',
                         label: 'Function graphs drawn',
-                        text: graphs.length,
+                        text: functions[index].length,
                     });
 
                     // make actions with each graph
-                    graphs.forEach((graph, i) => {
+                    functions[index].forEach((graph, i) => {
                         plane.add(graph);
 
                         // show function formula to display UI
@@ -268,130 +299,7 @@ let cartesianPlane = new Scene({
                             text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
                         });
                     });
-                } else if(newValue == 3) {
-                    const graphs = [
-                        new Graph('x^2', getColor('red')),
-                        new Graph('-x^2', getColor('purple')),
-
-                        new Graph('1/10x^2', getColor('green')),
-                        new Graph('-1/10x^2', getColor('cyan')),
-
-                        new Graph('0.25x^2-5', getColor('orange')),
-                        new Graph('-0.25x^2+5', getColor('indigo')),
-                    ];
-
-                    console.log(graphs);
-
-                    // updating info about current visible area of plane
-                    display.dynamicRender('visibleArea', {
-                        type: 'display-item',
-                        label: 'Current visible area',
-                        text: visibleAreaDisplayElement,
-                    });
-
-                    display.dynamicRender('spacer', {
-                        type: 'display-spacer',
-                    });
-
-                    display.dynamicRender('function-list-title', {
-                        type: 'display-item',
-                        label: 'Function graphs drawn',
-                        text: graphs.length,
-                    });
-
-                    // make actions with each graph
-                    graphs.forEach((graph, i) => {
-                        plane.add(graph);
-
-                        // show function formula to display UI
-                        display.dynamicRender('function-formula-' + i, {
-                            type: 'display-float-tile',
-                            hideColon: true,
-                            label: generateColorLabel(graph.color),
-                            text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
-                        });
-                    });
-                } else if(newValue == 4) {
-                    const graphs = [
-                        new Graph('1/100x^3', getColor('red')),
-                        new Graph('-1/100x^3', getColor('blue')),
-                        new Graph('x^3+3x^2-6', getColor('amber')),
-                        new Graph('-x^3-3x^2+6', getColor('purple')),
-                    ];
-
-                    console.log(graphs);
-
-                     // updating info about current visible area of plane
-                     display.dynamicRender('visibleArea', {
-                        type: 'display-item',
-                        label: 'Current visible area',
-                        text: visibleAreaDisplayElement,
-                    });
-
-                    display.dynamicRender('spacer', {
-                        type: 'display-spacer',
-                    });
-
-                    display.dynamicRender('function-list-title', {
-                        type: 'display-item',
-                        label: 'Function graphs drawn',
-                        text: graphs.length,
-                    });
-
-                    // make actions with each graph
-                    graphs.forEach((graph, i) => {
-                        plane.add(graph);
-
-                        // show function formula to display UI
-                        display.dynamicRender('function-formula-' + i, {
-                            type: 'display-float-tile',
-                            hideColon: true,
-                            label: generateColorLabel(graph.color),
-                            text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
-                        });
-                    });
-                } else if(newValue == 5) {
-                    const graphs = [
-                        new Graph('1/x', getColor('red')),
-                        new Graph('-1/x', getColor('purple')),
-                        new Graph('2/x', getColor('amber')),
-                        new Graph('-2/x', getColor('teal')),
-                        new Graph('3/x', getColor('green')),
-                        new Graph('-3/x', getColor('cyan')),
-                    ];
-
-                    console.log(graphs);
-
-                     // updating info about current visible area of plane
-                     display.dynamicRender('visibleArea', {
-                        type: 'display-item',
-                        label: 'Current visible area',
-                        text: visibleAreaDisplayElement,
-                    });
-
-                    display.dynamicRender('spacer', {
-                        type: 'display-spacer',
-                    });
-
-                    display.dynamicRender('function-list-title', {
-                        type: 'display-item',
-                        label: 'Function graphs drawn',
-                        text: graphs.length,
-                    });
-
-                    // make actions with each graph
-                    graphs.forEach((graph, i) => {
-                        plane.add(graph);
-
-                        // show function formula to display UI
-                        display.dynamicRender('function-formula-' + i, {
-                            type: 'display-float-tile',
-                            hideColon: true,
-                            label: generateColorLabel(graph.color),
-                            text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
-                        });
-                    });
-                }
+                } 
 
                 plane.render();
             }
@@ -399,7 +307,7 @@ let cartesianPlane = new Scene({
 
 
         // Some trick to set first (index 0) preset as default preset
-        settings.setState('selectedPreset', 0);
+        settings.setState('selectedPreset', 1);
     }
 });
 
