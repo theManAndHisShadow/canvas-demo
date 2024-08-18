@@ -23,7 +23,7 @@ let cartesianPlane = new Scene({
                 'Linear functions',
                 'Quadratic functions',
                 'Cubic functions', 
-                'Hyperbola'
+                'Hyperbplic functions'
             ],
             defaultValue: 0,
         },
@@ -171,14 +171,8 @@ let cartesianPlane = new Scene({
                     let points1 = [
                         new Point('O', 0, 0, 'white' ),
 
-                        new Point("A", 0, 2.5, getColor("orange"), getColor("red")),
-                        new Point("B", 1.7, 1.7, getColor("orange"), getColor("red")),
-                        new Point("C", 2.5, 0, getColor("orange"), getColor("red")),
-                        new Point("D", 1.7, -1.7, getColor("orange"), getColor("red")),
-                        new Point("E", 0, -2.5, getColor("orange"), getColor("red")),
-                        new Point("G", -1.7, -1.7, getColor("orange"), getColor("red")),
-                        new Point("H", -2.5, 0, getColor("orange"), getColor("red")),
-                        new Point("I", -1.7, 1.7, getColor("orange"), getColor("red")),
+                        new Point("A", 2, 2, getColor("red"), getColor("orange")),
+                        new Point("B", -2, 2, getColor("blue"), getColor("purple")),
                     ];
 
                     points1.forEach(point => {
@@ -307,7 +301,7 @@ let cartesianPlane = new Scene({
 
 
         // Some trick to set first (index 0) preset as default preset
-        settings.setState('selectedPreset', 1);
+        settings.setState('selectedPreset', 2);
     }
 });
 
@@ -637,10 +631,94 @@ class TinyMath {
 
         return result;
     }
+    
 
-    solveLinear(a, b){
-        let root = - b / a;
-        return [{x: root, y: 0}];
+    /**
+     * 
+     * @param {string} type - type of function
+     * @param {object} coeffs - coeffs object of function
+     * @returns {object[]} - roots of functions, array may be empty
+     */
+    findRoots(type, coeffs){
+        let roots = [];
+
+        // linear function: ax + b = 0
+        if(type == 'linear') {
+            let y = 0;
+            let x = (coeffs.b * -1) / coeffs.a;
+            roots.push({x, y});
+
+        // quadratic function: ax^2 + bx + c = 0
+        } else if(type == 'quadratic') {
+            const a = coeffs.a;
+            const b = coeffs.b;
+            const c = coeffs.c;
+
+            // discriminant
+            const discriminant = b**2 - 4 * a * c;
+
+            if (discriminant > 0) {
+                // Two real roots
+                let x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+                let x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+                roots.push({x: x1, y: 0});
+                roots.push({x: x2, y: 0});
+            } else if (discriminant === 0) {
+                // One real root
+                let x = -b / (2 * a);
+                roots.push({x, y: 0});
+            } else {
+                // Two complex roots
+                let realPart = -b / (2 * a);
+                let imaginaryPart = Math.sqrt(-discriminant) / (2 * a);
+                roots.push({x: realPart, y: imaginaryPart}); // root of the form x + iy
+                roots.push({x: realPart, y: -imaginaryPart}); // root of the form x - iy
+            }
+
+        // Cubic function: ax^3 + bx^2 + cx + d = 0
+        } else if(type == 'cubic') {
+            const a = coeffs.a;
+            const b = coeffs.b;
+            const c = coeffs.c;
+            const d = coeffs.d;
+
+            // Reduction to canonical form: t^3 + pt + q = 0
+            const p = (3 * a * c - b ** 2) / (3 * a ** 2);
+            const q = (2 * b ** 3 - 9 * a * b * c + 27 * a ** 2 * d) / (27 * a ** 3);
+
+            const discriminant = (q ** 2) / 4 + (p ** 3) / 27;
+
+            if (discriminant > 0) {
+                // One real root and two complex roots
+                const u = Math.cbrt(-q / 2 + Math.sqrt(discriminant));
+                const v = Math.cbrt(-q / 2 - Math.sqrt(discriminant));
+                const x1 = u + v - b / (3 * a);
+                roots.push({x: x1, y: 0});
+            } else if (discriminant === 0) {
+                // All roots are real and at least two of them are equal
+                const u = Math.cbrt(-q / 2);
+                const x1 = 2 * u - b / (3 * a);
+                const x2 = -u - b / (3 * a);
+                roots.push({x: x1, y: 0});
+                roots.push({x: x2, y: 0});
+            } else {
+                // All three roots are real
+                const r = Math.sqrt((p *-1) ** 3 / 27);
+                const phi = Math.acos(-q / (2 * r));
+                const x1 = 2 * Math.cbrt(r) * Math.cos(phi / 3) - b / (3 * a);
+                const x2 = 2 * Math.cbrt(r) * Math.cos((phi + 2 * Math.PI) / 3) - b / (3 * a);
+                const x3 = 2 * Math.cbrt(r) * Math.cos((phi + 4 * Math.PI) / 3) - b / (3 * a);
+                roots.push({x: x1, y: 0});
+                roots.push({x: x2, y: 0});
+                roots.push({x: x3, y: 0});
+            }
+
+        // hyperbolic function: k/x = 0
+        } else if(type == 'hyperbolic') {
+            // no roots for hyperblic function :)
+        }
+
+        return roots;
     }
 }
 
@@ -655,7 +733,7 @@ class Graph extends PlanePrimitive {
         this.formula = formula;
         this.type = this.processor.detect(this.formula);
         this.parsed = this.processor.parse(this.formula, this.type);
-        this.points = [];
+        this.roots = this.processor.findRoots(this.type, this.parsed);
         
         this.color = color;
     }
@@ -1022,10 +1100,7 @@ class CartesianPlane extends SynteticEventTarget2 {
                 item.endPoint.x = item.endPoint.x + xOffset;
                 item.endPoint.y = item.endPoint.y + yOffset;
             } else if(item.constructor.name == 'Graph') {
-                item.points.forEach(point => {
-                    point.x = point.x + xOffset;
-                    point.y = point.y + yOffset;
-                });
+
             }
         });
     }
