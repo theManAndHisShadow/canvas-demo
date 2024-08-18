@@ -28,7 +28,7 @@ class UI {
                 let element = uiStructureTree[key];
 
                 if(element.type == 'display-item') this.display.renderDisplayItem(key, element);
-                if(element.type == 'display-float-item') this.display.renderDisplayFloatItem(key, element);
+                if(element.type == 'display-float-tile') this.display.renderDisplayFloatTile(key, element);
                 if(element.type == 'display-spacer') this.display.renderSpacer();
                 if(element.type == 'display-infobox') this.display.renderInfoBox(key, element);
 
@@ -496,10 +496,10 @@ class UIDisplay{
     /**
      * Renders a space (empty line).
      * Can be called inside '.dynamicRender()'.
-     * @returns {HTMLBRElement}
+     * @returns {HTMLDivElement}
      */
     renderSpacer() {
-        let spacerContainer = document.createElement('br');
+        let spacerContainer = document.createElement('div');
         spacerContainer.classList.add('display-spacer');
 
         this.appendToRoot(spacerContainer);
@@ -562,10 +562,10 @@ class UIDisplay{
      * @param {string} elementName - element name
      * @param {object} elementObject - element object
      */
-    renderDisplayFloatItem(elementName, elementObject){
+    renderDisplayFloatTile(elementName, elementObject){
         let element = this.renderDisplayItem(elementName, elementObject);
-        element.classList.remove('display-item');
-        element.classList.add('display-float-item');
+            element.classList.remove('display-item');
+            element.classList.add('display-float-tile');
 
         return element;
     }
@@ -580,7 +580,7 @@ class UIDisplay{
         let dynamicllyRendered;
 
         if(elementObject.type == 'display-item') dynamicllyRendered = this.renderDisplayItem(elementName, elementObject);
-        if(elementObject.type == 'display-float-item') dynamicllyRendered = this.renderDisplayFloatItem(elementName, elementObject);
+        if(elementObject.type == 'display-float-tile') dynamicllyRendered = this.renderDisplayFloatTile(elementName, elementObject);
         if(elementObject.type == 'display-spacer') dynamicllyRendered = this.renderSpacer();
 
         if(dynamicllyRendered) dynamicllyRendered.setAttribute(this.#dynamicllyRenderedAttribute, true);
