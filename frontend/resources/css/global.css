@@ -20,7 +20,12 @@ html, body {
 .math-formula {
     font-family: "STIX Two Text", serif;
     font-optical-sizing: auto;
-    font-size: 17px;
+    font-size: 16px;
+}
+
+.scene-info__display-label, 
+.math-formula {
+    vertical-align: middle;
 }
 
 .math-fraction {
@@ -165,14 +170,40 @@ main {
     border-radius: 4px;
 }
 
+#scene-info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
 .display-infobox .scene-info__display-infobox-label {
     font-weight: 700;
 }
 
-.display-float-item {
-    float: left;
-    padding: 8px 14px;
+.display-spacer {
     position: relative;
+    width: 100%;
+    height: 14px;
+}
+
+.display-item {
+    width: 100%;
+}
+
+.display-float-tile {
+    padding: 3px 7px;
+    margin: 2px 2px;
+    background: #00000024;
+    border-radius: 2px;
+    border: 1px solid #0000005e;
+    font-size: 13px;
+    max-width: 230px;
+    min-width: 105px;
+    min-height: 24px;
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
 }
 
 
