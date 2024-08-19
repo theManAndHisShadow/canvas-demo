@@ -390,12 +390,12 @@ class UIDisplay{
          * @param {number} base - fraction base form (2/3 or 0.6)
          * @returns {string} - html elements string tree (outer html)
          */
-        const formatFraction = (base) => {
+        const formatFraction = (inlineFormat, degreeFormat = false, addX = false) => {
             let a = 1, b = 1, sign = '';
 
             // manual writed fraction
-            if(/\//g.test(base)) {
-                const splitted = base.split('/');
+            if(/\//g.test(inlineFormat)) {
+                const splitted = inlineFormat.split('/');
 
                 // clear values with {}
                 const clear = (stringNum) => {
@@ -407,7 +407,7 @@ class UIDisplay{
                 b = clear(splitted[1]);
             } else {
                 // converted from decimal
-                const fraction = decimalToFraction(base);
+                const fraction = decimalToFraction(inlineFormat);
                 sign = fraction.denominator < 0 ? '-' : '';
                 a = fraction.numerator;
                 b = Math.abs(fraction.denominator);
@@ -415,10 +415,11 @@ class UIDisplay{
         
             return `
                 ${sign ? '<span>' + sign + '</span>' : ''}
-                <div class="math-fraction">
+                <div class="math-fraction ${degreeFormat == true ? 'math-fraction--degree-format' : ''}">
                     <div class="math-fraction__numerator">${a}</div>
                     <div class="math-fraction__denominator">${b}</div>
                 </div>
+                <span class="math-fraction__x-symbol">${addX  == true? 'x' : ''}</span>
             `;
         }
 
@@ -439,7 +440,7 @@ class UIDisplay{
                                     // left side of n^k
                                     let base = splitted[i - 1].replace('x', '');
                                     let baseNum = base == '-' ? 1 : base == '' ? 1 : base;
-
+                                    
                                     // right side of n^k
                                     let degree = splitted[i + 1];
             
@@ -447,9 +448,13 @@ class UIDisplay{
                                     if(/\//g.test(baseNum)) {
                                        base = formatFraction(baseNum);
                                     }
+
+                                    if(/\//g.test(degree)) {
+                                        degree = formatFraction(degree.replace('x', ''), true, true);
+                                    }
                                     
                                     // compose
-                                    return `<span>${base}x<sup>${degree}</sup></span>`;
+                                    return `<span>${base}${base == 'e' ? '' : 'x'}<sup>${degree}</sup></span>`;
                                 }
                             });
         
