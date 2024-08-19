@@ -18,12 +18,13 @@ let cartesianPlane = new Scene({
             type: 'option-selector',
             label: 'Choose preset',
             optionNames: [
-                'Points', 
-                'Segments',
-                'Linear functions',
-                'Quadratic functions',
-                'Cubic functions', 
-                'Hyperbolic functions'
+                'Single points',            // 0
+                'Segments',                 // 1
+                'Line',                     // 2
+                'Quadratic parabola',       // 3
+                'Cubic parabola',           // 4
+                'Hyperbola',                // 5
+                'Exponential curve',        // 6
             ],
             defaultValue: 0,
         },
@@ -171,8 +172,10 @@ let cartesianPlane = new Scene({
                     let points1 = [
                         new Point('O', 0, 0, 'white' ),
 
-                        new Point("A", 2, 2, getColor("red"), getColor("orange")),
-                        new Point("B", -2, 2, getColor("blue"), getColor("purple")),
+                        new Point("A", 2, 2, getColor("orange"), getColor("red")),
+                        new Point("B", -2, 2, getColor("lime"), getColor("green")),
+                        new Point("C", -2, -2, getColor("purple"), getColor("deepPurple")),
+                        new Point("D", 2, -2, getColor("blue"), getColor("indigo")),
                     ];
 
                     points1.forEach(point => {
@@ -220,7 +223,7 @@ let cartesianPlane = new Scene({
                             });
                         } 
                     });
-                } else if(newValue >= 2 && newValue <= 5) {
+                } else if(newValue >= 2 && newValue <= 6) {
                     const index = newValue - 2;
                     const functions = [
                         [
@@ -259,7 +262,18 @@ let cartesianPlane = new Scene({
                             new Graph('-2/x', getColor('teal')),
                             new Graph('3/x', getColor('green')),
                             new Graph('-3/x', getColor('cyan')),
-                        ]
+                        ],
+
+                        // Exponential
+                        [
+                            new Graph('e^x', getColor('red')),
+                            new Graph('e^{5/10x}', getColor('amber')),
+                            new Graph('e^{3/10x}', getColor('lightAmber')),
+                            new Graph('e^{2/10x}', getColor('lightBlue')),
+                            new Graph('e^1/10x', getColor('blue')),
+
+                            new Graph('-e^1/10x', getColor('deepPurple')),
+                        ],
                     ];
 
                     console.log(functions[index]);
@@ -497,7 +511,9 @@ class TinyMath {
             type = "cubic";
         } else if(/x\^2/g.test(formula)){
             type = "quadratic";
-        } else if(/\/\d{0,}x/g.test(formula)) {
+        } else if(/e\^\{?\-?(\d+\/?\d+|0\.\d{1,})?x\}?/g.test(formula)) {
+            type = 'exponential';
+        } else if(/\/\d?x/g.test(formula)) {
             type = 'hyperbolic'
         } else {
             type = "linear";
@@ -517,7 +533,8 @@ class TinyMath {
         let result = {};
 
         // devides formula into groups based on math operators
-        let splitted = formula.split(/([+-])+/gm);
+        const delimeter = new RegExp(`(?<!\{)([+-])+`, 'gm');
+        let splitted = formula.split(delimeter);
 
         // internal helper function 
         // if monomial uses / symbol - wrap as fraction elem
@@ -534,7 +551,7 @@ class TinyMath {
             let a = 0, b = 0;
 
             splitted.forEach((item, i) => {
-                if (item.trim().length > 0 && !/[+-]/.test(item)) {
+                if (item.trim().length > 0 && !delimeter.test(item)) {
                     // detect sign of 'monomial'
                     let sign = i > 0 && splitted[i - 1] === '-' ? -1 : 1;
 
@@ -549,7 +566,7 @@ class TinyMath {
                 }
             });
 
-            result = {a, b};
+            result = {a, b}; 
         } else if(type == 'hyperbolic') {
             let a = 0, b = 0, c = 0;
 
@@ -627,6 +644,37 @@ class TinyMath {
             });
 
             result = {a, b, c, d};
+        } else if(type == 'exponential') {
+            let a = 0, b = 0, c = 0;
+
+            splitted.forEach((item, i) => {
+                // only for non-operator symbols and non-empty strings
+                if (item.trim().length > 0 && !delimeter.test(item)) {
+
+                    // major monomial
+                    if(/e\^\{?/g.test(item)){
+                        // get a coeff sign
+                        let sign_a = i > 0 && splitted[i - 1] === '-' ? -1 : 1;
+                        a = (item.split('e')[0] || 1);
+                        a = normalizeNumber(a) * sign_a;
+
+                        // preparations
+                        let raw_b = (item.split('e^')[1].split('x')[0].replace(/\{?/g, '') || 1);
+
+                        // get b coeff sign
+                        let sign_b = /\-/g.test(raw_b) === true ? -1 : 1;
+                        b = typeof raw_b == 'string' ? raw_b.replace(/\-?/, '') : raw_b;
+                        b = (normalizeNumber(b) || 1) * sign_b;
+
+                    // radical
+                    } else {
+                        let sign = i > 0 && splitted[i - 1] === '-' ? -1 : 1;
+                        c = normalizeNumber(item) * sign;
+                    }
+                }
+            });
+
+            result = {a, b, c}
         }
 
         return result;
@@ -716,6 +764,17 @@ class TinyMath {
         // hyperbolic function: k/x = 0
         } else if(type == 'hyperbolic') {
             // no roots for hyperblic function :)
+        } else if(type == 'exponential') {
+            const {a, b, c} = coeffs;
+
+            // Check if the exponential equation can have real solutions
+            if (a !== 0 && -c / a > 0) {
+                // Calculate the root using the natural logarithm
+                let x = Math.log(-c / a) / b;
+                roots.push({x: x, y: 0});
+            } else {
+                // No real roots possible
+            }
         }
 
         return roots;
@@ -1004,6 +1063,73 @@ class Graph extends PlanePrimitive {
         }
     }
 
+    
+    /**
+     * Draws a exponential functon's graph to context.
+     * @param {number} step - Smoothness (resolution) of the graph - what step between points to set when drawing a graph of a function
+     */
+    #drawExponential(step = 1){
+        this.renderer.beginPath();
+        this.renderer.strokeStyle = this.color;
+        this.renderer.lineWidth = 1;
+
+        let segmentStarted = false;
+    
+        for(let i = this.parent.visibleArea.x[0] - 4 ; i < this.parent.visibleArea.x[1] + 4; i += step){
+            let rawX = i;
+            let rawY = (this.parsed.a * Math.exp(this.parsed.b * rawX)) + this.parsed.c
+            
+            let y = rawY * (this.parent.gridCellSize*2) + this.parent.subpixel;
+            let x = rawX * (this.parent.gridCellSize*2) + this.parent.subpixel;
+            // console.log(i, x);
+
+            
+            let transformed = {
+                x: this.parent.cx + x,
+                y: this.parent.cy - y
+            };
+            
+            // console.log(transformed.x, transformed.y); 
+
+            let y_threshold = this.parent.gridCellSize * 5;
+
+            if (
+                transformed.x < 0 || 
+                transformed.x > this.parent.viewWidth || 
+                transformed.y < 0 - y_threshold|| 
+                transformed.y > this.parent.viewHeight + y_threshold
+            ) {
+                // If the current point of the exponenta line is outside the visible screen area,
+                // we need to end the current segment to avoid drawing a line connecting
+                // visible and non-visible points.
+                
+                if (segmentStarted) {
+                    // If a segment was in progress, finalize it by stroking and closing the path.
+                    this.renderer.stroke();
+                    this.renderer.closePath();
+                    segmentStarted = false; // Mark the segment as not started.
+                }
+                
+                continue; // Skip to the next iteration since this point is out of bounds.
+            }
+            
+            if (!segmentStarted) {
+                // If no segment is in progress, begin a new path for the visible segment.
+                this.renderer.beginPath();
+                this.renderer.moveTo(transformed.x, transformed.y);
+                segmentStarted = true; // Mark that a new segment has started.
+            } else {
+                // If a segment is already in progress, continue drawing the line to the current point.
+                this.renderer.lineTo(transformed.x, transformed.y);
+            }
+        }
+    
+        if (segmentStarted) {
+            this.renderer.stroke();
+            this.renderer.closePath();
+        }
+    }
+
 
     draw(){
         let defaultResolution = 0.1;
@@ -1015,6 +1141,8 @@ class Graph extends PlanePrimitive {
         // this method uses other default resolution value
         // for more details check comment note inside method
         if(this.type == 'hyperbolic') this.#drawHyperbolic(0.001);
+
+        if(this.type == 'exponential') this.#drawExponential(0.075);
     }
 }
 
