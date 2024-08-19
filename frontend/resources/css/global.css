@@ -37,10 +37,17 @@ html, body {
     margin-top: 4px;
 }
 
+.math-fraction--degree-format {
+    font-size: 9px !important;
+    bottom: 10px;
+    margin-top: 7px;
+}
+
 .math-fraction__x-symbol {
     position: relative;
     bottom: 3px;
 }
+
 
 .math-fraction__denominator {
     border-top: 1px solid black; 
