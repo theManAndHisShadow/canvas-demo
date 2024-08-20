@@ -7,6 +7,38 @@ let binarySearch = new Scene({
             label: 'Description',
             text: 'Empty'
         },
+
+        'givenNumber': {
+            type: 'input',
+            label: 'Choose number',
+            text: '',
+            minValue: 1,
+            defaultValue: 5,
+            maxValue: 100,
+        },
+
+        'range': {
+            type: 'input',
+            label: 'Search from 1 to',
+            minValue: 1,
+            defaultValue: 100,
+            maxValue: 200,
+        },
+
+        'searchMethod': {
+            type: 'option-selector',
+            label: 'Search method',
+            optionNames: [
+                'Brute force',
+                'Binary seach',
+            ],
+            defaultValue: 0,
+        },
+
+        'find': {
+            type: 'main-action-button',
+            text: 'Find number',
+        },
     },
 
     code: (root, display, settings) => {
@@ -28,6 +60,12 @@ let binarySearch = new Scene({
             cx: centerX,
             cy: centerY,
             size: 23,
+        });
+
+        settings.subscribe((propertyName, newValue, oldValue) => {
+            if(propertyName == 'find') {
+                console.log('main action triggered');
+            }
         });
 
         // Main function
