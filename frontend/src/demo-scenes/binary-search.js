@@ -286,8 +286,6 @@ function createNumberSquaresGrid(context, {cx, cy, columns = 10, rows = 10, size
 
     const startX = cx - ((computedWidth * columns) / 2);
     const startY = cy - ((computedWidth * rows) / 2);
-    let width = 0;
-    let height = 0;
 
     const items = [];
     let id = 1;
