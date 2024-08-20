@@ -178,14 +178,30 @@ class GridItem{
                 color: this.textColor,
             });
         } else {
-            drawRect(this.renderer, {
-                x: this.x + (this.size / 2),
-                y: this.y + (this.size / 2),
-                width: 1,
-                height: 1,
-                fillColor: this.textColor,
-            });
+            // exception:
+            // if 1 or 1000 - draw numbers
+            if(this.hideNumbers == true && (this.number == 1 || this.number == 1000)) {
+                drawText(this.renderer, {
+                    x: this.x + (this.size / 2),
+                    y: this.y + (this.size / 2) + 0.5,
+                    fontSize: 8,
+                    // for 1000 - 1k
+                    text: this.number == 1 ? 1 : '1k',
+                    color: this.textColor,
+                });
+            } else {
+                // for other numbers draw just dots
+                drawRect(this.renderer, {
+                    x: this.x + (this.size / 2),
+                    y: this.y + (this.size / 2),
+                    width: 1,
+                    height: 1,
+                    fillColor: this.textColor,
+                });
+            }
         }
+
+        
     }
 }
 
