@@ -104,7 +104,7 @@ let binarySearch = new Scene({
                     onTry: (min, max) => {
                         attempts += 1;
 
-                        display.updateValue('steps', attempts);
+                        display.updateValue('attemps', attempts);
                         display.updateValue('status', '<span class="yellow-word-bubble">in progress...</span>');
 
                         grid.items.forEach(square => {
@@ -115,7 +115,7 @@ let binarySearch = new Scene({
                     },
 
                     onSuccess: (numberPos) => {
-                        display.updateValue('steps', attempts);
+                        display.updateValue('attemps', attempts);
                         display.updateValue('status', '<span class="green-word-bubble">Done!</span>');
                         
                         let square = grid.items[numberPos];
@@ -123,7 +123,7 @@ let binarySearch = new Scene({
                     },
 
                     onFail: () => {
-                        display.updateValue('steps', attempts);
+                        display.updateValue('attemps', attempts);
                         display.updateValue('status', '<span class="red-word-bubble">Failed!</span>');
                     }
                 });
