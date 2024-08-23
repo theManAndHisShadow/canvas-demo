@@ -119,7 +119,7 @@ let binarySearch = new Scene({
                         display.updateValue('status', '<span class="green-word-bubble">Done!</span>');
                         
                         let square = grid.items[numberPos];
-                        square.paintInGreen();
+                        square.paintItGreen();
                     },
 
                     onFail: () => {
