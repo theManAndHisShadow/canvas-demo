@@ -5,7 +5,7 @@ let binarySearch = new Scene({
         'description': {
             type: 'display-infobox',
             label: 'Description',
-            text: 'Empty'
+            text: 'This is a clear demonstration of the difference in search speed between brute-force and binary search methods. The brute-force method involves a complete traversal of the entire dataset, but it does not require the dataset to be sorted. In contrast, binary search quickly finds the target value, even in a enormnous dataset, but it requires the dataset to be sorted.'
         },
 
         'attemps': {
