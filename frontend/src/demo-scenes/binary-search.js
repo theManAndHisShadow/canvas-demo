@@ -41,8 +41,8 @@ let binarySearch = new Scene({
             type: 'option-selector',
             label: 'Search method',
             optionNames: [
-                'Brute force',
                 'Binary seach',
+                'Brute force',
             ],
             defaultValue: 0,
         },
@@ -50,6 +50,7 @@ let binarySearch = new Scene({
         'find': {
             type: 'main-action-button',
             text: 'Find number',
+            blockControlDuringExecution: true,
         },
     },
 
@@ -74,14 +75,23 @@ let binarySearch = new Scene({
             size: 23,
         });
 
+        // inistial scene status
+        let currentStatus = 'not-started';
         settings.subscribe((propertyName, newValue, oldValue) => {
+            // get random number
             let choosedNumber = settings.getState('givenNumber');
+
+            // get current selected range
             let range = settings.getState('range');
+
+            // get current selected method
             let method = settings.getState('searchMethod');
+
+            // total attempts to get given number in range
             let attempts = 0;
 
-
-            if(propertyName == 'range') {
+            // local function to update the mesh after scene parameters have been changed by the user
+            let updateGrid = () => {
                 grid = createNumberSquaresGrid(context, {
                     cx: centerX,
                     cy: centerY,
@@ -91,42 +101,81 @@ let binarySearch = new Scene({
                     rows: range == 0 ? 10 : 25,
                     hideNumbers: range == 0 ? false : true,
                 });
+            };
+
+
+            // update grid only if status not 'in-progress'
+            if(propertyName == 'range') {
+                if(currentStatus !== 'in-progress') {
+                    updateGrid();
+                }
             }
 
 
             if(propertyName == 'find') {
-                let pos = search({
-                    method: method == 0 ? 'bruteforce' : 'binary',
-                    array: grid.items.map(item => item.number),
-                    givenNumber: choosedNumber,
-                    stepDelay: 1000,
+                    // update grid only if status not 'in-progress'
+                    if(currentStatus !== 'in-progress') {
+                        updateGrid();
 
-                    onTry: (min, max) => {
-                        attempts += 1;
+                        // run main search function
+                        search({
+                            method: method == 1 ? 'bruteforce' : 'binary',
+                            array: grid.items.map(item => item.number),
+                            givenNumber: choosedNumber,
 
-                        display.updateValue('attemps', attempts);
-                        display.updateValue('status', '<span class="yellow-word-bubble">in progress...</span>');
+                            // delay between attempts
+                            stepDelay: 1000,
 
-                        grid.items.forEach(square => {
-                            if (!(square.number >= min + 1) || !(square.number <= max + 1)) {
-                                square.check();
-                            } 
+                            // cb for each try
+                            onTry: (min, max) => {
+                                // update attempt counter
+                                attempts += 1;
+                                currentStatus = 'in-progress';
+
+                                // update status, attempts and status on display
+                                // set status 'in-progress' to temporarily block Control UI object
+                                settings.setState('find__status', currentStatus);
+                                display.updateValue('attemps', attempts);
+                                display.updateValue('status', '<span class="yellow-word-bubble">in progress...</span>');
+
+                                // check all squares that out of range at current try
+                                grid.items.forEach(square => {
+                                    if (!(square.number >= min + 1) || !(square.number <= max + 1)) {
+                                        // change visual to 'checked' pale sqaure
+                                        square.check();
+                                    } 
+                                });
+                            },
+
+                            // cb for success result
+                            onSuccess: (numberPos) => {
+                                currentStatus = 'done';
+                                
+                                // update status, attempts and status on display
+                                // set status 'done' to unblock Control UI object
+                                settings.setState('find__status', currentStatus);
+                                display.updateValue('attemps', attempts);
+                                display.updateValue('status', '<span class="green-word-bubble">Done!</span>');
+                                
+                                // change visual to 'green' sqaure
+                                let square = grid.items[numberPos];
+                                square.paintItGreen();
+                            },
+
+                            // cb for fail result
+                            onFail: () => {
+                                currentStatus = 'failed';
+                                
+                                // update status, attempts and status on display
+                                // set status 'failed' to unblock Control UI object
+                                settings.setState('find__status', currentStatus);
+                                display.updateValue('attemps', attempts);
+                                display.updateValue('status', '<span class="red-word-bubble">Failed!</span>');
+                            }
                         });
-                    },
-
-                    onSuccess: (numberPos) => {
-                        display.updateValue('attemps', attempts);
-                        display.updateValue('status', '<span class="green-word-bubble">Done!</span>');
-                        
-                        let square = grid.items[numberPos];
-                        square.paintItGreen();
-                    },
-
-                    onFail: () => {
-                        display.updateValue('attemps', attempts);
-                        display.updateValue('status', '<span class="red-word-bubble">Failed!</span>');
-                    }
-                });
+                } else {
+                    console.log('cant start, already in-progress');
+                }
             }
 
             console.log('state update', choosedNumber, range, method);
@@ -448,6 +497,7 @@ async function search({array, givenNumber, onTry, onSuccess, onFail, stepDelay =
 
     let start = 0;
     let end = array.length - 1;
+    let step = 0;
 
     /**
      * Delay execution by a given number of milliseconds.
@@ -462,9 +512,12 @@ async function search({array, givenNumber, onTry, onSuccess, onFail, stepDelay =
         // Brute-force search
         // Time Complexity: O(n)
         while (start <= end) {
-            await delay(stepDelay); // Delay before the next step
+            // Delay before the next step
+            // if it is first step - delay = 0
+            await delay(step == 0 ? 0 : stepDelay);
 
             onTry(start, end);
+            step += 1;
 
             if (array[start] === givenNumber) {
                 onSuccess(start);
@@ -477,10 +530,13 @@ async function search({array, givenNumber, onTry, onSuccess, onFail, stepDelay =
         // Binary search
         // Time Complexity: O(log n)
         while (start <= end) {
-            await delay(stepDelay); // Delay before the next step
+            // Delay before the next step
+            // if it is first step - delay = 0
+            await delay(step == 0 ? 0 : stepDelay);
             let middle = Math.floor((start + end) / 2);
 
             onTry(start, end);
+            step += 1;
 
             if (array[middle] < givenNumber) {
                 // Search the right half
