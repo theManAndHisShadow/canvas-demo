@@ -17,6 +17,11 @@ html, body {
     opacity: 0.3;
 }
 
+.disabled {
+    opacity: 0.55 !important;
+    cursor: default !important;
+}
+
 .math-formula {
     font-family: "STIX Two Text", serif;
     font-optical-sizing: auto;
