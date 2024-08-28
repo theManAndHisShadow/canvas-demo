@@ -55,6 +55,9 @@ let binarySearch = new Scene({
     },
 
     code: (root, display, settings) => {
+        // clearing prev created animation threads
+        window.runningAnimations.clearQueue();
+
         // describing basic canvas variables
         // reset the element state to remove all previously applied event handlers
         const canvas = resetElement(root.querySelector('canvas'));
@@ -177,8 +180,6 @@ let binarySearch = new Scene({
                     console.log('cant start, already in-progress');
                 }
             }
-
-            console.log('state update', choosedNumber, range, method);
         });
 
         // Main function
