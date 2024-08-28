@@ -102,10 +102,12 @@ let colorPicker = new Scene({
 
         // subscribing to settings changes
         settings.subscribe((key, newValue, oldValue) => {
+            if(key == 'adjustment-slider') {
                 let value = newValue / 100;
 
                 // redraw spectrum
                 draw(value);
+            }
         });
 
 
