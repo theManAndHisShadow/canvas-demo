@@ -33,6 +33,9 @@ let concentricCircles = new Scene({
     },
 
     code: (root, display, settings) => {
+        // clearing prev created animation threads
+        window.runningAnimations.clearQueue();
+        
         // reset the element state to remove all previously applied event handlers
         const canvas = resetElement(root.querySelector('canvas'));
 

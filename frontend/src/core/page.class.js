@@ -26,7 +26,7 @@ window.runningAnimations = {
      * @param {boolean} [clearAll=false]
      */
     add: function(animationFunction, clearAll = true) {
-        if(clearAll == true) this.clearQueue();
+        if(clearAll == true) this.clearQueue(true);
 
         // wrapping the required function for convenience
         const wrappedFunction = (timestamp) => {
@@ -47,12 +47,17 @@ window.runningAnimations = {
     /**
      * Stop all previously launched animation functions 
      */
-    clearQueue: function() {
+    clearQueue: function(ignoreEmptyLog = false) {
         // stopping previously running functions
-        this.queue.forEach(wrappedFunction => {
-            window.cancelAnimationFrame(wrappedFunction.id);
-        });
-
+        if(this.queue.length > 0){
+            this.queue.forEach(wrappedFunction => {
+                window.cancelAnimationFrame(wrappedFunction.id);
+    
+                console.log(`Animation thread #${wrappedFunction.id} from previous scene is killed right now`);
+            });
+        } else {
+            if(ignoreEmptyLog == false) console.log('All OK! Animation queue is already empty');
+        }
         // resetting queue
         this.queue = [];
     }
@@ -70,10 +75,11 @@ class Page {
 
     // location of demo scenes
     static #scenesLocation = './src/demo-scenes/';
+    static #basicWindowTitle = 'Canvas demo';
 
     constructor(){
         this.displayName = 'Page';
-        this.windowTitle = 'Canvas demo'
+        this.windowTitle = Page.#basicWindowTitle;
 
         // root for demo scene drawning
         this.root = Page.parseRoot();
@@ -148,6 +154,16 @@ class Page {
         scriptElement.setAttribute("async", "async");
 
         return scriptElement;
+    }
+
+
+    /**
+     * Updates page tab title
+     * @param {string} sceneName 
+     */
+    #updatePageTabTitle(sceneName){
+        // creating full tab title
+        this.windowTitle = Page.#basicWindowTitle + ' - ' + sceneName;
     }
 
     
@@ -246,6 +262,9 @@ class Page {
                         let uiTree = loadedScene.ui;
                         // render it (and add event handlers, that updated values)
                         this.ui.render(uiTree);
+
+                        // updating tab name using scene title
+                        this.#updatePageTabTitle(loadedScene.title);
 
                         // Scene contains code of demo
                         // we can execute that code when user clicks at link

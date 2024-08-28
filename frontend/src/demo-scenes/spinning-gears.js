@@ -38,6 +38,9 @@ let spinningGears = new Scene({
     },
 
     code: (root, display, settings) => {
+        // clearing prev created animation threads
+        window.runningAnimations.clearQueue();
+        
         // describing basic canvas variables
         // reset the element state to remove all previously applied event handlers
         const canvas = resetElement(root.querySelector('canvas'));

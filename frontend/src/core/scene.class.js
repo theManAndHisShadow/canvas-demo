@@ -21,18 +21,15 @@ class Scene {
 
     /**
      * Executes code of separate scene
-     * @param {string} param.baseTabTitle - base part of tab title
      * @param {HTMLDivElement} param.root - ref to scene html root element
      * @param {UIDisplay} param.display - ref to UIDisplay instance to control scene ui info display
      * @param {object} param.settings - scene settings
      */
-    execute({baseTabTitle, root, display, settings}){
+    execute({root, display, settings}){
         let callback = this.code;
 
         let titleElement = root.children[0];
         titleElement.textContent = this.title;
-        
-        document.title = baseTabTitle + ' - ' + this.title;
 
         callback(
             // ref to root element of canvas

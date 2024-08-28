@@ -17,6 +17,11 @@ html, body {
     opacity: 0.3;
 }
 
+.disabled {
+    opacity: 0.55 !important;
+    cursor: default !important;
+}
+
 .math-formula {
     font-family: "STIX Two Text", serif;
     font-optical-sizing: auto;
@@ -56,7 +61,7 @@ html, body {
 }
 
 .green-word-bubble {
-    padding: 2px;
+    padding: 2px 5px;
     background-color: #b5df85;
     border-radius: 3px;
     color: #064b06;
@@ -64,10 +69,18 @@ html, body {
 }
 
 .yellow-word-bubble {
-    padding: 2px;
+    padding: 2px 5px;
     background-color: #f0de74;
     border-radius: 3px;
     color: #5a5a02;
+    font-size: 15px;
+}
+
+.red-word-bubble {
+    padding: 2px 5px;
+    background-color: #df8585;
+    border-radius: 3px;
+    color: #4b0606;
     font-size: 15px;
 }
 

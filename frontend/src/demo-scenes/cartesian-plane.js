@@ -31,6 +31,9 @@ let cartesianPlane = new Scene({
     },
 
     code: (root, display, settings) => {
+        // clearing prev created animation threads
+        window.runningAnimations.clearQueue(); 
+        
         // reset the element state to remove all previously applied event handlers
         let canvas = resetElement(root.querySelector('canvas'));
         
@@ -55,9 +58,6 @@ let cartesianPlane = new Scene({
         });
 
         plane.render();
-
-        // clearing prev created animation threads
-        window.runningAnimations.clearQueue();
 
         // very important scene var
         let mouseIsDown = false;

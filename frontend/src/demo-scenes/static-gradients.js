@@ -43,6 +43,9 @@ let staticGadients = new Scene({
     },
 
     code: (root, display, settings) => {
+        // clearing prev created animation threads
+        window.runningAnimations.clearQueue();
+        
         // reset the element state to remove all previously applied event handlers
         const canvas = resetElement(root.querySelector('canvas'));
 
@@ -59,9 +62,6 @@ let staticGadients = new Scene({
 
         // main animating function
         let draw = (method, type) => {
-            // clearing prev created animation threads
-            window.runningAnimations.clearQueue();
-
             // clearif prev canvas content
             context.clearRect(
                 0, 0,

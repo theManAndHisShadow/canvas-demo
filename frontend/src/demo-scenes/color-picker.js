@@ -24,6 +24,9 @@ let colorPicker = new Scene({
     },
 
     code: (root, display, settings) => {
+        // clearing prev created animation threads
+        window.runningAnimations.clearQueue();
+
         // reset the element state to remove all previously applied event handlers
         let canvas = resetElement(root.querySelector('canvas'));
         
@@ -38,9 +41,6 @@ let colorPicker = new Scene({
         // scene values
         // raduis of "spectrum" circle
         const radius = 150;
-
-        // clearing prev created animation threads
-        window.runningAnimations.clearQueue();
 
         // Main scene function
         const draw = (opacity) => {
@@ -102,10 +102,12 @@ let colorPicker = new Scene({
 
         // subscribing to settings changes
         settings.subscribe((key, newValue, oldValue) => {
-            let value = newValue / 100;
+            if(key == 'adjustment-slider') {
+                let value = newValue / 100;
 
-            // redraw spectrum
-            draw(value);
+                // redraw spectrum
+                draw(value);
+            }
         });
 
 
@@ -330,7 +332,7 @@ function drawSpectrum(context, {radius = 120, opacity = 1} = {}){
     // adding each color
     colors.forEach((color, i) => {
         let pos = (1 / colors.length) * i;
-
+        
         gradient.addColorStop(pos, color);
     });
     
