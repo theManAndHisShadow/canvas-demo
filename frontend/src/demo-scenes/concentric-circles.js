@@ -18,12 +18,6 @@ let concentricCircles = new Scene({
             label: ' - angle of view',
         },
 
-        'dev': {
-            type: 'checkbox',
-            label: 'Show dev visual',
-            state: false,
-        },
-
         'circlesAmount': {
             type: 'input',
             label: 'Circles',
@@ -118,55 +112,53 @@ let concentricCircles = new Scene({
                     });
                 }
 
-                if(settings.getState("dev") === true) {
-                     // Draw a point at the center of the innermost circle
-                    if (i === amount - 1) {
-                        if (mousePos.x && mousePos.y) {
-                            drawLine(context, {
-                                x1: nx,
-                                y1: ny,
-                                x2: mousePos.x,
-                                y2: mousePos.y,
-                                color: 'rgba(0, 0, 0, 0.5)',
-                                thickness: 1,
-                            });
+                // Draw a point at the center of the innermost circle
+                if (i === amount - 1) {
+                    if (mousePos.x && mousePos.y) {
+                        drawLine(context, {
+                            x1: nx,
+                            y1: ny,
+                            x2: mousePos.x,
+                            y2: mousePos.y,
+                            color: 'rgba(0, 0, 0, 0.5)',
+                            thickness: 1,
+                        });
 
-                            drawLine(context, {
-                                x1: width / 2 - outerRadius,
-                                y1: height/ 2,
-                                x2: mousePos.x,
-                                y2: mousePos.y,
-                                color: 'rgba(0, 0, 0, 0.5)',
-                                thickness: 1,
-                            });
+                        drawLine(context, {
+                            x1: width / 2 - outerRadius,
+                            y1: height/ 2,
+                            x2: mousePos.x,
+                            y2: mousePos.y,
+                            color: 'rgba(0, 0, 0, 0.5)',
+                            thickness: 1,
+                        });
 
-                            drawLine(context, {
-                                x1: width / 2 + outerRadius,
-                                y1: height/ 2,
-                                x2: mousePos.x,
-                                y2: mousePos.y,
-                                color: 'rgba(0, 0, 0, 0.5)',
-                                thickness: 1,
-                            });
+                        drawLine(context, {
+                            x1: width / 2 + outerRadius,
+                            y1: height/ 2,
+                            x2: mousePos.x,
+                            y2: mousePos.y,
+                            color: 'rgba(0, 0, 0, 0.5)',
+                            thickness: 1,
+                        });
 
-                            drawLine(context, {
-                                x1: width / 2,
-                                y1: height / 2 + outerRadius,
-                                x2: mousePos.x,
-                                y2: mousePos.y,
-                                color: 'rgba(0, 0, 0, 0.5)',
-                                thickness: 1,
-                            });
+                        drawLine(context, {
+                            x1: width / 2,
+                            y1: height / 2 + outerRadius,
+                            x2: mousePos.x,
+                            y2: mousePos.y,
+                            color: 'rgba(0, 0, 0, 0.5)',
+                            thickness: 1,
+                        });
 
-                            drawLine(context, {
-                                x1: width / 2,
-                                y1: height / 2 - outerRadius,
-                                x2: mousePos.x,
-                                y2: mousePos.y,
-                                color: 'rgba(0, 0, 0, 0.5)',
-                                thickness: 1,
-                            });
-                        }
+                        drawLine(context, {
+                            x1: width / 2,
+                            y1: height / 2 - outerRadius,
+                            x2: mousePos.x,
+                            y2: mousePos.y,
+                            color: 'rgba(0, 0, 0, 0.5)',
+                            thickness: 1,
+                        });
                     }
                 }
             }

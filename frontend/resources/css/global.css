@@ -60,6 +60,15 @@ html, body {
     margin-bottom: -12px;
 }
 
+
+.gray-word-bubble {
+    padding: 2px 5px;
+    background-color: #c6c6c6;
+    border-radius: 3px;
+    color: #373737;
+    font-size: 15px;
+}
+
 .green-word-bubble {
     padding: 2px 5px;
     background-color: #b5df85;

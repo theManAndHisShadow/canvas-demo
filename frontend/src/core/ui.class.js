@@ -235,11 +235,12 @@ class UIControls {
 
         this.states.setState(elementName, elementObject.defaultValue);
 
-        range.addEventListener('click', event => {
+        range.addEventListener('mousemove', event => {
             // update state only when Control UI is not blocked
             if(this.blocked == false) {
                 range.title = range.value;
-                this.states.setState(elementName, range.value);}
+                this.states.setState(elementName, range.value);
+            }
         });
 
         element.appendChild(startLabel);
