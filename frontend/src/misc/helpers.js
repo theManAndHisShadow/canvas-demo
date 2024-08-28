@@ -219,6 +219,43 @@ function changeColorOpacity(rgba, newOpacity){
 }
 
 
+/**
+ * Function to make a color more vibrant by maximizing the dominant color component.
+ * @param {string} rgbaColor - A string in the format 'rgba(r, g, b, a)'.
+ * @returns {string} - A new color string in 'rgba' format, with increased vibrancy.
+ */
+function getColorDominantComponent(rgbaColor) {
+    // Extract the RGBA components from the string
+    const rgba = rgbaColor
+        .replace(/^rgba?\(|\s+|\)$/g, '') // Remove 'rgba(', 'rgb(', ')', and spaces
+        .split(',')                       // Split by comma
+        .map(Number);                     // Convert strings to numbers
+
+    let [r, g, b, a] = rgba;
+
+    // Find the dominant color component (r, g, or b)
+    const maxComponent = Math.max(r, g, b);
+    const minComponent = Math.min(r, g, b);
+
+    // Increase the intensity of the dominant component
+    if (r === maxComponent) {
+        r = 255;
+        g = Math.max(0, g - minComponent);
+        b = Math.max(0, b - minComponent);
+    } else if (g === maxComponent) {
+        g = 255;
+        r = Math.max(0, r - minComponent);
+        b = Math.max(0, b - minComponent);
+    } else {
+        b = 255;
+        r = Math.max(0, r - minComponent);
+        g = Math.max(0, g - minComponent);
+    }
+
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+
 
 /**
  * Draws a line from point A (x1, y1) to point B (x2, y2)
