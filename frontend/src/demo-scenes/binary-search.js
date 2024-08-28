@@ -13,9 +13,14 @@ let binarySearch = new Scene({
             label: 'Attempts',
         },
 
+        'current-search-range': {
+            type: 'display-item',
+            label: 'Current search range',
+        },
+
         'status': {
             type: 'display-item',
-            label: 'Current status'
+            label: 'Status'
         },
 
         'givenNumber': {
@@ -139,6 +144,7 @@ let binarySearch = new Scene({
                                 // set status 'in-progress' to temporarily block Control UI object
                                 settings.setState('find__status', currentStatus);
                                 display.updateValue('attemps', attempts);
+                                display.updateValue('current-search-range', `[${min + 1}, ${max + 1}]`)
                                 display.updateValue('status', '<span class="yellow-word-bubble">in progress...</span>');
 
                                 // check all squares that out of range at current try
