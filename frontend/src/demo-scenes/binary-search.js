@@ -145,7 +145,7 @@ let binarySearch = new Scene({
                                 settings.setState('find__status', currentStatus);
                                 display.updateValue('attemps', attempts);
                                 display.updateValue('current-search-range', `[${min + 1}, ${max + 1}]`)
-                                display.updateValue('status', '<span class="yellow-word-bubble">in progress...</span>');
+                                display.updateValue('status', '<span class="yellow-word-bubble">In progress...</span>');
 
                                 // check all squares that out of range at current try
                                 grid.items.forEach(square => {
@@ -164,7 +164,7 @@ let binarySearch = new Scene({
                                 // set status 'done' to unblock Control UI object
                                 settings.setState('find__status', currentStatus);
                                 display.updateValue('attemps', attempts);
-                                display.updateValue('status', '<span class="green-word-bubble">Done!</span>');
+                                display.updateValue('status', '<span class="green-word-bubble">Success!</span>');
                                 
                                 // change visual to 'green' sqaure
                                 let square = grid.items[numberPos];
