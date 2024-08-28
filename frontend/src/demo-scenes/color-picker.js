@@ -10,7 +10,7 @@ let colorPicker = new Scene({
 
         'currentColor': {
             type: 'display-item',
-            label: 'Current color',
+            label: 'Picker',
         },
 
         'adjustment-slider': {
@@ -133,33 +133,53 @@ let colorPicker = new Scene({
             let rawData = context.getImageData(mousePos.x, mousePos.y, 1, 1).data;
 
             // re-collect to rgb color string
-            let color = `rgb(${rawData[0]}, ${rawData[1]}, ${rawData[2]})`;
+            let color = `rgba(${rawData[0]}, ${rawData[1]}, ${rawData[2]}, 1)`;
+            let correctColor = (color, brightness) => {
+                // all cases where brightness less 50 - use color from picker
+                return brightness < 49 
+                    ? color : 
+                    // all cases where brightness more than 80
+                    brightness >= 80 
+                        // use blck color
+                        ? 'rgba(0, 0, 0, 1)' 
+                        // for range from 49 to 80 - use color dominant component
+                        : getColorDominantComponent(color);
+            };
+
+            let cssTextColor = correctColor(color, settings.getState('adjustment-slider'));
+            let cssBackgroundColor = changeColorOpacity(color, 0.35);
             
             // update value of 'Current color' display option
             display.updateValue
-            ('currentColor', 
-                // check is mouse under a spectrum circle
-                mouseOnCircle ? 
+                ('currentColor',
+                    // check is mouse under a spectrum circle
+                    mouseOnCircle ?
 
-                // some DARK CSS MAGIC xD
+                        // some DARK CSS MAGIC xD
+                        // if true - draw round colored element with color string text
+                        `<span style="
+    background: ${color}; 
+    width: 9px;
+    height: 9px;
+    position: relative;
+    display: inline-block;
+    border-radius: 100%;
+    border: 2px solid rgba(0, 0, 0, 0.25);
+    padding: 1px;
+    left: 3px;
+    top: 3px;
+"></span>
+<span class="gray-word-bubble" style="
+    font-size: 13px;
+    background: ${cssBackgroundColor};
+    color: ${cssTextColor}
+">
+    ${color}
+</span>`
 
-                // if true - draw round colored element with color string text
-                `<span style="
-                    background: ${color}; 
-                    width: 7px; 
-                    height: 7px; 
-                    position: relative;
-                    display: inline-block;
-                    border-radius: 100%; 
-                    border: 2px solid rgba(0, 0, 0, 0.25); 
-                    padding: 1px; 
-                    left: -2px; 
-                    top: 2px;
-                "></span>${color}` 
-
-                // else - draw pale colored mockup
-                : '<i class="pale">no info</i>'
-            );
+                        // else - draw pale colored mockup
+                        : '<i class="pale">no info</i>'
+                );
         });
     }
 });
