@@ -36,14 +36,26 @@ let colorPicker = new Scene({
         canvas.width = width;
         canvas.height = height;
 
-        const context = canvas.getContext('2d');
+        const context = canvas.getContext('2d', { willReadFrequently: true });
 
         // scene values
         // raduis of "spectrum" circle
         const radius = 150;
 
-        // Main scene function
+        // color picker feature values
+        let mouseOnCircle = false;
+        let mousePos = false;
+        let pickerPos = false;
+        let mouseDown = false;
+
+        /**
+         * Main function of this scene. 
+         * Draws spectrum circle and some color name labels.
+         * @param {number} opacity - from 1 to 100
+         */
         const draw = (opacity) => {
+            opacity = opacity / 100;
+
             context.clearRect(
                 0, 0,
                 width,
@@ -96,27 +108,84 @@ let colorPicker = new Scene({
         }
 
         // setting default values
-        let defaultValue = 0.5;
+        let defaultValue = 50;
         settings.setState('adjustment-slider', defaultValue);
         draw(defaultValue);
 
         // subscribing to settings changes
         settings.subscribe((key, newValue, oldValue) => {
             if(key == 'adjustment-slider') {
-                let value = newValue / 100;
-
                 // redraw spectrum
-                draw(value);
+                draw(newValue);
+
+                pickColor();
             }
         });
 
+        /**
+         * Select correct color for some special cases
+         * @param {string} color - color in rgba format
+         * @param {number} brightness - brightness of spectrum (from 0 to 100)
+         * @returns {string} - rgba color
+         */
+        let correctColor = (color, brightness) => {
+            // all cases where brightness less 50 - use color from picker
+            return brightness < 49
+                ? color :
+                // all cases where brightness more than 80
+                brightness >= 80
+                    // use blck color
+                    ? 'rgba(0, 0, 0, 1)'
+                    // for range from 49 to 80 - use color dominant component
+                    : getColorDominantComponent(color);
+        };
 
-        // color picker feature values
-        let mouseOnCircle = false;
-        let mousePos = false;
+        /**
+         * Select color under mouse and updates info at html display.
+         */
+        let pickColor = () => {
+            // get pixel data
+            let rawData = context.getImageData(pickerPos.x, pickerPos.y, 1, 1).data;
+
+            // re-collect to rgba color string
+            let color = `rgba(${rawData[0]}, ${rawData[1]}, ${rawData[2]}, 1)`;
+
+            // color for css 'color' prop of html element with color code
+            let cssTextColor = correctColor(color, settings.getState('adjustment-slider'));
+
+            // color for css 'background' prop of html element with color code
+            let cssBackgroundColor = changeColorOpacity(color, 0.35);
+
+            // update value of 'Current color' display option
+            display.updateValue('currentColor',
+                // some DARK CSS MAGIC xD
+                    // if true - draw round colored element with color string text
+                    `<span style="
+                            background: ${color}; 
+                            width: 9px;
+                            height: 9px;
+                            position: relative;
+                            display: inline-block;
+                            border-radius: 100%;
+                            border: 2px solid rgba(0, 0, 0, 0.25);
+                            padding: 1px;
+                            left: 3px;
+                            top: 3px;
+                        "></span>
+                        <span class="gray-word-bubble" style="
+                            font-size: 13px;
+                            background: ${cssBackgroundColor};
+                            color: ${cssTextColor}
+                        ">
+                            ${color}
+                        </span>`
+            );
+        }
+
 
         // updating values on mouse move
         canvas.addEventListener('mousemove', (event) => {
+            // upadtin current mouse pos using event object
             mousePos = getMousePos(canvas, event);
 
             // if distance - radius less than 0 - mouse cursor is under a spectrum circle
@@ -125,69 +194,58 @@ let colorPicker = new Scene({
 
             // update mouse cursor when its on spectrum circle
             canvas.style.cursor = mouseOnCircle ? 'crosshair' : 'inherit';
+
+            // check if mouse is under spectrum circle and mouse is pressed right now
+            if (mouseOnCircle && mouseDown === true) {
+                // update pos of picker
+                pickerPos = mousePos;
+
+                // redraw ONLY picker pointer element
+                drawPickerPointer(context, {
+                    radius: 7,
+                    x: pickerPos.x,
+                    y: pickerPos.y,
+                });
+
+                // update picked color (update html display item)
+                pickColor();
+            }
         });
 
+
         // updating color on click at canvas
-        canvas.addEventListener('click', (event) => {
-            // get pixel data
-            let rawData = context.getImageData(mousePos.x, mousePos.y, 1, 1).data;
+        canvas.parentNode.addEventListener('mousedown', (event) => {
+            // update mouse down state
+            mouseDown = true;
 
-            // re-collect to rgb color string
-            let color = `rgba(${rawData[0]}, ${rawData[1]}, ${rawData[2]}, 1)`;
-            let correctColor = (color, brightness) => {
-                // all cases where brightness less 50 - use color from picker
-                return brightness < 49 
-                    ? color : 
-                    // all cases where brightness more than 80
-                    brightness >= 80 
-                        // use blck color
-                        ? 'rgba(0, 0, 0, 1)' 
-                        // for range from 49 to 80 - use color dominant component
-                        : getColorDominantComponent(color);
-            };
+            // update pos of mouse
+            mousePos = getMousePos(canvas, event);
 
-            let cssTextColor = correctColor(color, settings.getState('adjustment-slider'));
-            let cssBackgroundColor = changeColorOpacity(color, 0.35);
+            // set pos of picker
+            pickerPos = mousePos;
+        });
+
+
+        canvas.parentNode.addEventListener('mouseup', (event) => {
+            // update mouse down state
+            mouseDown = false;
+
+            // update pos of mouse
+            mousePos = getMousePos(canvas, event);
             
-            // update value of 'Current color' display option
-            display.updateValue
-                ('currentColor',
-                    // check is mouse under a spectrum circle
-                    mouseOnCircle ?
+            // set pos of picker
+            pickerPos = mousePos;
 
-                        // some DARK CSS MAGIC xD
-                        // if true - draw round colored element with color string text
-                        `<span style="
-    background: ${color}; 
-    width: 9px;
-    height: 9px;
-    position: relative;
-    display: inline-block;
-    border-radius: 100%;
-    border: 2px solid rgba(0, 0, 0, 0.25);
-    padding: 1px;
-    left: 3px;
-    top: 3px;
-"></span>
-<span class="gray-word-bubble" style="
-    font-size: 13px;
-    background: ${cssBackgroundColor};
-    color: ${cssTextColor}
-">
-    ${color}
-</span>`
-
-                        // else - draw pale colored mockup
-                        : '<i class="pale">no info</i>'
-                );
+            // redraw only picker pointer element
+            drawPickerPointer(context, {
+                radius: 7,
+                x: pickerPos.x,
+                y: pickerPos.y,
+            });
         });
     }
 });
 
-
-/**
- * TODO: check bug with scene switching 'static-gradients' <---> 'color-picker'
- */
 
 // Exproting scene
 window.exportedObjects.push(colorPicker);
@@ -363,4 +421,39 @@ function drawSpectrum(context, {radius = 120, opacity = 1} = {}){
     context.fillStyle = gradient;
     context.fill();
     context.closePath();
+}
+
+
+/**
+ * Draws a color picker pointer HTML element.
+ * If element already created - updates its position
+ * @param {CanvasRenderingContext2D} context - canvas 2d context
+ * @param {number} param.radius - radius of picker element
+ * @param {number} param.x - x pos of picker element
+ * @param {number} param.y - y pos of picker element
+ */
+function drawPickerPointer(context, {radius = 10, x, y}){
+    let pickerRound = document.querySelector('#color-picker');
+    let parent = context.canvas.parentNode;
+    
+    if(!pickerRound){
+            pickerRound = document.createElement('span');
+            pickerRound.id = 'color-picker';
+            pickerRound.style = `
+                width: ${radius}px;
+                height: ${radius}px;
+                left: ${x}px;
+                top: ${y}px;
+                position: absolute;
+                background: #ffffff;
+                border-radius: 100%;
+                border: 1px solid black;
+                cursor: crosshair;
+            `;
+
+        parent.appendChild(pickerRound);
+    } else {
+        pickerRound.style.left = x + 23 + 'px';
+        pickerRound.style.top = y + 51 + 'px';
+    }
 }
