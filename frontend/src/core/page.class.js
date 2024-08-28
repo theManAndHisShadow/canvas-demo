@@ -26,7 +26,7 @@ window.runningAnimations = {
      * @param {boolean} [clearAll=false]
      */
     add: function(animationFunction, clearAll = true) {
-        if(clearAll == true) this.clearQueue();
+        if(clearAll == true) this.clearQueue(true);
 
         // wrapping the required function for convenience
         const wrappedFunction = (timestamp) => {
@@ -47,12 +47,17 @@ window.runningAnimations = {
     /**
      * Stop all previously launched animation functions 
      */
-    clearQueue: function() {
+    clearQueue: function(ignoreEmptyLog = false) {
         // stopping previously running functions
-        this.queue.forEach(wrappedFunction => {
-            window.cancelAnimationFrame(wrappedFunction.id);
-        });
-
+        if(this.queue.length > 0){
+            this.queue.forEach(wrappedFunction => {
+                window.cancelAnimationFrame(wrappedFunction.id);
+    
+                console.log(`Animation thread #${wrappedFunction.id} from previous scene is killed right now`);
+            });
+        } else {
+            if(ignoreEmptyLog == false) console.log('All OK! Animation queue is already empty');
+        }
         // resetting queue
         this.queue = [];
     }
