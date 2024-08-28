@@ -80,7 +80,7 @@ let binarySearch = new Scene({
         let grid = createNumberSquaresGrid(context, {
             cx: centerX,
             cy: centerY,
-            size: 23,
+            size: 30,
         });
 
         // inistial scene status
@@ -103,7 +103,7 @@ let binarySearch = new Scene({
                 grid = createNumberSquaresGrid(context, {
                     cx: centerX,
                     cy: centerY,
-                    size: range == 0 ? 23 : 10,
+                    size: range == 0 ? 30 : 10,
                     margin: range == 0 ? 3 : 1,
                     columns: range == 0 ? 10 : 40,
                     rows: range == 0 ? 10 : 25,
@@ -292,7 +292,7 @@ class GridItem{
             drawText(this.renderer, {
                 x: this.x + (this.size / 2),
                 y: this.y + (this.size / 2),
-                fontSize: this.number >= 100 ? 9 : 11,
+                fontSize: this.number >= 100 ? 11 : 13,
                 text: this.number,
                 color: this.textColor,
             });
