@@ -147,42 +147,45 @@ let colorPicker = new Scene({
          * Select color under mouse and updates info at html display.
          */
         let pickColor = () => {
-            // get pixel data
-            let rawData = context.getImageData(pickerPos.x, pickerPos.y, 1, 1).data;
+            // check is pickerPos is not false
+            if(pickerPos) {
+                // get pixel data
+                let rawData = context.getImageData(pickerPos.x, pickerPos.y, 1, 1).data;
 
-            // re-collect to rgba color string
-            let color = `rgba(${rawData[0]}, ${rawData[1]}, ${rawData[2]}, 1)`;
+                // re-collect to rgba color string
+                let color = `rgba(${rawData[0]}, ${rawData[1]}, ${rawData[2]}, 1)`;
 
-            // color for css 'color' prop of html element with color code
-            let cssTextColor = correctColor(color, settings.getState('adjustment-slider'));
+                // color for css 'color' prop of html element with color code
+                let cssTextColor = correctColor(color, settings.getState('adjustment-slider'));
 
-            // color for css 'background' prop of html element with color code
-            let cssBackgroundColor = changeColorOpacity(color, 0.35);
+                // color for css 'background' prop of html element with color code
+                let cssBackgroundColor = changeColorOpacity(color, 0.35);
 
-            // update value of 'Current color' display option
-            display.updateValue('currentColor',
-                // some DARK CSS MAGIC xD
-                    // if true - draw round colored element with color string text
-                    `<span style="
-                            background: ${color}; 
-                            width: 9px;
-                            height: 9px;
-                            position: relative;
-                            display: inline-block;
-                            border-radius: 100%;
-                            border: 2px solid rgba(0, 0, 0, 0.25);
-                            padding: 1px;
-                            left: 3px;
-                            top: 3px;
-                        "></span>
-                        <span class="gray-word-bubble" style="
-                            font-size: 13px;
-                            background: ${cssBackgroundColor};
-                            color: ${cssTextColor}
-                        ">
-                            ${color}
-                        </span>`
-            );
+                // update value of 'Current color' display option
+                display.updateValue('currentColor',
+                    // some DARK CSS MAGIC xD
+                        // if true - draw round colored element with color string text
+                        `<span style="
+                                background: ${color}; 
+                                width: 9px;
+                                height: 9px;
+                                position: relative;
+                                display: inline-block;
+                                border-radius: 100%;
+                                border: 2px solid rgba(0, 0, 0, 0.25);
+                                padding: 1px;
+                                left: 3px;
+                                top: 3px;
+                            "></span>
+                            <span class="gray-word-bubble" style="
+                                font-size: 13px;
+                                background: ${cssBackgroundColor};
+                                color: ${cssTextColor}
+                            ">
+                                ${color}
+                            </span>`
+                );
+            }
         }
 
 
