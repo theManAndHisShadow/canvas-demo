@@ -50,6 +50,15 @@ class UI {
 class UIControls {
     #html;
 
+    /**
+     * The ability to lock the state of an object allows you to ignore clicks on elements 
+     * if you need to freeze the input while some function is running. 
+     * 
+     * All important click/change event handlers access this property 
+     * and are triggered only if the property contains "true".
+     */
+    #isBlocked = false;
+
     // attribute for all rendered controle elements (labels not marked with this attrib)
     #renderedControlElementAttribute = 'data-rendered-control-element';
 
@@ -62,15 +71,6 @@ class UIControls {
         }
 
         this.states = states;
-
-        /**
-         * The ability to lock the state of an object allows you to ignore clicks on elements 
-         * if you need to freeze the input while some function is running. 
-         * 
-         * All important click/change event handlers access this property 
-         * and are triggered only if the property contains "true".
-         */
-        this.blocked = false;
     }
 
 
@@ -95,7 +95,7 @@ class UIControls {
      * Blocks controls actions triggers and set rendered elements as 'disabled'
      */
     #block() {
-        this.blocked = true;
+        this.#isBlocked = true;
         
         // update visual style of all rendered control elements
         let elements = Array.from(this.#html.root.querySelectorAll(`[${this.#renderedControlElementAttribute}]`));
@@ -113,7 +113,7 @@ class UIControls {
      * Unlocks controls actions triggers and set rendered elements as 'disabled'
      */
     #unblock() {
-        this.blocked = false;
+        this.#isBlocked = false;
         
         // update visual style of all rendered control elements
         let elements = Array.from(this.#html.root.querySelectorAll(`[${this.#renderedControlElementAttribute}]`));
@@ -150,7 +150,7 @@ class UIControls {
 
         checkbox.addEventListener('click', event => {
             // update state only when Control UI is not blocked
-            if(this.blocked == false) this.states.setState(elementName, checkbox.checked);
+            if(this.#isBlocked == false) this.states.setState(elementName, checkbox.checked);
         });
 
         element.appendChild(label);
@@ -198,7 +198,7 @@ class UIControls {
             if(Number(input.value) < elementObject.minValue) input.value = elementObject.minValue;
 
             // update state only when Control UI is not blocked
-            if(this.blocked == false) this.states.setState(elementName, Number(input.value));
+            if(this.#isBlocked == false) this.states.setState(elementName, Number(input.value));
         });
 
         element.appendChild(label);
@@ -237,7 +237,7 @@ class UIControls {
 
         range.addEventListener('mousemove', event => {
             // update state only when Control UI is not blocked
-            if(this.blocked == false) {
+            if(this.#isBlocked == false) {
                 range.title = range.value;
                 this.states.setState(elementName, range.value);
             }
@@ -270,7 +270,7 @@ class UIControls {
 
             button.addEventListener('click', () => {
                 // update state only when Control UI is not blocked
-                if(this.blocked == false) {
+                if(this.#isBlocked == false) {
                     let timestamp = Date.now();
                     this.states.setState(elementName, timestamp);
                 }
@@ -302,7 +302,7 @@ class UIControls {
     
                 button.addEventListener('click', () => {
                     // update state only when Control UI is not blocked
-                    if(this.blocked == false) {
+                    if(this.#isBlocked == false) {
                         let timestamp = Date.now();
                         this.states.setState(elementName, timestamp);
                     }
@@ -376,7 +376,7 @@ class UIControls {
 
             button.addEventListener('click', () => {
                 // update state only when Control UI is not blocked
-                if(this.blocked == false) {
+                if(this.#isBlocked == false) {
                     // deselecting prev selected buttons INSIDE of this control menu element (element.querySelector)
                     let prevSelected = Array.from(element.querySelectorAll('[data-selected-option="true"]'));
                     if(prevSelected.length > 0) prevSelected.forEach(button => button.removeAttribute('data-selected-option'));
