@@ -46,8 +46,11 @@ let staticGadients = new Scene({
         // clearing prev created animation threads
         window.runningAnimations.clearQueue();
         
+        // timestamp to current scene's canvas elem
+        const timestamp = Date.now();
+
         // reset the element state to remove all previously applied event handlers
-        const canvas = resetElement(root.querySelector('canvas'));
+        let canvas = resetElement(root.querySelector('canvas'), `canvas-${timestamp}`);
 
         const width = 600;
         const height = 400;
