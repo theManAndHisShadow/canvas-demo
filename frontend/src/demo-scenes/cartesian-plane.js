@@ -34,8 +34,11 @@ let cartesianPlane = new Scene({
         // clearing prev created animation threads
         window.runningAnimations.clearQueue(); 
         
+        // timestamp to current scene's canvas elem
+        const timestamp = Date.now();
+
         // reset the element state to remove all previously applied event handlers
-        let canvas = resetElement(root.querySelector('canvas'));
+        let canvas = resetElement(root.querySelector('canvas'), `canvas-${timestamp}`);
         
         // basic canvas values
         const width = 600;

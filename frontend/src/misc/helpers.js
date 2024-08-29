@@ -474,13 +474,28 @@ function drawText(context, {x, y, text, color ='white', fontFamily = 'Arial', fo
 
 /**
  * Replace element with clone to reset all event listeners
- * @param {HTMLElement} target 
+ * @param {HTMLElement} target - target to reset
+ * @param {string} id - dynamic id
  * @returns {HTMLElement}
  */
-function resetElement(target){
+function resetElement(target, id){
     let clone = target.cloneNode(true);
+    
+    if(id && id.length > 0) {
+        clone.id = id;
+    }
+
     target.parentNode.insertBefore(clone, target);
     target.remove();
+
+    // deleting helper elements (reset uses on scene switching, new scene - new helper elements)
+    let helperElements = document.querySelectorAll(`[data-element-for]`);
+    if(helperElements.length > 0) {
+        Array.from(helperElements).forEach(element => {
+            // if detected elements with other id
+            if(element.getAttribute('data-element-for') !== id) element.remove();
+        });
+    };
 
     return clone;
 }

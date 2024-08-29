@@ -27,8 +27,11 @@ let colorPicker = new Scene({
         // clearing prev created animation threads
         window.runningAnimations.clearQueue();
 
+        // timestamp to current scene's canvas elem
+        const timestamp = Date.now();
+
         // reset the element state to remove all previously applied event handlers
-        let canvas = resetElement(root.querySelector('canvas'));
+        let canvas = resetElement(root.querySelector('canvas'), `canvas-${timestamp}`);
         
         // basic canvas values
         const width = 600;
@@ -196,7 +199,7 @@ let colorPicker = new Scene({
             canvas.style.cursor = mouseOnCircle ? 'crosshair' : 'inherit';
 
             // check if mouse is under spectrum circle and mouse is pressed right now
-            if (mouseOnCircle && mouseDown === true) {
+            if (mouseOnCircle === true && mouseDown === true) {
                 // update pos of picker
                 pickerPos = mousePos;
 
@@ -205,6 +208,7 @@ let colorPicker = new Scene({
                     radius: 7,
                     x: pickerPos.x,
                     y: pickerPos.y,
+                    forElement: canvas.id
                 });
 
                 // update picked color (update html display item)
@@ -236,12 +240,14 @@ let colorPicker = new Scene({
             // set pos of picker
             pickerPos = mousePos;
 
-            // redraw only picker pointer element
-            drawPickerPointer(context, {
-                radius: 7,
-                x: pickerPos.x,
-                y: pickerPos.y,
-            });
+            if(mouseOnCircle === true) {
+                // redraw only picker pointer element
+                drawPickerPointer(context, {
+                    radius: 7,
+                    x: pickerPos.x,
+                    y: pickerPos.y,
+                });
+            }
         });
     }
 });
@@ -432,7 +438,7 @@ function drawSpectrum(context, {radius = 120, opacity = 1} = {}){
  * @param {number} param.x - x pos of picker element
  * @param {number} param.y - y pos of picker element
  */
-function drawPickerPointer(context, {radius = 10, x, y}){
+function drawPickerPointer(context, {radius = 10, x, y, forElement}){
     let pickerRound = document.querySelector('#color-picker');
     let parent = context.canvas.parentNode;
     
@@ -450,6 +456,10 @@ function drawPickerPointer(context, {radius = 10, x, y}){
                 border: 1px solid black;
                 cursor: crosshair;
             `;
+
+        if(forElement && forElement.length > 0) {
+            pickerRound.setAttribute('data-element-for', forElement);
+        }
 
         parent.appendChild(pickerRound);
     } else {
