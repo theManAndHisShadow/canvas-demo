@@ -16,12 +16,16 @@ class UI {
     /**
      * Renders ui structure tree to ready html ui elements
      * @param {object} uiStructureTree 
+     * @param {number} sceneTimestamp - current scene timestamp
      */
-    render(uiStructureTree){
+    render(uiStructureTree, sceneTimestamp){
         if(uiStructureTree){
             // reset inner of #controls container of UI
             this.display.clearRoot();
             this.controls.clearRoot();
+
+            // set relevant scene timestamp to UI Controls instance
+            this.controls.currentSceneTimestamp = sceneTimestamp;
 
             let keys = Object.keys(uiStructureTree);
             for(let key of keys) {
@@ -50,15 +54,6 @@ class UI {
 class UIControls {
     #html;
 
-    /**
-     * The ability to lock the state of an object allows you to ignore clicks on elements 
-     * if you need to freeze the input while some function is running. 
-     * 
-     * All important click/change event handlers access this property 
-     * and are triggered only if the property contains "true".
-     */
-    #isBlocked = false;
-
     // attribute for all rendered controle elements (labels not marked with this attrib)
     #renderedControlElementAttribute = 'data-rendered-control-element';
 
@@ -69,6 +64,16 @@ class UIControls {
         this.#html = {
             root: html,
         }
+
+        /**
+         * The ability to lock the state of an object allows you to ignore clicks on elements 
+         * if you need to freeze the input while some function is running. 
+         * 
+         * All important click/change event handlers access this property 
+         * and are triggered only if the property 'blockedSceneTimestamp' do not contains timestamp thats equal to 'currentSceneTimestamp'.
+         */
+        this.currentSceneTimestamp = false;
+        this.blockedSceneTimestamp = false;
 
         this.states = states;
     }
@@ -92,38 +97,55 @@ class UIControls {
 
 
     /**
-     * Blocks controls actions triggers and set rendered elements as 'disabled'
+     * Manage when UI controls is blocked/unblocked
+     * @param {number} timestamp - scene timestamp, where UI is blockled
+     * @returns {{Function: block, Function: unblock}} - block and unblock functions
      */
-    #block() {
-        this.#isBlocked = true;
-        
-        // update visual style of all rendered control elements
-        let elements = Array.from(this.#html.root.querySelectorAll(`[${this.#renderedControlElementAttribute}]`));
-            elements.forEach(element => {
-                if(element.tagName == 'INPUT') {
-                    element.setAttribute('disabled', '');
-                } else {
-                    element.classList.add('disabled');
-                }
-            });
-    }
+    #blockManager(timestamp){
+        let lastSceneTimestamp = timestamp;
+        let self = this;
 
+        return {
+            /**
+             * Blocks controls actions triggers and set rendered elements as 'disabled'
+             */
+            block() {
+                self.blockedSceneTimestamp = lastSceneTimestamp;
 
-    /**
-     * Unlocks controls actions triggers and set rendered elements as 'disabled'
-     */
-    #unblock() {
-        this.#isBlocked = false;
-        
-        // update visual style of all rendered control elements
-        let elements = Array.from(this.#html.root.querySelectorAll(`[${this.#renderedControlElementAttribute}]`));
-            elements.forEach(element => {
-                if(element.tagName == 'INPUT') {
-                    element.removeAttribute('disabled');
-                } else {
-                    element.classList.remove('disabled');
-                }
-            });
+                // update visual style of all rendered control elements
+                let elements = Array.from(self.#html.root.querySelectorAll(`[${self.#renderedControlElementAttribute}]`));
+                elements.forEach(element => {
+                    // If element from scene with blocked UI - block that element
+                    if (element.getAttribute(self.#renderedControlElementAttribute) == lastSceneTimestamp) {
+                        if (element.tagName == 'INPUT') {
+                            element.setAttribute('disabled', '');
+                        } else {
+                            element.classList.add('disabled');
+                        }
+                    }
+                });
+            },
+
+            /**
+             * Unblocks controls actions triggers and set rendered elements as 'disabled'
+             */
+            unblock() {
+                self.blockedSceneTimestamp = 0;
+
+                // update visual style of all rendered control elements
+                let elements = Array.from(self.#html.root.querySelectorAll(`[${self.#renderedControlElementAttribute}]`));
+                // If element from scene with blocked UI - unblock that element
+                elements.forEach(element => {
+                    if (element.getAttribute(self.#renderedControlElementAttribute) == lastSceneTimestamp) {
+                        if (element.tagName == 'INPUT') {
+                            element.removeAttribute('disabled');
+                        } else {
+                            element.classList.remove('disabled');
+                        }
+                    }
+                });
+            }
+        }
     }
 
 
@@ -144,13 +166,13 @@ class UIControls {
             checkbox.type = 'checkbox';
             checkbox.classList.add('controls__checkbox-checkbox');
             checkbox.checked = elementObject.state;
-            checkbox.setAttribute(this.#renderedControlElementAttribute, '');
+            checkbox.setAttribute(this.#renderedControlElementAttribute, this.currentSceneTimestamp);
 
         this.states.setState(elementName, elementObject.state);
 
         checkbox.addEventListener('click', event => {
-            // update state only when Control UI is not blocked
-            if(this.#isBlocked == false) this.states.setState(elementName, checkbox.checked);
+            // update state only when current scene Control UI is not blocked
+            if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) this.states.setState(elementName, checkbox.checked);
         });
 
         element.appendChild(label);
@@ -183,7 +205,7 @@ class UIControls {
             input.min = elementObject.minValue;
             input.max = elementObject.maxValue;
             input.placeholder = 'max ' + elementObject.maxValue;
-            input.setAttribute(this.#renderedControlElementAttribute, '');
+            input.setAttribute(this.#renderedControlElementAttribute, this.currentSceneTimestamp);
             input.value = elementObject.defaultValue;
 
         // this.states[elementName] = elementObject.defaultValue;
@@ -197,8 +219,8 @@ class UIControls {
             if(Number(input.value) > elementObject.maxValue) input.value = elementObject.maxValue;
             if(Number(input.value) < elementObject.minValue) input.value = elementObject.minValue;
 
-            // update state only when Control UI is not blocked
-            if(this.#isBlocked == false) this.states.setState(elementName, Number(input.value));
+            // update state only when current scene Control UI is not blocked
+            if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) this.states.setState(elementName, Number(input.value));
         });
 
         element.appendChild(label);
@@ -226,7 +248,7 @@ class UIControls {
             range.max = elementObject.maxValue;
             range.value = elementObject.defaultValue;
             range.classList.add('controls__range-slider');
-            range.setAttribute(this.#renderedControlElementAttribute, '');
+            range.setAttribute(this.#renderedControlElementAttribute, this.currentSceneTimestamp);
             range.checked = elementObject.state;
 
         let endLabel = document.createElement('span');
@@ -236,8 +258,8 @@ class UIControls {
         this.states.setState(elementName, elementObject.defaultValue);
 
         range.addEventListener('mousemove', event => {
-            // update state only when Control UI is not blocked
-            if(this.#isBlocked == false) {
+            // update state only when current scene Control UI is not blocked
+            if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) {
                 range.title = range.value;
                 this.states.setState(elementName, range.value);
             }
@@ -265,12 +287,12 @@ class UIControls {
 
         let button = document.createElement('button');
             button.classList.add('controls__button');
-            button.setAttribute(this.#renderedControlElementAttribute, '');
+            button.setAttribute(this.#renderedControlElementAttribute, this.currentSceneTimestamp);
             button.textContent = elementObject.text;
 
             button.addEventListener('click', () => {
-                // update state only when Control UI is not blocked
-                if(this.#isBlocked == false) {
+                // update state only when current scene Control UI is not blocked
+                if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) {
                     let timestamp = Date.now();
                     this.states.setState(elementName, timestamp);
                 }
@@ -297,12 +319,12 @@ class UIControls {
             let button = document.createElement('button');
                 button.classList.add('controls__main-action-button');
                 button.setAttribute(this.#mainActionButtonAttribute, '');
-                button.setAttribute(this.#renderedControlElementAttribute, '');
+                button.setAttribute(this.#renderedControlElementAttribute, this.currentSceneTimestamp);
                 button.textContent = elementObject.text;
     
                 button.addEventListener('click', () => {
-                    // update state only when Control UI is not blocked
-                    if(this.#isBlocked == false) {
+                    // update state only when current scene Control UI is not blocked
+                    if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) {
                         let timestamp = Date.now();
                         this.states.setState(elementName, timestamp);
                     }
@@ -324,6 +346,7 @@ class UIControls {
                 let mainActionStatusStateName = elementName + '__status';
                 this.states.setState(mainActionStatusStateName, 'not-started');
 
+                let blockChecker = this.#blockManager(this.currentSceneTimestamp);
                 this.states.subscribe((propertyName, newValue, oldValue) => {
                     if(propertyName == mainActionStatusStateName) {
                         /**
@@ -331,14 +354,14 @@ class UIControls {
                          * then the object will be blocked with all the consequences for processing the clicks and other events.... 
                          */
                         if(newValue == 'in-progress') {
-                            this.#block();
+                            blockChecker.block();
                         } else {
                             /**
                              * ...Since we listen to changes through the 'StateManager.subscribe()' on changes, 
                              * then the next state change of status to "successful", "error" and something else 
                              * will cause the unlocking of the entire object and the resumption of work with changes in the scene parameters.
                              */
-                            this.#unblock();
+                            blockChecker.unblock();
                         }
                     }
                 });
@@ -367,7 +390,7 @@ class UIControls {
         elementObject.optionNames.forEach((optionName, i) => {
             let button = document.createElement('button');
                 button.classList.add('controls__option-selector-button');
-                button.setAttribute(this.#renderedControlElementAttribute, '');
+                button.setAttribute(this.#renderedControlElementAttribute, this.currentSceneTimestamp);
                 button.textContent = optionName;
                 button.setAttribute('data-preset-num', i);
 
@@ -375,8 +398,8 @@ class UIControls {
             if(i == 0) button.setAttribute('data-selected-option', true);
 
             button.addEventListener('click', () => {
-                // update state only when Control UI is not blocked
-                if(this.#isBlocked == false) {
+                // update state only when current scene Control UI is not blocked
+                if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) {
                     // deselecting prev selected buttons INSIDE of this control menu element (element.querySelector)
                     let prevSelected = Array.from(element.querySelectorAll('[data-selected-option="true"]'));
                     if(prevSelected.length > 0) prevSelected.forEach(button => button.removeAttribute('data-selected-option'));
