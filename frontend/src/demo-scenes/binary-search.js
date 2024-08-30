@@ -94,6 +94,8 @@ let binarySearch = new Scene({
             // replacing context, beacuse every time when scene code is re-executed, 
             // the scene canvas WILL BE replaced with a new one
             grid.renderer = context;
+
+            grid.source = 'loaded';
             console.log('loaded instance from storage', grid);
         } else {
             grid = new Grid({
@@ -211,6 +213,15 @@ let binarySearch = new Scene({
             }
         });
 
+
+        // create fading loader layer
+        let loader = new LoaderLayer({
+            text: 'Loading scene from memory...',
+            fontSize: 12,
+            duration: 2000,
+            renderer: context,
+        });
+
         // Main function
         let loop = () => {
             context.clearRect(
@@ -228,6 +239,11 @@ let binarySearch = new Scene({
             });
 
             grid.render();
+
+            // if is loaded scene - render loader layer
+            if(grid.source == 'loaded' && loader.opacity > 0) {
+                loader.render();
+            }
         }
 
         // animate
@@ -373,6 +389,7 @@ class Grid {
         this.#generate()
 
         this.createdAt = Date.now();
+        this.source = 'created';
     }
 
 
@@ -532,6 +549,46 @@ class Grid {
         if(this.items.length > 100){
             this.drawScale({
                 padding: 10,
+            });
+        }
+    }
+}
+
+class LoaderLayer {
+    constructor({text, duration = 1000, opacity = 1, fontSize, textColor = 'white', backgroundColor = 'black', renderer}){
+        this.text = text;
+        this.duration = duration;
+        this.backgroundColor = backgroundColor;
+        this.textColor = textColor;
+        this.fontSize = fontSize;
+        this.opacity = opacity;
+        this.renderer = renderer;
+
+        const delta = (0 - opacity) / (duration / 1000 * 60);
+        this.step = delta;
+    }
+
+    /**
+     * Renders loader layer wityh text.
+     */
+    render() {
+        this.opacity += this.opacity >= 0 && this.opacity <= 1 ? this.step : 0;
+        
+        drawRect(this.renderer, {
+            x: 0,
+            y: 0,
+            width: this.renderer.canvas.width,
+            height: this.renderer.canvas.height,
+            fillColor: getColor(this.backgroundColor, this.opacity),
+        });
+
+        if(this.text && typeof this.text == 'string' && this.text.length > 0) {
+            drawText(this.renderer, {
+                x: this.renderer.canvas.width / 2,
+                y: this.renderer.canvas.height / 2,
+                text: this.text,
+                color: getColor(this.textColor, this.opacity),
+                fontSize: this.fontSize,
             });
         }
     }
