@@ -80,12 +80,36 @@ let binarySearch = new Scene({
         const centerX = width / 2 + 1;
         const centerY = height / 2 + 0.5;
 
-        let grid = createNumberSquaresGrid(context, {
-            cx: centerX,
-            cy: centerY,
-            size: 30,
-        });
 
+        /**
+         * N.B.:
+         * A trick for correctly rendering a grid on which the search function is already running. 
+         * The class instance is either created from scratch (first scene load) or loaded from memory
+         */
+        let grid = null;
+        if(settings.getState('gridObject')) {
+            // get instabce from storage
+            grid = settings.getState('gridObject');
+
+            // replacing context, beacuse every time when scene code is re-executed, 
+            // the scene canvas WILL BE replaced with a new one
+            grid.renderer = context;
+
+            grid.source = 'loaded';
+            console.log('loaded instance from storage', grid);
+        } else {
+            grid = new Grid({
+                cx: centerX,
+                cy: centerY,
+                renderer: context,
+            });
+
+            // save to stotage
+            settings.setState('gridObject', grid);
+            console.log('created new instance', grid);
+        }
+
+        
         // inistial scene status
         let currentStatus = 'not-started';
         settings.subscribe((propertyName, newValue, oldValue) => {
@@ -103,10 +127,8 @@ let binarySearch = new Scene({
 
             // local function to update the mesh after scene parameters have been changed by the user
             let updateGrid = () => {
-                grid = createNumberSquaresGrid(context, {
-                    cx: centerX,
-                    cy: centerY,
-                    size: range == 0 ? 30 : 10,
+                grid.update({
+                    cellSize: range == 0 ? 30 : 10,
                     margin: range == 0 ? 3 : 1,
                     columns: range == 0 ? 10 : 40,
                     rows: range == 0 ? 10 : 25,
@@ -148,7 +170,7 @@ let binarySearch = new Scene({
                                 settings.setState('find__status', currentStatus);
                                 display.updateValue('attemps', attempts);
                                 display.updateValue('current-search-range', `[${min + 1}, ${max + 1}]`)
-                                display.updateValue('status', '<span class="yellow-word-bubble">In progress...</span>');
+                                display.updateValue('status', '<span class="yellow-word-bubble">In progress...</span>')
 
                                 // check all squares that out of range at current try
                                 grid.items.forEach(square => {
@@ -191,6 +213,15 @@ let binarySearch = new Scene({
             }
         });
 
+
+        // create fading loader layer
+        let loader = new LoaderLayer({
+            text: 'Loading scene from memory...',
+            fontSize: 12,
+            duration: 2000,
+            renderer: context,
+        });
+
         // Main function
         let loop = () => {
             context.clearRect(
@@ -207,16 +238,11 @@ let binarySearch = new Scene({
                 fillColor: getColor('black', 0.85),
             });
 
-            grid.items.forEach(item => {
-                item.render();
-            });
+            grid.render();
 
-            // if range "1-1000" - draw scale
-            if(settings.getState('range') == 1) {
-                drawScale(context, {
-                    gridObject: grid,
-                    padding: 10,
-                });
+            // if is loaded scene - render loader layer
+            if(grid.source == 'loaded' && loader.opacity > 0) {
+                loader.render();
             }
         }
 
@@ -233,7 +259,7 @@ window.exportedObjects.push(binarySearch);
 */
 
 class GridItem{
-    constructor({number, size, x, y, margin, fillColor = getColor('black'), hideNumbers, textColor = getColor('white'), renderer}){
+    constructor({number, size, x, y, margin, fillColor = getColor('black'), hideNumbers, textColor = getColor('white'), parent}){
         this.number = number;
         this.size = size;
         this.x = x;
@@ -243,7 +269,7 @@ class GridItem{
         this.textColor = textColor;
         this.hideNumbers = hideNumbers;
 
-        this.renderer = renderer;
+        this.parent = parent;
         this.checked = false;
     }
 
@@ -282,7 +308,7 @@ class GridItem{
      * Renders grid item
      */
     render(){
-        drawRect(this.renderer, {
+        drawRect(this.parent.renderer, {
             x: this.x,
             y: this.y,
             width: this.size,
@@ -292,7 +318,7 @@ class GridItem{
 
         // draw number or just dot depending on 'hideNumbers' param
         if(this.hideNumbers == false) {
-            drawText(this.renderer, {
+            drawText(this.parent.renderer, {
                 x: this.x + (this.size / 2),
                 y: this.y + (this.size / 2),
                 fontSize: this.number >= 100 ? 11 : 13,
@@ -303,7 +329,7 @@ class GridItem{
             // exception:
             // if 1 or 1000 - draw numbers
             if(this.hideNumbers == true && (this.number == 1 || this.number == 1000)) {
-                drawText(this.renderer, {
+                drawText(this.parent.renderer, {
                     x: this.x + (this.size / 2),
                     y: this.y + (this.size / 2) + 0.5,
                     fontSize: 8,
@@ -313,7 +339,7 @@ class GridItem{
                 });
             } else {
                 // for other numbers draw just dots
-                drawRect(this.renderer, {
+                drawRect(this.parent.renderer, {
                     x: this.x + (this.size / 2),
                     y: this.y + (this.size / 2),
                     width: 1,
@@ -328,148 +354,246 @@ class GridItem{
 }
 
 
-/**
- * Draws a scale elements for grid
- * @param {CanvasRenderingContext2D} context - canvas context
- * @param {object} param.gridObject - grid object
- * @param {number} param.padding - padding from grid to scale
- */
-function drawScale(context, {gridObject, padding = 10}){
-    // some function important vars
-    const subpixel = 0.5;
-    const color = 'rgba(255, 255, 255, 1)';
-    
-    // drawning "axes"
-    context.beginPath();
-    context.strokeStyle = color;
-    context.lineWidth = 1;
+class Grid {
+    /**
+     * Creates grid of blocks with numbers.
+     * @param {CanvasRenderingContext2D} context - canvas 2d context
+     * @param {number} param.cx - grid center x
+     * @param {number} param.cy - grid center y
+     * @param {number} param.columns - number of columns
+     * @param {number} param.rows - number of rows
+     * @param {number} param.cellSize - size of grid item (cell)
+     * @param {number} param.margin - margin between grid items
+     * @param {number} param.hideNumbers - optional param, hides cell number label
+     * @returns {object}
+     */
+    constructor({cx, cy, columns = 10, rows = 10, cellSize = 30, margin = 3, renderer, hideNumbers = false} = {}){
+        this.cx = cx;
+        this.cy = cy;
 
-    // horizontal axis
-    let horizontalY = gridObject.startY - padding + subpixel;
-    context.moveTo(gridObject.startX - padding+ subpixel, horizontalY);
-    context.lineTo(gridObject.startX + gridObject.width + subpixel, horizontalY); 
+        this.columns = columns;
+        this.rows = rows;
 
-    // vertival axis
-    let verticalX = gridObject.startX - padding + subpixel;
-    context.moveTo(verticalX, horizontalY);
-    context.lineTo(verticalX, gridObject.startY + gridObject.height + subpixel); 
+        this.cellSize = cellSize;
+        this.margin = margin;
 
-    // finish axes drawning
-    context.closePath();
-    context.stroke();
+        this.width = null;
+        this.height = null;
+        this.startX = null;
+        this.startY = null;
 
-    // drawning scale marks and numbers
-    context.beginPath();
+        this.hideNumbers = hideNumbers;
 
-    // loop for horizontal axis
-    for(let i = 1; i <= gridObject.columns; i++) {
-        let x = gridObject.startX + ((i -1) * (gridObject.margin + gridObject.itemSize)) + (gridObject.itemSize / 2) + subpixel;
+        this.renderer = renderer;
+        this.items = [];
+        this.#generate()
 
-        // draw number each 5 
-        if(i == 1 || i % 5 === 0) {
-            drawText(context, {
-                x: x,
-                y: gridObject.startY - padding - 10,
-                text: i,
-                color: color,
-                fontSize: 8,
-            });
-        }
-
-        // draw scale line marks
-        context.moveTo(x, horizontalY);
-        context.lineTo(x, horizontalY - 3);
+        this.createdAt = Date.now();
+        this.source = 'created';
     }
 
-    // loop for vertical axis
-    for(let j = 1; j <= gridObject.rows; j++) {
-        let y = gridObject.startY + ((j -1) * (gridObject.margin + gridObject.itemSize)) + (gridObject.itemSize / 2) + subpixel;
 
-        // draw axis scale number
-        if(j == 1 || j % 5 === 0) {
-            drawText(context, {
-                x: gridObject.startX - padding - 10,
-                y: y,
-                text: j,
-                color: color,
-                fontSize: 8,
-            });
+    /**
+     * Creates grid of blocks with numbers.
+     */
+    #generate() {
+        // function createNumberSquaresGrid(context, {cx, cy, columns = 10, rows = 10, size = 20, margin = 3, hideNumbers = false} = {}){
+        const computedWidth = this.margin + this.cellSize;
+
+        const startX = this.cx - ((computedWidth * this.columns) / 2);
+        const startY = this.cy - ((computedWidth * this.rows) / 2);
+
+        const items = [];
+        let id = 1;
+
+        for (let j = 0; j < this.rows; j++) {
+            for (let i = 0; i < this.columns; i++) {
+                // calc current square x, y
+                let x = startX + (i * computedWidth);
+                let y = startY + (j * computedWidth);
+
+                // create new square
+                let square = new GridItem({
+                    parent: this,
+                    size: this.cellSize,
+                    margin: this.margin,
+                    number: id,
+                    x: x,
+                    y: y,
+                    hideNumbers: this.hideNumbers,
+                });
+
+                // update counter
+                id++;
+
+                // add to result array
+                items.push(square);
+            }
         }
 
-        // draw axis scale line marks
-        context.moveTo(verticalX, y);
-        context.lineTo(verticalX - 3, y);
+        this.items = items;
+        this.width = this.columns * computedWidth;
+        this.height = this.rows * computedWidth;
+        this.startX = startX;
+        this.startY = startY;
     }
 
-    // finish axes drawning process
-    context.closePath();
-    context.stroke();
+
+    /**
+    * Updates grid properties
+    * @param {CanvasRenderingContext2D} context - canvas 2d context
+    * @param {number} param.rows - number of rows
+    * @param {number} param.columns - number of columns
+    * @param {number} param.margin - margin between grid items
+    * @param {number} param.cellSize - size of grid item (cell)
+    * @param {number} param.hideNumbers - optional param, hides cell number label
+    * @returns {object}
+    */
+    update({rows, columns, margin, cellSize, hideNumbers}){
+        for(let key in arguments[0]) {
+            if(arguments[0].hasOwnProperty(key)) {
+                this[key] = arguments[0][key];
+            }
+        }
+
+        this.#generate();
+    }
+
+
+    /**
+     * Draws a scale elements for grid
+     * @param {CanvasRenderingContext2D} context - canvas context
+     * @param {number} param.padding - padding from grid to scale
+     */
+    drawScale({ padding = 10 }){
+        // some function important vars
+        const subpixel = 0.5;
+        const color = 'rgba(255, 255, 255, 1)';
+
+        // drawning "axes"
+        this.renderer.beginPath();
+        this.renderer.strokeStyle = color;
+        this.renderer.lineWidth = 1;
+
+        // horizontal axis
+        let horizontalY = this.startY - padding + subpixel;
+        this.renderer.moveTo(this.startX - padding+ subpixel, horizontalY);
+        this.renderer.lineTo(this.startX + this.width + subpixel, horizontalY); 
+
+        // vertival axis
+        let verticalX = this.startX - padding + subpixel;
+        this.renderer.moveTo(verticalX, horizontalY);
+        this.renderer.lineTo(verticalX, this.startY + this.height + subpixel); 
+
+        // finish axes drawning
+        this.renderer.closePath();
+        this.renderer.stroke();
+
+        // drawning scale marks and numbers
+        this.renderer.beginPath();
+
+        // loop for horizontal axis
+        for(let i = 1; i <= this.columns; i++) {
+            let x = this.startX + ((i -1) * (this.margin + this.cellSize)) + (this.cellSize / 2) + subpixel;
+
+            // draw number each 5 
+            if(i == 1 || i % 5 === 0) {
+                drawText(this.renderer, {
+                    x: x,
+                    y: this.startY - padding - 10,
+                    text: i,
+                    color: color,
+                    fontSize: 8,
+                });
+            }
+
+            // draw scale line marks
+            this.renderer.moveTo(x, horizontalY);
+            this.renderer.lineTo(x, horizontalY - 3);
+        }
+
+        // loop for vertical axis
+        for(let j = 1; j <= this.rows; j++) {
+            let y = this.startY + ((j -1) * (this.margin + this.cellSize)) + (this.cellSize / 2) + subpixel;
+
+            // draw axis scale number
+            if(j == 1 || j % 5 === 0) {
+                drawText(this.renderer, {
+                    x: this.startX - padding - 10,
+                    y: y,
+                    text: j,
+                    color: color,
+                    fontSize: 8,
+                });
+            }
+
+            // draw axis scale line marks
+            this.renderer.moveTo(verticalX, y);
+            this.renderer.lineTo(verticalX - 3, y);
+        }
+
+        // finish axes drawning process
+        this.renderer.closePath();
+        this.renderer.stroke();
+    }
+
+
+    /**
+     * Renders a grid with numbers.
+     */
+    render(){
+        this.items.forEach(item => {
+            item.render();
+        });
+
+        if(this.items.length > 100){
+            this.drawScale({
+                padding: 10,
+            });
+        }
+    }
 }
 
+class LoaderLayer {
+    constructor({text, duration = 1000, opacity = 1, fontSize, textColor = 'white', backgroundColor = 'black', renderer}){
+        this.text = text;
+        this.duration = duration;
+        this.backgroundColor = backgroundColor;
+        this.textColor = textColor;
+        this.fontSize = fontSize;
+        this.opacity = opacity;
+        this.renderer = renderer;
 
-
-/**
- * Creates grid of blocks with numbers.
- * @param {CanvasRenderingContext2D} context - canvas 2d context
- * @param {number} param.cx - grid center x
- * @param {number} param.cy - grid center y
- * @param {number} param.columns - number of columns
- * @param {number} param.rows - number of rows
- * @param {number} param.size - size of grid item
- * @param {number} param.margin - margin between grid items
- * @returns {object}
- */
-function createNumberSquaresGrid(context, {cx, cy, columns = 10, rows = 10, size = 20, margin = 3, hideNumbers = false} = {}){
-    const computedWidth = margin + size;
-
-    const startX = cx - ((computedWidth * columns) / 2);
-    const startY = cy - ((computedWidth * rows) / 2);
-
-    const items = [];
-    let id = 1;
-
-    for(let j = 0; j < rows; j++) {
-        for(let i = 0; i < columns; i ++) {
-            // calc current square x, y
-            let x = startX + (i * computedWidth);
-            let y = startY + (j * computedWidth);
-
-            // create new square
-            let square = new GridItem({
-                renderer: context,
-                size: size,
-                margin: margin,
-                number: id,
-                x: x,
-                y: y,
-                hideNumbers: hideNumbers,
-            });
-
-            // update counter
-            id++;
-
-            // add to result array
-            items.push(square);
-        }
+        const delta = (0 - opacity) / (duration / 1000 * 60);
+        this.step = delta;
     }
 
-    // return grid object
-    return {
-        items: items,
+    /**
+     * Renders loader layer wityh text.
+     */
+    render() {
+        this.opacity += this.opacity >= 0 && this.opacity <= 1 ? this.step : 0;
+        
+        drawRect(this.renderer, {
+            x: 0,
+            y: 0,
+            width: this.renderer.canvas.width,
+            height: this.renderer.canvas.height,
+            fillColor: getColor(this.backgroundColor, this.opacity),
+        });
 
-        startX: startX,
-        startY: startY,
-
-        rows: rows,
-        columns: columns,
-
-        itemSize: size,
-        margin: margin,
-
-        width: (columns * (size + margin)),
-        height: (rows * (size + margin)),
-    };
+        if(this.text && typeof this.text == 'string' && this.text.length > 0) {
+            drawText(this.renderer, {
+                x: this.renderer.canvas.width / 2,
+                y: this.renderer.canvas.height / 2,
+                text: this.text,
+                color: getColor(this.textColor, this.opacity),
+                fontSize: this.fontSize,
+            });
+        }
+    }
 }
+
 
 /**
  * @typedef {Object} SearchOptions

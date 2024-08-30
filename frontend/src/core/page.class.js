@@ -258,10 +258,14 @@ class Page {
                     // it will return a scene object if the scene is loaded for the first time 
                     // or even if it has already been loaded before
                     this.loadScene(scenePath).then(loadedScene => {
+                        // set current scen
+                        this.currentScene = loadedScene;
+
                         // getting scene ui structure tree with settings and controls
                         let uiTree = loadedScene.ui;
-                        // render it (and add event handlers, that updated values)
-                        this.ui.render(uiTree);
+
+                        // render it (and add event handlers, that updated values) and pass relevant current scene timestamp
+                        this.ui.render(uiTree, loadedScene.timestamp);
 
                         // updating tab name using scene title
                         this.#updatePageTabTitle(loadedScene.title);
@@ -281,8 +285,6 @@ class Page {
                             // it makes updated values available inside scene code
                             settings: this.ui.states,
                         });
-
-                        this.currentScene = loadedScene;
                     }).catch(error => {
                         console.log(error);
                     }); 
