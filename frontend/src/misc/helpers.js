@@ -220,6 +220,41 @@ function changeColorOpacity(rgba, newOpacity){
 
 
 /**
+ * Converts an RGBA color value to a HEX color value.
+ * 
+ * @param {number} r - The red component of the color (0-255).
+ * @param {number} g - The green component of the color (0-255).
+ * @param {number} b - The blue component of the color (0-255).
+ * @param {number} a - The alpha component of the color (0-1), where 0 is fully transparent and 1 is fully opaque.
+ * 
+ * @returns {string} The HEX color value including the alpha channel in the format `#RRGGBBAA`.
+ */
+function rgba2hex(r, g, b, a) {
+    // Validate input
+    if (
+        typeof r !== 'number' || r < 0 || r > 255 ||
+        typeof g !== 'number' || g < 0 || g > 255 ||
+        typeof b !== 'number' || b < 0 || b > 255 ||
+        typeof a !== 'number' || a < 0 || a > 1
+    ) {
+        throw new Error('Invalid input: Ensure that r, g, b are between 0 and 255, and a is between 0 and 1.');
+    }
+
+    // Convert alpha to a value between 0 and 255
+    const alpha = Math.round(a * 255);
+
+    // Convert RGB and alpha to hexadecimal strings
+    const rHex = r.toString(16).padStart(2, '0');
+    const gHex = g.toString(16).padStart(2, '0');
+    const bHex = b.toString(16).padStart(2, '0');
+    const aHex = alpha.toString(16).padStart(2, '0');
+
+    // Return the HEX color value with alpha channel
+    return `#${rHex}${gHex}${bHex}${aHex}`;
+}
+
+
+/**
  * Function to make a color more vibrant by maximizing the dominant color component.
  * @param {string} rgbaColor - A string in the format 'rgba(r, g, b, a)'.
  * @returns {string} - A new color string in 'rgba' format, with increased vibrancy.
