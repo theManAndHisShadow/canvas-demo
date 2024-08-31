@@ -61,8 +61,8 @@ let colorPicker = new Scene({
          * Draws spectrum circle and some color name labels.
          * @param {number} opacity - from 1 to 100
          */
-        const draw = (opacity) => {
-            opacity = opacity / 100;
+        const draw = (brightness) => {
+            brightness = brightness / 100;
 
             context.clearRect(
                 0, 0,
@@ -70,26 +70,10 @@ let colorPicker = new Scene({
                 height
             );
 
-            // Drawing shading behind a circle
-            drawShadow(context, {
-                radius: radius * 2,
-                opacity: opacity,
-            });
-
-            // drawning special layer under spectrum circle
-            // layer color depends on 'darkerk-lighter' slider range at UI Controls panel
-            drawCircle(context, {
-                cx: canvas.width / 2,
-                cy: canvas.height / 2,
-                r: radius - 0.6,
-                fillColor: opacity > 0.5 ? 'rgb(255, 255, 255)' : 'rgb(0, 0, 0)',
-                borderColor: opacity > 0.5 ? 'rgb(255, 255, 255)' : 'rgb(0, 0, 0)',
-            });
-
             // Drawing spectrum circle (using built-in methods)
             drawSpectrum(context, {
                 radius: radius,
-                opacity: opacity,
+                brightness: brightness,
             });
 
             // Drawing color labels and angle labels
@@ -104,14 +88,14 @@ let colorPicker = new Scene({
                  */
                 colorOrder: [
                     {name: 'RED',         offset: 20}, 
-                    {name: 'ORANGE',      offset: 30}, 
+                    {name: 'YELLOW',      offset: 30}, 
                     {name: 'GREEN',       offset: 35}, 
                     {name: 'CYAN',        offset: 25}, 
-                    {name: 'INDIGO',      offset: 30}, 
-                    {name: 'VIOLET',      offset: 30},
+                    {name: 'BLUE',        offset: 30}, 
+                    {name: 'MAGENTA',     offset: 30},
                 ],
 
-                opacity: opacity,
+                brightness: brightness,
             });
         }
 
@@ -284,9 +268,9 @@ window.exportedObjects.push(colorPicker);
  * @param {CanvasRenderingContext2D} context 
  * @param {Number} param.radius - radius of spectrum circle  
  * @param {Object[]} param.colorOrder - order of color objects, where color object = {name: 'name, offset: 10}
- * @param {opacity} param.opacity - opacity of colors
+ * @param {number} param.brightness - brightness of colors
  */
-function drawColorLabels(context, {radius, colorOrder, opacity}){
+function drawColorLabels(context, {radius, colorOrder, brightness}){
     // center of canvas
     const centerX = context.canvas.width / 2;
     const centerY = context.canvas.height / 2;
@@ -350,8 +334,8 @@ function drawColorLabels(context, {radius, colorOrder, opacity}){
             let colorText = colorOrder[j].name;
 
             // some special names for extreme values
-            if(opacity < 0.05) colorText = 'BLACK';
-            if(opacity > 0.99) colorText = 'WHITE';
+            if(brightness < 0.05) colorText = 'BLACK';
+            if(brightness > 0.99) colorText = 'WHITE';
 
             // update current color label angle
             currentMainAngle += mainAngleStep;
@@ -396,55 +380,104 @@ function drawShadow(context, {radius}){
  * Draws a spectrum circle
  * @param {CanvasRenderingContext2D} context 
  * @param {Number} param.radius - radius of spectrum circle
- * @param {Number} param.opacity - opacity of spectrum color (from 0 to 1)
+ * @param {Number} param.brightness - opacity of spectrum color (from 0 to 1)
  */
-function drawSpectrum(context, {radius = 120, opacity = 1} = {}){
+function drawSpectrum(context, {radius = 120, brightness = 1} = {}){
     const width = context.canvas.width;
     const height = context.canvas.height;
     const centerX = width / 2;
     const centerY = height / 2
+
+    // Create an ImageData object
+    const imageData = context.createImageData(width, height);
     
-    // Range left side | Middle | Range right side 
-    // 0$................100%.....................0%
-    // <------------------()----------------------->
-    opacity = opacity > 0.5 ? 1 - opacity : opacity;
-    opacity = opacity * 2;
-   
-    /**
-     * we adjust the colors manually, for seamlessness we duplicate the color of the beginning and end, 
-     * however, this causes a slight asymmetry in the arrangement of colors
-     */
-    const gradient = context.createConicGradient(-20, width/2, height/2);
-    const colors = [ 
-        `rgba(255, 0, 0, ${opacity})`, // pure red
-
-        `rgba(255, 255, 0, ${opacity})`, // mix
-
-        `rgba(0, 255, 0, ${opacity})`, // pure green
-
-        `rgba(0, 255, 255, ${opacity})`, // mix
-
-        `rgba(0, 0, 255, ${opacity})`, // pure blue
-
-        `rgba(155, 0, 255, ${opacity})`, // mix
-
-        `rgba(255, 0, 0, ${opacity})`, // pure red
-    ];
-
-    // adding each color
-    colors.forEach((color, i) => {
-        let pos = (1 / colors.length) * i;
-        
-        gradient.addColorStop(pos, color);
-    });
+    // init result color array
+    let resultColor = [0, 0, 0];
     
-    // render spectrum circle
-    context.beginPath();
-    context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-    
-    context.fillStyle = gradient;
-    context.fill();
-    context.closePath();
+    // Loop through each pixel
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            // Calculate the index in the imageData array for the pixel at coordinates (x, y)
+            // Detailed explanation:
+            // - y * width: Determines the row offset by multiplying the y-coordinate by the width of the image.
+            //   This gives the total number of pixels in all rows before the current row.
+            // - y * width + x: Adds the x-coordinate to the row offset to get the exact pixel position within the image.
+            // - (y * width + x) * 4: Multiplies the pixel position by 4 because each pixel is represented by 4 consecutive values
+            // - red, green, blue and alpha channels
+            const index = (y * width + x) * 4;
+
+            //A factor that influences how the color will be interpolated
+            let factor = getDistanseBetweenTwoPoint(centerX, centerY, x, y);
+
+            let rotated = rotatePoint(centerX, centerY, x, y, 90);
+            let angle = getNormalizedAngle(centerX, centerY, rotated.x, rotated.y);
+
+            if (factor <= radius - 2) {
+                if (angle < 1 / 6) {
+                    // Interpolate from red to yellow
+                    resultColor[0] = 255;
+                    resultColor[1] = Math.round(angle * 6 * 255); // Green increases from 0 to 255
+                    resultColor[2] = 0;
+                } else if (angle < 2 / 6) {
+                    // Interpolate from yellow to green
+                    resultColor[0] = Math.round(255 - (angle - 1 / 6) * 6 * 255); // Red decreases from 255 to 0
+                    resultColor[1] = 255;
+                    resultColor[2] = 0;
+                } else if (angle < 3 / 6) {
+                    // Interpolate from green to cyan
+                    resultColor[0] = 0;
+                    resultColor[1] = 255;
+                    resultColor[2] = Math.round((angle - 2 / 6) * 6 * 255); // Blue increases from 0 to 255
+                } else if (angle < 4 / 6) {
+                    // Interpolate from cyan to blue
+                    resultColor[0] = 0;
+                    resultColor[1] = Math.round(255 - (angle - 3 / 6) * 6 * 255); // Green decreases from 255 to 0
+                    resultColor[2] = 255;
+                } else if (angle < 5 / 6) {
+                    // Interpolate from blue to violet
+                    resultColor[0] = Math.round((angle - 4 / 6) * 6 * 255); // Red increases from 0 to 255
+                    resultColor[1] = 0;
+                    resultColor[2] = 255;
+                } else {
+                    // Interpolate from violet to red
+                    resultColor[0] = 255;
+                    resultColor[1] = 0;
+                    resultColor[2] = Math.round(255 - (angle - 5 / 6) * 6 * 255); // Blue decreases from 255 to 0
+                }
+                
+                let adjustedBrightness = getBezierCurveValue(brightness);
+                
+                // Get the value from which the calculation is made 
+                let base = adjustedBrightness >= 0.5 ? 255 : 0;
+
+                // color gain for dark and light sides
+                let gain = adjustedBrightness >= 0.5 ? (adjustedBrightness - 0.5) * 2 : 1 - (adjustedBrightness * 2);
+                
+                // calc delta for each channel
+                let rDelta = (base - resultColor[0]) * gain;
+                let gDelta = (base - resultColor[1]) * gain;
+                let bDelta = (base - resultColor[2]) * gain;
+                
+                // update channel value
+                resultColor[0] += rDelta; // Red
+                resultColor[1] += gDelta; // Green
+                resultColor[2] += bDelta; // Blue
+            } else {
+                resultColor[0] = 255;
+                resultColor[1] = 255;
+                resultColor[2] = 255;
+            }
+
+            // update colors using index and ofsset for diff channels
+            imageData.data[index    ] = resultColor[0]; // Red
+            imageData.data[index + 1] = resultColor[1]; // Green
+            imageData.data[index + 2] = resultColor[2]; // Blue
+            imageData.data[index + 3] = 255;            // Alpha (fully opaque)
+        }
+    }
+
+    // Put the ImageData object onto the canvas
+    context.putImageData(imageData, 0, 0);
 }
 
 
