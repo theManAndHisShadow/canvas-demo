@@ -52,15 +52,27 @@ let cycloidMotionScene = new Scene({
         const context = canvas.getContext('2d');
 
         // get initial param of cycloid
-        let radius_1 = settings.getState('externalRadius');
-        let radius_2 = settings.getState('internalRadius');
+        let externalRadius = settings.getState('externalRadius');
+        let internalRadius = settings.getState('internalRadius');
         let drawCenterPoints = settings.getState('drawCenterPoints');
+        let cycloid = new Cycloid({
+            cx: centerX,
+            cy: centerY,
+            externalRadius: externalRadius,
+            internalRadius: internalRadius,
+            drawCenterPoints: drawCenterPoints,
+            renderer: context,
+        });
 
         settings.subscribe((key, newValue, oldValue) => {
             // update params of cycloid from ui
-            if(key == 'externalRadius') radius_1 = newValue;
-            if(key == 'internalRadius') radius_2 = newValue;
+            if(key == 'externalRadius') externalRadius = newValue;
+            if(key == 'internalRadius') internalRadius = newValue;
             if(key == 'drawCenterPoints') drawCenterPoints = newValue;
+
+            cycloid.update('externalRadius', externalRadius);
+            cycloid.update('internalRadius', internalRadius);
+            cycloid.update('drawCenterPoints', drawCenterPoints);
         });
 
         // Main function
@@ -70,15 +82,9 @@ let cycloidMotionScene = new Scene({
                 width,
                 height
             );
-
-            // draw prototype function
-            drawCycloid(context, {
-                centerX: centerX,
-                centerY: centerY,
-                externalRadius: radius_1,
-                internalRaius: radius_2,
-                drawCenterPoints: drawCenterPoints,
-            }); 
+            
+            // draw cycloid each time when frame is updated
+            cycloid.render();
         }
 
         // animate
@@ -94,76 +100,171 @@ window.exportedObjects.push(cycloidMotionScene);
 * Scene file internal helper function defenitions
 */
 
+
 /**
- * Function prototype
- * @param {*} context 
- * @param {*} param.centerX
- * @param {*} param.centerY
- * @param {*} param.externalRadius
- * @param {*} param.internalRadius
- * @param {*} param.drawCenterPoints
+ * Class of single figure (bone)
  */
-function drawCycloid(context, {centerX, centerY, externalRadius, internalRaius, drawCenterPoints = true}){
-    let delta_radius = (externalRadius - internalRaius);
+class CircleBone {
+    constructor({cx, cy, radius, fillColor, borderColor, borderThickness, type, renderer, drawCenterPoint = false, drawRadiusLine = false, offset = 0}){
+        this.renderer = renderer;
 
-    // external circle
-    drawCircle(context, {
-        cx: centerX,
-        cy: centerY,
-        r: externalRadius, 
-        borderThickness: 2,
-        borderColor: getColor('black'),
-        fillColor: 'transparent',
-    });
+        this.cx = cx;
+        this.cy = cy;
+        this.radius = radius;
+        this.fillColor = fillColor;
+        this.borderColor = borderColor;
+        this.borderThickness = borderThickness;
+        this.offset = offset;
+        
+        this.drawCenterPoint = drawCenterPoint;
+        this.drawRadiusLine = drawRadiusLine;
+        this.type = type;
+    }
 
-    // internal circle
-    drawCircle(context, {
-        cx: centerX,
-        cy: centerY - delta_radius,
-        r: internalRaius, 
-        borderThickness: 2,
-        borderColor: getColor('black'),
-        fillColor: 'transparent',
-    });
 
-    // radius line of internal circle
-    drawLine(context, {
-        x1: centerX,
-        y1: centerY - delta_radius,
-        x2: centerX,
-        y2: centerY - delta_radius + internalRaius,
-    });
-
-     // radius end dot on  internal circle line
-    drawCircle(context, {
-        cx: centerX,
-        cy: centerY - delta_radius + internalRaius,
-        r: 3, 
-        borderThickness: 2,
-        borderColor: getColor('black'),
-        fillColor: getColor('black'),
-    });
-
-    if(drawCenterPoints === true) {
-        // external circle's center
-        drawCircle(context, {
-            cx: centerX,
-            cy: centerY,
-            r: 3, 
-            borderThickness: 2,
-            borderColor: getColor('black'),
-            fillColor: getColor('black'),
+    /**
+     * Renders circle bone
+     */
+    render(){    
+        // circle line
+        drawCircle(this.renderer, {
+            cx: this.cx,
+            cy: this.cy - this.offset,
+            r: this.radius, 
+            borderThickness: this.borderThickness,
+            borderColor: this.borderColor,
+            fillColor: this.fillColor,
         });
 
+        if(this.drawCenterPoint === true) {
+            // circle's center
+            drawCircle(this.renderer, {
+                cx: this.cx,
+                cy: this.cy - this.offset,
+                r: 3, 
+                borderThickness: this.borderThickness,
+                borderColor: this.borderColor,
+                fillColor: this.borderColor, // not typo!
+            });
+        }
 
-        // internal circle's center
-        drawCircle(context, {
-            cx: centerX,
-            cy: centerY - delta_radius,
-            r: 3, 
-            borderThickness: 2,
-            borderColor: getColor('black'),
-            fillColor: getColor('black'),
+        // radius line line from center to cicrlce line
+        if(this.drawRadiusLine === true) {
+            // radius line of circle
+            drawLine(this.renderer, {
+                x1: this.cx,
+                y1: this.cy - this.offset,
+                x2: this.cx,
+                y2: this.cy + this.radius - this.offset,
+                thickness: this.borderThickness,
+                color: this.borderColor,
+            });
+
+            // draw point on circle line
+            drawCircle(this.renderer, {
+                cx: this.cx,
+                cy: this.cy + this.radius - this.offset,
+                r: 3, 
+                borderThickness: 2,
+                borderColor: this.borderColor,
+                fillColor: getColor('black'),
+            });
+        }
+    }
+}
+
+
+
+/**
+ * Main class
+ */
+class Cycloid {
+    constructor({cx, cy, externalRadius, internalRadius, drawCenterPoints, renderer}){
+        this.renderer = renderer;
+
+        // main feature - cycloid line
+        this.line = null;
+
+        this.cx = cx;
+        this.cy = cy;
+
+        this.drawCenterPoints= drawCenterPoints;
+
+        // some helper value
+        let delta_radius = externalRadius - internalRadius;
+
+        // create 2 bone - external and internal
+        this.skeleton = [
+            new CircleBone({
+                type: 'external',
+                cx: this.cx,
+                cy: this.cy,
+                radius: externalRadius,
+                fillColor: 'transparent',
+                borderColor: getColor('black'),
+                borderThickness: 2,
+                renderer: this.renderer,
+                drawCenterPoint: drawCenterPoints,
+                drawRadiusLine: false,
+            }),
+
+            new CircleBone({
+                type: 'internal',
+                cx: this.cx,
+                cy: this.cy,
+                offset: delta_radius,
+                radius: internalRadius,
+                fillColor: 'transparent',
+                borderColor: getColor('black'),
+                borderThickness: 2,
+                renderer: this.renderer,
+                drawCenterPoint: drawCenterPoints,
+                drawRadiusLine: true,
+            }),
+        ];
+    }
+
+
+    /**
+     * Updates value of cycloid and it bone params
+     * @param {string} keyName - cycloid param key name
+     * @param {any} newValue - new value
+     */
+    update(keyName, newValue){
+        // update value for cycloid itself
+        if(keyName == 'drawCenterPoints') this[keyName] = newValue;
+
+        // update params for bones
+        this.skeleton.forEach(bone => {
+            // when user change external circles radius - update value of offset for all internal circles
+            if(bone.type == 'external' && keyName == 'externalRadius') {
+                let internal = this.skeleton.find(bone => bone.type == 'internal');
+                
+                bone.radius = newValue;
+                internal.offset = newValue - internal.radius;
+            }
+
+            // when user change internal circles radius - update value of offset for all internal circles
+            if(bone.type == 'internal' && keyName == 'internalRadius') {
+                let external = this.skeleton.find(bone => bone.type == 'external');
+
+                bone.radius = newValue;
+                bone.offset = external.radius - newValue;
+            }
+
+            if(keyName == 'drawCenterPoints') {
+                bone.drawCenterPoint = newValue;
+            }
         });
+    }
+
+
+    /**
+     * Renders cycloid bones.
+     */
+    render(){
+        this.skeleton.forEach(bone => {
+            bone.render();
+        })
     }
 }
