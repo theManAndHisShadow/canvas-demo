@@ -318,7 +318,7 @@ let cartesianPlane = new Scene({
 
 
         // Some trick to set first (index 0) preset as default preset
-        settings.setState('selectedPreset', 2);
+        settings.setState('selectedPreset', 0);
     }
 });
 

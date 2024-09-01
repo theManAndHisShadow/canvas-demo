@@ -198,7 +198,7 @@ function drawGradient(context, {color1, color2, width, height, type, method = 1}
                     factor = (distance * (height / 2)) / 100 / 200;
                 }
 
-                // if this is type 4 gradient - direct impact on the resulting color without intermediate fatcores
+                // if this is type 4 gradient - direct impact on the resulting color without intermediate factores
                 if(type == 3) {
                     let angle = getNormalizedAngle(width/2, height/2, x, y);
 

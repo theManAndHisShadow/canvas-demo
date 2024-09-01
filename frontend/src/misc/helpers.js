@@ -508,6 +508,18 @@ function drawText(context, {x, y, text, color ='white', fontFamily = 'Arial', fo
 
 
 /**
+ * Calculates the value on the Bezier curve depending on the parameter t.
+ * This value can be used for smooth animations or to smooth transitions.
+ *
+ * @param {number} t - Curve parameter, where 0 <= t <= 1. Defines the position on the curve.
+ * @returns {number} - The value on the Bezier curve corresponding to the parameter t.
+ */
+function getBezierCurveValue(t) {
+    return t * t * (3 - 2 * t);
+}
+
+
+/**
  * Replace element with clone to reset all event listeners
  * @param {HTMLElement} target - target to reset
  * @param {string} id - dynamic id
