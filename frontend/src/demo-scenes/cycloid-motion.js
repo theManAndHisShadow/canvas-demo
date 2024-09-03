@@ -37,6 +37,12 @@ let cycloidMotionScene = new Scene({
             label: 'Draw center points',
             state: true,
         },
+
+        'invertRotationDirection': {
+            type: 'checkbox',
+            label: 'Invert circles rotation dirtection',
+            state: false,
+        },
     },
 
     code: (root, display, settings) => {
@@ -64,6 +70,7 @@ let cycloidMotionScene = new Scene({
         let internalRadius = settings.getState('internalRadius');
         let drawCenterPoints = settings.getState('drawCenterPoints');
         let speed = settings.getState('speed');
+        let invertRotationDirection = settings.getState('invertLocalRotation');
 
         // create a new cycloid
         let cycloid = new Cycloid({
@@ -74,6 +81,7 @@ let cycloidMotionScene = new Scene({
             drawCenterPoints: drawCenterPoints,
             animationSpeed: speed,
             renderer: context,
+            invertRotationDirection: invertRotationDirection,
         });
 
         // log
@@ -85,12 +93,14 @@ let cycloidMotionScene = new Scene({
             if(key == 'internalRadius') internalRadius = newValue;
             if(key == 'drawCenterPoints') drawCenterPoints = newValue;
             if(key == 'speed') speed = newValue;
+            if(key == 'invertRotationDirection') invertRotationDirection = newValue;
 
             // update cycloid params
             cycloid.update('externalRadius', externalRadius);
             cycloid.update('internalRadius', internalRadius);
             cycloid.update('drawCenterPoints', drawCenterPoints);
             cycloid.update('animationSpeed', speed);
+            cycloid.update('invertRotationDirection', invertRotationDirection);
         });
 
         // Main function
@@ -202,10 +212,11 @@ class CircleBone {
      * @param {boolean} param.drawRadiusLine - draw or not radius line of circle
      * @param {number} param.offset - offset between external circle center and internal center
      * @param {CanvasRenderingContext2D} param.renderer - where the circle will be drawn
+     * @param {boolean} param.invertRotationDirection - select direction of rotatioin
      */
     constructor({
         parent, cx, cy, radius, angle = 0, origin, fillColor, traceColor = getColor('red'), borderColor, borderThickness, 
-        type, renderer, drawCenterPoint = false, drawRadiusLine = false, offset = 0
+        type, renderer, drawCenterPoint = false, drawRadiusLine = false, offset = 0, invertRotationDirection = false
     }){
         this.renderer = renderer;
         this.parent = parent;
@@ -233,6 +244,7 @@ class CircleBone {
         this.drawCenterPoint = drawCenterPoint;
         this.drawRadiusLine = drawRadiusLine;
         this.type = type;
+        this.invertRotationDirection = invertRotationDirection;
     }
 
 
@@ -241,7 +253,7 @@ class CircleBone {
      * @param {number} step - rotation step
      */
     rotate(step){
-        this.angle += step;
+        this.angle += (this.invertRotationDirection === true ? step * -1 : step);
 
         if(this.angle >= 360) this.angle = 0;
     }
@@ -332,7 +344,7 @@ class CircleBone {
  * Main class
  */
 class Cycloid {
-    constructor({cx, cy, animationSpeed, externalRadius, internalRadius, drawCenterPoints, renderer}){
+    constructor({cx, cy, animationSpeed, externalRadius, internalRadius, drawCenterPoints, renderer, invertRotationDirection}){
         this.renderer = renderer;
 
         this.cx = cx;
@@ -377,6 +389,7 @@ class Cycloid {
                 drawRadiusLine: true,
                 parent: this,
                 renderer: this.renderer,
+                invertRotationDirection: invertRotationDirection,
             }),
 
              // inner circle 1
@@ -394,6 +407,7 @@ class Cycloid {
                 drawRadiusLine: true,
                 parent: this,
                 renderer: this.renderer,
+                invertRotationDirection: invertRotationDirection,
             }),
         ];
     }
@@ -412,6 +426,11 @@ class Cycloid {
 
         // Update parameters for the bones (external and internal circles)
         this.skeleton.forEach(bone => {
+            if(keyName === 'invertRotationDirection') {
+                let internals = this.skeleton.filter(bone => bone.type === 'internal');
+                internals.forEach(internalBone => { internalBone.invertRotationDirection = newValue });
+            }
+
             // If the external radius is being updated, adjust related values
             if (bone.type === 'external' && keyName === 'externalRadius') {
                 let externalBone = bone;
@@ -426,7 +445,6 @@ class Cycloid {
 
                     // Calculate the new offset based on the external and internal radii and direction (updatin delta radius)
                     internalBone.offset = direction * (newValue - internalBone.radius);
-                    console.log(internalBone.offset);
 
                     // Recalculate the internal circle's initial coordinates based on the new offset
                     internalBone.staticCX = externalBone.cx;
