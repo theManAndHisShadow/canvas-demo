@@ -11,7 +11,7 @@ let cycloidMotionScene = new Scene({
         'externalRadius': {
             type: 'input',
             label: 'Radius of external circle',
-            defaultValue: 120, // 150
+            defaultValue: 100, // 150
             minValue: 100,
             maxValue: 195,
         },
@@ -19,7 +19,7 @@ let cycloidMotionScene = new Scene({
         'internalRadius': {
             type: 'input',
             label: 'Radius of inner circle',
-            defaultValue: 40, // 50
+            defaultValue: 10, // 50
             minValue: 10,
             maxValue: 100,
         },
@@ -57,7 +57,7 @@ let cycloidMotionScene = new Scene({
         canvas.width = width;
         canvas.height = height;
 
-        const context = canvas.getContext('2d');
+        const context = canvas.getContext('2d', { willReadFrequently: true });
 
         // get initial param of cycloid
         let externalRadius = settings.getState('externalRadius');
@@ -126,8 +126,8 @@ window.exportedObjects.push(cycloidMotionScene);
  * A class that tracks the movement of a point along a trajectory and draws that trajectory
  */
 class Tracer {
+    #trace = []
     constructor({color, length = 100, parent}){
-        this.trace = [];
 
         this.length = length;
         this.color = color;
@@ -144,12 +144,20 @@ class Tracer {
         // if point x and y is correct values
         if(typeof point.x == 'number' && typeof point.y == 'number'){
             // if overload - remove first elements
-            if(this.trace.length > this.length) {
-                this.trace.shift();
+            if(this.#trace.length > this.length) {
+                this.#trace.shift();
             }
 
-            this.trace.push(point);
+            this.#trace.push(point);
         }
+    }
+
+
+    /**
+     * Resets Tracer points array.
+     */
+    clear(){
+        this.#trace = [];
     }
 
 
@@ -157,7 +165,7 @@ class Tracer {
      * Render trace.
      */
     render(){
-        this.trace.forEach(point => {
+        this.#trace.forEach(point => {
             // draw each point
             drawCircle(this.parent.renderer, {
                 cx: point.x,
@@ -170,6 +178,8 @@ class Tracer {
         });
     }
 }
+
+
 
 /**
  * Class of single figure (bone)
@@ -202,12 +212,15 @@ class CircleBone {
 
         this.cx = cx;
         this.cy = cy;
+        this.staticCX = cx;
+        this.staticCY = cy - offset;
         this.angle = angle;
+        this.globalAngle = 0;
         this.origin = origin || {x: (this.renderer.canvas.width / 2), y: (this.renderer.canvas.height / 2)};
 
         this.trace = new Tracer({
             color: traceColor,
-            length: 325,
+            length: 10000,
             parent: this,
         });
 
@@ -234,16 +247,24 @@ class CircleBone {
     }
 
 
-    /**
+   /**
      * Moves circle around origin point (epicenter)
      * @param {number} step 
      */
-    moveAroundOirigin(step = 1){
-        let rotatedCenter = rotatePoint(this.origin.x, this.origin.y, this.cx, this.cy, step * 3);
+    moveAroundOrigin(step = 1) {
+        this.globalAngle = (this.globalAngle + step) % 360;
 
-        if(rotatedCenter && rotatedCenter.x && rotatedCenter.y) {
-            this.cx = rotatedCenter.x;
-            this.cy = rotatedCenter.y;
+        const rotatedCenter = rotatePoint(
+            this.origin.x, 
+            this.origin.y, 
+            this.staticCX, 
+            this.staticCY, 
+            this.globalAngle
+        );
+
+        if (rotatedCenter && typeof rotatedCenter.x === 'number' && typeof rotatedCenter.y === 'number') {
+            this.cy = rotatedCenter.y - this.offset;
+            this.cx = rotatedCenter.x
         }
     }
 
@@ -252,10 +273,13 @@ class CircleBone {
      * Renders circle bone
      */
     render(){    
+        let corrected_x = this.cx + 0; // no offset
+        let corrected_y = this.cy + this.offset;
+
         // circle line
         drawCircle(this.renderer, {
-            cx: this.cx,
-            cy: this.cy,
+            cx: corrected_x,
+            cy: corrected_y,
             r: this.radius, 
             borderThickness: this.borderThickness,
             borderColor: this.borderColor,
@@ -265,8 +289,8 @@ class CircleBone {
         if(this.drawCenterPoint === true) {
             // circle's center
             drawCircle(this.renderer, {
-                cx: this.cx,
-                cy: this.cy,
+                cx: corrected_x,
+                cy: corrected_y,
                 r: 3, 
                 borderThickness: this.borderThickness,
                 borderColor: this.borderColor,
@@ -276,13 +300,13 @@ class CircleBone {
 
         // radius line line from center to cicrlce line
         if(this.drawRadiusLine === true) {
-            let rotatedPoint = rotatePoint(this.cx, this.cy, this.cx, this.cy + this.radius, this.angle);
+            let rotatedPoint = rotatePoint(corrected_x, corrected_y, corrected_x, corrected_y + this.radius, this.angle);
             this.trace.push(rotatedPoint);
             
             // radius line of circle
             drawLine(this.renderer, {
-                x1: this.cx,
-                y1: this.cy,
+                x1: corrected_x,
+                y1: corrected_y,
                 x2: rotatedPoint.x,
                 y2: rotatedPoint.y,
                 thickness: this.borderThickness,
@@ -342,8 +366,8 @@ class Cycloid {
             new CircleBone({
                 type: 'internal',
                 cx: this.cx,
-                cy: this.cy - delta_radius,
-                offset: delta_radius,
+                cy: this.cy,
+                offset: -delta_radius,
                 radius: internalRadius,
                 fillColor: 'transparent',
                 borderColor: getColor('black'),
@@ -355,11 +379,11 @@ class Cycloid {
                 renderer: this.renderer,
             }),
 
-            // inner circle 2
+             // inner circle 1
             new CircleBone({
                 type: 'internal',
                 cx: this.cx,
-                cy: this.cy + delta_radius,
+                cy: this.cy,
                 offset: delta_radius,
                 radius: internalRadius,
                 fillColor: 'transparent',
@@ -376,37 +400,69 @@ class Cycloid {
 
 
     /**
-     * Updates value of cycloid and it bone params
-     * @param {string} keyName - cycloid param key name
-     * @param {any} newValue - new value
+     * Updates the values of the cycloid and its bones (circles) parameters.
+     * @param {string} keyName - The parameter key name to update.
+     * @param {any} newValue - The new value to assign to the parameter.
      */
-    update(keyName, newValue){
-        // update value for cycloid itself
-        if(keyName == 'drawCenterPoints' || keyName == 'animationSpeed') this[keyName] = newValue;
+    update(keyName, newValue) {
+        // Update the value for the cycloid itself if the key is either 'drawCenterPoints' or 'animationSpeed'
+        if (keyName === 'drawCenterPoints' || keyName === 'animationSpeed') {
+            this[keyName] = newValue;
+        }
 
-        // update params for bones
+        // Update parameters for the bones (external and internal circles)
         this.skeleton.forEach(bone => {
-            // when user change external circles radius - update value of offset for all internal circles
-            if(bone.type == 'external' && keyName == 'externalRadius') {
-                let internal = this.skeleton.find(bone => bone.type == 'internal');
+            // If the external radius is being updated, adjust related values
+            if (bone.type === 'external' && keyName === 'externalRadius') {
+                let externalBone = bone;
+                let internals = this.skeleton.filter(bone => bone.type === 'internal');
                 
-                bone.radius = newValue;
-                internal.offset = newValue - internal.radius;
+                // Update the external circle's radius
+                externalBone.radius = newValue;
+
+                internals.forEach(internalBone => {
+                    // Determine the offset direction: one internal circle moves upwards (1), the other downwards (-1)
+                    let direction = internalBone.offset >= 0 ? 1 : -1;
+
+                    // Calculate the new offset based on the external and internal radii and direction (updatin delta radius)
+                    internalBone.offset = direction * (newValue - internalBone.radius);
+                    console.log(internalBone.offset);
+
+                    // Recalculate the internal circle's initial coordinates based on the new offset
+                    internalBone.staticCX = externalBone.cx;
+
+                    // Adjust the internal circle's y-coordinate considering the external circle's radius
+                    internalBone.staticCY = externalBone.cy + (direction * (externalBone.radius - internalBone.radius));
+
+                    // Clear the trace (history of points) to start a fresh trace with the new settings
+                    internalBone.trace.clear();
+                });
             }
 
-            // when user change internal circles radius - update value of offset for all internal circles
-            if(bone.type == 'internal' && keyName == 'internalRadius') {
-                let external = this.skeleton.find(bone => bone.type == 'external');
+            // If the internal radius is being updated, adjust related values
+            if (bone.type === 'internal' && keyName === 'internalRadius') {
+                let externalBone = this.skeleton.find(bone => bone.type === 'external');
+                let internalBone = bone;
 
-                bone.radius = newValue;
-                bone.offset = external.radius - newValue;
-            }
+                // Update the internal circle's radius
+                internalBone.radius = newValue;
 
-            if(keyName == 'drawCenterPoints') {
-                bone.drawCenterPoint = newValue;
+                // Determine the offset direction again
+                let direction = internalBone.offset >= 0 ? 1 : -1;
+
+                // Recalculate the offset and initial coordinates based on the new internal radius
+                internalBone.offset = direction * (externalBone.radius - internalBone.radius);
+                internalBone.staticCX = externalBone.cx;
+
+                // Adjust the internal circle's y-coordinate considering the external circle's radius
+                internalBone.staticCY = externalBone.cy + direction * (externalBone.radius - internalBone.radius);
+
+                // Clear the trace to restart it with the new settings
+                internalBone.trace.clear();
             }
         });
     }
+
 
 
     /**
@@ -425,7 +481,7 @@ class Cycloid {
             bone.rotate(speed);
 
             // and at same time move bone aroud orign (epicenter)
-            bone.moveAroundOirigin((speed * -1) * (bone.radius / externalCircle.radius));
+            bone.moveAroundOrigin((speed * -1) * (bone.radius / externalCircle.radius));
         });
     }
 
