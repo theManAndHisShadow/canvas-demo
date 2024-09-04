@@ -1,4 +1,5 @@
 class Scene {
+
     /**
      * @param {string} param.title - title name of scene
      * @param {Function} param.code - All manipulations that are performed with the root element are here. Function has access to scene HTML root element.
@@ -8,8 +9,13 @@ class Scene {
         this.title = title;
 
         // ui strucutre tree with some settings
-        // check note inside 'execute' method for detailed info
-        this.ui = ui;
+        // using in this.ui render to render objects tor eal html
+        // using in page.loadScene
+        this.uiTree = ui;
+
+        // scene own UI class instance
+        // isolated from other instances, has own timestamp, which equals to scene timestamp
+        this.ui = null;
 
         // JS code of scene, code invokes inside 'execute' method as callback
         this.code = code;
@@ -22,10 +28,8 @@ class Scene {
     /**
      * Executes code of separate scene
      * @param {HTMLDivElement} param.root - ref to scene html root element
-     * @param {UIDisplay} param.display - ref to UIDisplay instance to control scene ui info display
-     * @param {object} param.settings - scene settings
      */
-    execute({root, display, settings}){
+    execute({root}){
         let callback = this.code;
 
         let titleElement = root.children[0];
@@ -44,7 +48,7 @@ class Scene {
              * you can update the data either automatically (by passing 'ui' as part of the parameter) 
              * or manually (by calling 'ui.display.render()', 'ui.display.updateValue()' yourself).
              */
-            display, 
+            this.ui.display, 
 
             /**
              * Some notes about 'settings' param:
@@ -55,7 +59,7 @@ class Scene {
              * the '.subscribe()' method or request data using '.getState()'. This way, a certain reactivity is achieved, 
              * allowing the scene to know if someone has affected its settings (through the "Controls" HTML block) at any given moment.
              */
-            settings
+            this.ui.states
         );
     }
 }
