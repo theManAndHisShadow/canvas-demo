@@ -84,11 +84,6 @@ class Page {
         // root for demo scene drawning
         this.root = Page.parseRoot();
 
-        this.ui = new UI({
-            display: Page.parseUIDisplay(),
-            controls: Page.parseUIControls(),
-        });
-
         this.currentScene = null;
 
         // get all finded links
@@ -261,29 +256,24 @@ class Page {
                         // set current scen
                         this.currentScene = loadedScene;
 
-                        // getting scene ui structure tree with settings and controls
-                        let uiTree = loadedScene.ui;
+                        // creating new instance for each scene, to isolate from side effects
+                        loadedScene.ui = new UI({
+                            timestamp: loadedScene.timestamp,
+                            display: Page.parseUIDisplay(),
+                            controls: Page.parseUIControls(),
+                        });
 
-                        // render it (and add event handlers, that updated values) and pass relevant current scene timestamp
-                        this.ui.render(uiTree, loadedScene.timestamp);
+                        // render scene ui instance using scene uiTree and pass relevant current scene timestamp
+                        loadedScene.ui.render(loadedScene.uiTree);
 
                         // updating tab name using scene title
                         this.#updatePageTabTitle(loadedScene.title);
 
-                        // Scene contains code of demo
+                        // Scene contains code of demo and own ui blocks
                         // we can execute that code when user clicks at link
                         // Code will affect to html root node and windows tab title
                         loadedScene.execute({
-                            root: this.root,
-                            baseTabTitle: this.windowTitle,
-
-                            // adding access to UIDisplay instance inside scene
-                            // more information here - 'scene.class.js'
-                            display: this.ui.display,
-
-                            // put updated values to settings params
-                            // it makes updated values available inside scene code
-                            settings: this.ui.states,
+                            root: this.root
                         });
                     }).catch(error => {
                         console.log(error);
