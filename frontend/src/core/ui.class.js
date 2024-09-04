@@ -27,8 +27,10 @@ class SceneEventTarget {
  * Parent class that manages work of UIControls and UIDisplay classes. Also stores StateManager of UI.
  */
 class UI extends SceneEventTarget {
-    constructor({display, controls}){
+    constructor({display, controls, timestamp}){
         super();
+
+        this.currentSceneTimestamp = timestamp;
 
         // storing some pure values for later use inside the SCENE code
         this.states = new StateManager();
@@ -36,24 +38,18 @@ class UI extends SceneEventTarget {
         // where is ui root node is placed
         this.display = new UIDisplay(display), 
         this.controls = new UIControls(controls, this);
-
-        this.currentSceneTimestamp = null;
     }
 
 
     /**
      * Renders ui structure tree to ready html ui elements
      * @param {object} uiStructureTree 
-     * @param {number} sceneTimestamp - current scene timestamp
      */
-    render(uiStructureTree, sceneTimestamp){
+    render(uiStructureTree){
         if(uiStructureTree){
             // reset inner of #controls container of UI
             this.display.clearRoot();
             this.controls.clearRoot();
-
-            // set relevant scene timestamp to UI Controls instance
-            this.currentSceneTimestamp = sceneTimestamp;
 
             // present key array as render queue
             let renderQueue = [...Object.keys(uiStructureTree)];
