@@ -5,7 +5,18 @@ let cycloidMotionScene = new Scene({
         'description': {
             type: 'display-infobox',
             label: 'Description',
-            text: 'A cycloid is the curve traced by a point on the circumference of a circle as it rolls along a straight line. The key condition in this motion is that the circle rolls without slipping. A specific example of a cycloid is the epicycloid, where a circle rolls inside a larger circle. An example of an epicycloid is demonstrated in the interactive scene.',
+            text: 'A cycloid is the curve traced by a point on the circumference of a circle as it rolls along a straight line. The key condition in this motion is that the circle rolls without slipping. A specific example of a cycloid is the epicycloid, where a circle rolls inside a larger circle. An example of an hypocycloid is demonstrated in the interactive scene.',
+        },
+
+        'preset': {
+            type: 'preset-dropdown-list',
+            label: 'Preset',
+            selectedByDefault: 2,
+            options: [
+                {name: 'Sandbox', allowedElements: ['*']}, 
+                {name: 'Test 1', allowedElements: []},
+                {name: 'Test 2', allowedElements: ['externalRadius', 'internalRadius']}
+            ],
         },
 
         'externalRadius': {
