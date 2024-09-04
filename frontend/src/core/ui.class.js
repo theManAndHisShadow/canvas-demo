@@ -1,15 +1,43 @@
 /**
+ * Helper class.
+ */
+class SceneEventTarget {
+    constructor (){
+        this.events = {};
+    }
+
+    addEventListener(eventType, callback) {
+        if (!this.events[eventType]) {
+            this.events[eventType] = [];
+        }
+        
+        this.events[eventType].push(callback);
+    }
+
+    dispatchEvent(eventType, data) {
+        if (this.events[eventType]) {
+            this.events[eventType].forEach(callback => callback(data));
+        }
+    }
+}
+
+
+
+/**
  * Parent class that manages work of UIControls and UIDisplay classes. Also stores StateManager of UI.
  */
-class UI {
+class UI extends SceneEventTarget {
     constructor({display, controls}){
+        super();
+
         // storing some pure values for later use inside the SCENE code
         this.states = new StateManager();
 
         // where is ui root node is placed
         this.display = new UIDisplay(display), 
-        this.controls = new UIControls(controls, this.states);
+        this.controls = new UIControls(controls, this);
 
+        this.currentSceneTimestamp = null;
     }
 
 
@@ -25,12 +53,17 @@ class UI {
             this.controls.clearRoot();
 
             // set relevant scene timestamp to UI Controls instance
-            this.controls.currentSceneTimestamp = sceneTimestamp;
+            this.currentSceneTimestamp = sceneTimestamp;
 
-            let keys = Object.keys(uiStructureTree);
-            for(let key of keys) {
+            // present key array as render queue
+            let renderQueue = [...Object.keys(uiStructureTree)];
+
+            // render each element using its key
+            while(renderQueue.length > 0) {
+                // get single elem
+                let key = renderQueue.shift();
                 let element = uiStructureTree[key];
-
+    
                 if(element.type == 'display-item') this.display.renderDisplayItem(key, element);
                 if(element.type == 'display-float-tile') this.display.renderDisplayFloatTile(key, element);
                 if(element.type == 'display-spacer') this.display.renderSpacer();
@@ -42,17 +75,36 @@ class UI {
                 if(element.type == 'checkbox') this.controls.renderCheckbox(key, element);
                 if(element.type == 'input') this.controls.renderInput(key, element);
                 if(element.type == 'option-selector') this.controls.renderOptionSelector(key, element);
-                if(element.type == 'option-dropdown-list') this.controls.renderDropdownList(key, element);
+
+                /**
+                 * The difference between 'UIControls.renderOptionDropdownList()' and 'UIControls.renderPresetDropdownList()' is that:
+                 * -> 'UIControls.renderOptionDropdownList()' is simply a drop-down list with values ​​that define scene details, 
+                 * -> while 'UIControls.renderPresetDropdownList()' in turn affects the scene controls elements globally.
+                 * 
+                 * 'UIControls.renderPresetDropdownList()' uses the code base of 'UIControls.renderOptionDropdownList()', extending its behavior.
+                 */
+                if(element.type == 'option-dropdown-list') this.controls.renderOptionDropdownList(key, element);
+                if(element.type == 'preset-dropdown-list') this.controls.renderPresetDropdownList(key, element);
+
+                /**
+                 * For some actions, you need to understand when the rendering queue has reached the end
+                 */
+                if(renderQueue.length == 0) {
+                    this.dispatchEvent('renderEnd');
+                    console.log(this);
+                }
             }
         }
     }
 }
 
 
+
 /**
  * Child class which controls the operation of user interface elements
  */
 class UIControls {
+    // This private property stores references to html elements
     #html;
 
     // attribute for all rendered controle elements (labels not marked with this attrib)
@@ -61,7 +113,9 @@ class UIControls {
     // attribute for main action button element
     #mainActionButtonAttribute = 'data-main-action-button';
 
-    constructor(html, states){
+    constructor(html, parent){
+        this.parent = parent;
+        
         this.#html = {
             root: html,
         }
@@ -73,10 +127,8 @@ class UIControls {
          * All important click/change event handlers access this property 
          * and are triggered only if the property 'blockedSceneTimestamp' do not contains timestamp thats equal to 'currentSceneTimestamp'.
          */
-        this.currentSceneTimestamp = false;
+        this.currentSceneTimestamp = this.parent.currentSceneTimestamp;
         this.blockedSceneTimestamp = false;
-
-        this.states = states;
     }
 
 
@@ -89,11 +141,12 @@ class UIControls {
 
 
     /**
-     * Appends new ready HTML element to 'Controls' HTML block
-     * @param {HTMLElement} child - ref to fullt ready html element
+     * Appends new ready HTML element to 'Controls' HTML root block
+     * @param {HTMLElement} element - ref to fullt ready html element
      */
-    appendToRoot(child){
-        this.#html.root.appendChild(child);
+    appendToHTML(elementName, element){
+        this.#html[elementName] = element;
+        this.#html.root.appendChild(element);
     }
 
 
@@ -169,17 +222,17 @@ class UIControls {
             checkbox.checked = elementObject.state;
             checkbox.setAttribute(this.#renderedControlElementAttribute, this.currentSceneTimestamp);
 
-        this.states.setState(elementName, elementObject.state);
+        this.parent.states.setState(elementName, elementObject.state);
 
         checkbox.addEventListener('click', event => {
             // update state only when current scene Control UI is not blocked
-            if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) this.states.setState(elementName, checkbox.checked);
+            if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) this.parent.states.setState(elementName, checkbox.checked);
         });
 
         element.appendChild(label);
         element.appendChild(checkbox);
 
-        this.appendToRoot(element);
+        this.appendToHTML(elementName, element);
     }
 
 
@@ -209,8 +262,8 @@ class UIControls {
             input.setAttribute(this.#renderedControlElementAttribute, this.currentSceneTimestamp);
             input.value = elementObject.defaultValue;
 
-        // this.states[elementName] = elementObject.defaultValue;
-        this.states.setState(elementName, elementObject.defaultValue);    
+        // this.parent.states.elementName] = elementObject.defaultValue;
+        this.parent.states.setState(elementName, elementObject.defaultValue);    
 
         input.addEventListener('change', event => {
             /**
@@ -221,13 +274,13 @@ class UIControls {
             if(Number(input.value) < elementObject.minValue) input.value = elementObject.minValue;
 
             // update state only when current scene Control UI is not blocked
-            if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) this.states.setState(elementName, Number(input.value));
+            if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) this.parent.states.setState(elementName, Number(input.value));
         });
 
         element.appendChild(label);
         element.appendChild(input);
 
-        this.appendToRoot(element);
+        this.appendToHTML(elementName, element);
     }
 
     /**
@@ -256,13 +309,13 @@ class UIControls {
             endLabel.innerText = elementObject.endLabel;
             endLabel.classList.add('controls__range-slider-end-label', 'controls__option-label');
 
-        this.states.setState(elementName, elementObject.defaultValue);
+        this.parent.states.setState(elementName, elementObject.defaultValue);
 
         range.addEventListener('mousemove', event => {
             // update state only when current scene Control UI is not blocked
             if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) {
                 range.title = range.value;
-                this.states.setState(elementName, range.value);
+                this.parent.states.setState(elementName, range.value);
             }
         });
 
@@ -270,7 +323,7 @@ class UIControls {
         element.appendChild(range);
         element.appendChild(endLabel);
 
-        this.appendToRoot(element);
+        this.appendToHTML(elementName, element);
     }
 
 
@@ -295,14 +348,14 @@ class UIControls {
                 // update state only when current scene Control UI is not blocked
                 if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) {
                     let timestamp = Date.now();
-                    this.states.setState(elementName, timestamp);
+                    this.parent.states.setState(elementName, timestamp);
                 }
             });
 
         element.appendChild(label);
         element.appendChild(button);
 
-        this.appendToRoot(element);
+        this.appendToHTML(elementName, element);
     }
 
         /**
@@ -327,7 +380,7 @@ class UIControls {
                     // update state only when current scene Control UI is not blocked
                     if(this.blockedSceneTimestamp !== this.currentSceneTimestamp) {
                         let timestamp = Date.now();
-                        this.states.setState(elementName, timestamp);
+                        this.parent.states.setState(elementName, timestamp);
                     }
                 });
     
@@ -345,10 +398,10 @@ class UIControls {
              */
             if(elementObject.blockControlDuringExecution === true) {
                 let mainActionStatusStateName = elementName + '__status';
-                this.states.setState(mainActionStatusStateName, 'not-started');
+                this.parent.states.setState(mainActionStatusStateName, 'not-started');
 
                 let blockChecker = this.#blockManager(this.currentSceneTimestamp);
-                this.states.subscribe((propertyName, newValue, oldValue) => {
+                this.parent.states.subscribe((propertyName, newValue, oldValue) => {
                     if(propertyName == mainActionStatusStateName) {
                         /**
                          *  ...If in another part someone transfers a new state and it is equal to "in-progress", 
@@ -368,7 +421,7 @@ class UIControls {
                 });
             }
     
-            this.appendToRoot(element);
+            this.appendToHTML(elementName, element);
         }
 
 
@@ -386,7 +439,7 @@ class UIControls {
             label.innerText = elementObject.label + ': ';
 
         let optionContainer = document.createElement('div');
-            optionContainer.classList.add('controls__buttons-container');
+        optionContainer.classList.add('controls__buttons-container');
 
         elementObject.optionNames.forEach((optionName, i) => {
             let button = document.createElement('button');
@@ -406,19 +459,20 @@ class UIControls {
                     if(prevSelected.length > 0) prevSelected.forEach(button => button.removeAttribute('data-selected-option'));
 
                     button.setAttribute('data-selected-option', true);
-                    this.states.setState(elementName, Number(i));   
+                    this.parent.states.setState(elementName, Number(i));   
                 } 
             });
 
             optionContainer.appendChild(button);
         });
 
-        this.states.setState(elementName, elementObject.defaultValue);    
+        this.parent.states.setState(elementName, elementObject.defaultValue);    
 
         element.appendChild(label);
         element.appendChild(optionContainer);
+        console.log(element);
 
-        this.appendToRoot(element);
+        this.appendToHTML(elementName, element);
     }
 
 
@@ -427,7 +481,7 @@ class UIControls {
      * @param {string} elementName 
      * @param {object} elementObject 
      */
-    renderDropdownList(elementName, elementObject){
+    renderOptionDropdownList(elementName, elementObject){
         let element = document.createElement('div');
             element.id = elementName;
 
@@ -435,38 +489,90 @@ class UIControls {
             label.classList.add('controls__option-dropdown-list-label', 'controls__option-dropdown-list-label');
             label.innerText = elementObject.label + ': ';
 
-        let optionContainer = document.createElement('select');
-            optionContainer.classList.add('controls__option-dropdown-list-container');
+        let dropdownContainer = document.createElement('select');
+            dropdownContainer.classList.add('controls__option-dropdown-list-container');
 
         // create for each option own html tag
-        elementObject.optionNames.forEach((optionName, i) => {
+        elementObject.options.forEach((option, i) => {
             let optionButton = document.createElement('option');
                 optionButton.classList.add('controls__option-dropdown-list-button');
                 optionButton.setAttribute(this.#renderedControlElementAttribute, this.currentSceneTimestamp);
-                optionButton.textContent = optionName;
+                optionButton.textContent = option.name;
                 optionButton.setAttribute('data-preset-num', i);
 
             // select by default
-            if(i == elementObject.defaultValue) {
+            if(elementObject.selectedByDefault === i) {
                 optionButton.setAttribute('selected', '');
-                this.states.setState(elementName, Number(i));   
+                this.parent.states.setState(elementName, Number(i));   
             }
 
             // add to container
-            optionContainer.appendChild(optionButton);
+            dropdownContainer.appendChild(optionButton);
         });
 
 
         // update state value on select
-        optionContainer.addEventListener('change', (event) => {
-            let index = Number(optionContainer.selectedOptions[0].getAttribute("data-preset-num"));
-            this.states.setState(elementName, Number(index));   
+        dropdownContainer.addEventListener('change', (event) => {
+            let index = Number(dropdownContainer.selectedOptions[0].getAttribute("data-preset-num"));
+            this.parent.states.setState(elementName, Number(index));   
         });
 
         element.appendChild(label);
-        element.appendChild(optionContainer);
+        element.appendChild(dropdownContainer);
 
-        this.appendToRoot(element);
+        this.appendToHTML(elementName, element);
+
+        return element;
+    }
+
+    /**
+     * Renders preset dropdown.
+     * @param {string} elementName 
+     * @param {object} elementObject 
+     */
+    renderPresetDropdownList(elementName, elementObject) {
+        // Get the select element
+        const selectElement = this.renderOptionDropdownList(elementName, elementObject).querySelector('select');
+
+        const handleSelection = () => {
+            // Get all element IDs
+            const allElementIds = Object.keys(this.#html);
+
+            // Get selected preset index and corresponding object
+            const selectedIndex = Number(selectElement.selectedOptions[0].getAttribute("data-preset-num"));
+            const selectedPreset = elementObject.options[selectedIndex];
+
+            // Get allowed elements array
+            const allowedElements = selectedPreset.allowedElements;
+
+            // Determine which elements should be hidden
+            let elementsToHide;
+            if (Array.isArray(allowedElements)) {
+                if (allowedElements.length === 0) {
+                    elementsToHide = allElementIds.filter(id => id !== elementName && id !== 'root');
+                } else if (allowedElements.includes('*')) {
+                    elementsToHide = [];
+                } else {
+                    elementsToHide = allElementIds.filter(id => id !== elementName && id !== 'root' && !allowedElements.includes(id));
+                }
+            } else {
+                throw new Error('option.allowedElements type must be an array!');
+            }
+
+            // Toggle visibility of elements
+            allElementIds.forEach(id => {
+                const element = this.#html[id];
+                if (elementsToHide.includes(id)) {
+                    element.classList.add('hidden');
+                } else {
+                    element.classList.remove('hidden');
+                }
+            });
+        }
+
+        // Add event listener for option selection
+        selectElement.addEventListener('change', handleSelection);
+        this.parent.addEventListener('renderEnd', handleSelection);
     }
 }
 
@@ -509,7 +615,7 @@ class UIDisplay{
      * Appends new ready HTML element to 'Controls' HTML block
      * @param {HTMLElement} child - ref to fullt ready html element
      */
-    appendToRoot(child){
+    appendToHTML(elementName, child){
         this.#html.root.appendChild(child);
     }
 
@@ -552,7 +658,7 @@ class UIDisplay{
 
         element.appendChild(label);
         element.appendChild(text);
-        this.appendToRoot(element);
+        this.appendToHTML(elementName, element);
     }
 
 
@@ -684,7 +790,7 @@ class UIDisplay{
         let spacerContainer = document.createElement('div');
         spacerContainer.classList.add('display-spacer');
 
-        this.appendToRoot(spacerContainer);
+        this.appendToHTML(elementName, spacerContainer);
 
         return spacerContainer;
     }
@@ -731,7 +837,7 @@ class UIDisplay{
 
         this.#html[elementName] = valueContainer;
 
-        this.appendToRoot(element);
+        this.appendToHTML(elementName, element);
 
         return element;
     }
