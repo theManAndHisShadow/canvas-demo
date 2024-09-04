@@ -283,6 +283,11 @@ main {
     opacity: 1;
 }
 
+.controls__option-dropdown-list-container,
+.controls__option-dropdown-list-button {
+    cursor: pointer;
+}
+
 .controls__main-action-button {
     background: none;
     border: 1px solid #23369e;

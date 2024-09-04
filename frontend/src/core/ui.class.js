@@ -42,6 +42,7 @@ class UI {
                 if(element.type == 'checkbox') this.controls.renderCheckbox(key, element);
                 if(element.type == 'input') this.controls.renderInput(key, element);
                 if(element.type == 'option-selector') this.controls.renderOptionSelector(key, element);
+                if(element.type == 'option-dropdown-list') this.controls.renderDropdownList(key, element);
             }
         }
     }
@@ -413,6 +414,54 @@ class UIControls {
         });
 
         this.states.setState(elementName, elementObject.defaultValue);    
+
+        element.appendChild(label);
+        element.appendChild(optionContainer);
+
+        this.appendToRoot(element);
+    }
+
+
+    /**
+     * Renders dropdown list, click selects only one option.
+     * @param {string} elementName 
+     * @param {object} elementObject 
+     */
+    renderDropdownList(elementName, elementObject){
+        let element = document.createElement('div');
+            element.id = elementName;
+
+        let label = document.createElement('span');
+            label.classList.add('controls__option-dropdown-list-label', 'controls__option-dropdown-list-label');
+            label.innerText = elementObject.label + ': ';
+
+        let optionContainer = document.createElement('select');
+            optionContainer.classList.add('controls__option-dropdown-list-container');
+
+        // create for each option own html tag
+        elementObject.optionNames.forEach((optionName, i) => {
+            let optionButton = document.createElement('option');
+                optionButton.classList.add('controls__option-dropdown-list-button');
+                optionButton.setAttribute(this.#renderedControlElementAttribute, this.currentSceneTimestamp);
+                optionButton.textContent = optionName;
+                optionButton.setAttribute('data-preset-num', i);
+
+            // select by default
+            if(i == elementObject.defaultValue) {
+                optionButton.setAttribute('selected', '');
+                this.states.setState(elementName, Number(i));   
+            }
+
+            // add to container
+            optionContainer.appendChild(optionButton);
+        });
+
+
+        // update state value on select
+        optionContainer.addEventListener('change', (event) => {
+            let index = Number(optionContainer.selectedOptions[0].getAttribute("data-preset-num"));
+            this.states.setState(elementName, Number(index));   
+        });
 
         element.appendChild(label);
         element.appendChild(optionContainer);
