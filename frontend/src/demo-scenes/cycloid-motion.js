@@ -11,7 +11,7 @@ let cycloidMotionScene = new Scene({
         'preset': {
             type: 'preset-dropdown-list',
             label: 'Preset',
-            selectedByDefault: 1,
+            selectedByDefault: 0,
             options: [
                 {name: 'Sandbox', allowedElements: ['*']}, 
                 {name: 'Deltoid', allowedElements: ['speed', 'drawRadiusLine']},
@@ -49,7 +49,7 @@ let cycloidMotionScene = new Scene({
             type: 'input',
             label: 'Trace length',
             minValue: 200,
-            defaultValue: 200,
+            defaultValue: 600,
             maxValue: 10000,
         },
 
@@ -100,84 +100,93 @@ let cycloidMotionScene = new Scene({
 
         const context = canvas.getContext('2d', { willReadFrequently: true });
 
+        // declaring all constructor interactive param names
+        const paramKeyNames = [
+            'externalRadius',
+            'internalRadius',
+            'drawCenterPoint',
+            'drawRadiusLine',
+            'speed',
+            'traceLength',
+            'invertRotationDirection',
+            'radiusOfTracePoint'
+        ];
+
+        // local helper function to fast updating states of params
+        const getCycloidParams = () => {
+            return paramKeyNames.reduce((acc, key) => {
+                acc[key] = settings.getState(key);
+                return acc;
+            }, {})
+        };
+
         // get initial param of cycloid
-        let externalRadius = settings.getState('externalRadius');
-        let internalRadius = settings.getState('internalRadius');
-        let drawCenterPoint = settings.getState('drawCenterPoint');
-        let drawRadiusLine = settings.getState('drawRadiusLine');
         let speed = settings.getState('speed');
         let traceLength = settings.getState('traceLength');
-        let invertRotationDirection = settings.getState('invertRotationDirection');
-        let radiusOfTracePoint = settings.getState('radiusOfTracePoint');
+
+        // Using a mapping scheme of approximate visual perception of presets, instead of conditional constructions like "if"
+        // If you don't need specific parameter adjustments, get the composed rest part of the parameters using '...getCycloidParams()'
+        // All manual adjustments should be made after receiving the '...getCycloidParams()', for their subsequent rewriting default values
+        let presets = {
+            '0': [
+                new Cycloid({
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                }),
+            ], 
+
+            "1": [
+                new Cycloid({
+                    renderer: context,
+                    cx: (centerX * (1/2)),
+                    cy: (centerY * (2/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,     
+                    internalRadius: 30,      
+                    radiusOfTracePoint: 10,
+                    traceColor: getColor('red'),  
+                }),
+
+                new Cycloid({
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY + (centerY * (1/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,      
+                    internalRadius: 30,       
+                    radiusOfTracePoint: 30,   
+                    traceColor: getColor('green'),
+                }),
+
+                new Cycloid({
+                    renderer: context,
+                    cx: centerX + (centerX * (1/2)),
+                    cy: (centerY * (2/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,      
+                    internalRadius: 30,       
+                    radiusOfTracePoint: 45,   
+                    traceColor: getColor('blue'),
+                }),
+            ],
+        }
         
-
-        // create a new cycloid
-        let cycloid = new Cycloid({
-            renderer: context,
-            cx: centerX,
-            cy: centerY,
-
-            externalRadius: externalRadius,
-            internalRadius: internalRadius,
-            drawCenterPoint: drawCenterPoint,
-            drawRadiusLine: drawRadiusLine,
-            animationSpeed: speed,
-            traceLength: traceLength,
-            invertRotationDirection: invertRotationDirection,
-            radiusOfTracePoint: radiusOfTracePoint,
-        });
-
-        // log
-        console.log(cycloid);
-
+        let preset = presets[0] || [];
         settings.subscribe((key, newValue, oldValue) => {
             // update params of cycloid from ui
-            if(key == 'externalRadius') externalRadius = newValue;
-            if(key == 'internalRadius') internalRadius = newValue;
-            if(key == 'drawCenterPoint') drawCenterPoint = newValue;
-            if(key == 'speed') speed = newValue;
-            if(key == 'traceLength') traceLength = newValue;
-            if(key == 'invertRotationDirection') invertRotationDirection = newValue;
-            if(key == 'radiusOfTracePoint') radiusOfTracePoint = newValue;
-            if(key == 'drawRadiusLine') drawRadiusLine = newValue;
+            let updatedParams = getCycloidParams();
 
-            if(key == 'preset') {
-                if(newValue == 0) {
-
-                } else {
-                    let externalRadius_default = 120;
-                    let denuminator = 1;
-
-                    if(newValue == 1) {
-                        denuminator = 3;
-                        traceLength = 520;
-                    } else if(newValue == 2) {
-                        denuminator = 4;
-                        traceLength = 540;
-                    } else if(newValue == 3) {
-                        denuminator = 5;
-                        traceLength = 560;
-                    } else if(newValue == 4) {
-                        denuminator = 6;
-                        traceLength = 560;
-                    }
-
-                    externalRadius = externalRadius_default;
-                    internalRadius = externalRadius_default / denuminator;
-                    radiusOfTracePoint = internalRadius;
+            preset.forEach(cycloid => {
+                for(let [key, value] of Object.entries(updatedParams)) {
+                    cycloid.update(key, value);
                 }
-            }
-            
-            // update cycloid params
-            cycloid.update('externalRadius', externalRadius);
-            cycloid.update('internalRadius', internalRadius);
-            cycloid.update('drawCenterPoint', drawCenterPoint);
-            cycloid.update('drawRadiusLine', drawRadiusLine);
-            cycloid.update('traceLength', traceLength);
-            cycloid.update('animationSpeed', speed);
-            cycloid.update('invertRotationDirection', invertRotationDirection);
-            cycloid.update('radiusOfTracePoint', radiusOfTracePoint);
+            });
+
+            if(key == 'preset') preset = presets[newValue];
         });
+
 
         // Main function
         let loop = () => {
@@ -195,11 +204,14 @@ let cycloidMotionScene = new Scene({
                 fillColor: getColor('black', 0.98),
             });
             
-            // amimate cycloid
-            cycloid.animate(speed);
+            // process each precet cycloid
+            preset.forEach(cycloid => {
+                // animate cycloid
+                cycloid.animate(speed);
 
-            // draw cycloid each time when frame is updated
-            cycloid.render();
+                // draw cycloid each time when frame is updated
+                cycloid.render();
+            });
         }
 
         // animate
@@ -299,7 +311,7 @@ class CircleBone {
      * @param {boolean} param.invertRotationDirection - select direction of rotatioin
      */
     constructor({
-        id = null, parent, cx, cy, radius, angle = 0, origin, fillColor, traceColor = getColor('red'), traceLength = 200, borderColor, borderThickness, 
+        id = null, parent, cx, cy, radius, angle = 0, origin, fillColor, traceColor = getColor('red'), traceLength = 1000, borderColor, borderThickness, 
         type, renderer, drawCenterPoint = false, drawRadiusLine = false, offset = 0, invertRotationDirection = false, radiusOfTracePoint,
     }){
         this.renderer = renderer;
@@ -313,7 +325,7 @@ class CircleBone {
         this.staticCY = cy - offset;
         this.angle = angle;
         this.globalAngle = 0;
-        this.origin = origin || {x: (this.renderer.canvas.width / 2), y: (this.renderer.canvas.height / 2)};
+        this.origin = origin || {x: this.parent.cx, y: this.parent.cy};
 
         this.trace = new Tracer({
             color: traceColor,
@@ -431,8 +443,10 @@ class CircleBone {
  * Main class
  */
 class Cycloid {
-    constructor({cx, cy, animationSpeed, externalRadius, internalRadius, drawCenterPoint, traceLength, drawRadiusLine, renderer, invertRotationDirection, radiusOfTracePoint}){
+    constructor({cx, cy, animationSpeed, externalRadius, internalRadius, drawCenterPoint, traceColor = getColor('white'), traceLength, drawRadiusLine, renderer, invertRotationDirection, radiusOfTracePoint}){
         this.renderer = renderer;
+
+        console.log(externalRadius);
 
         this.cx = cx;
         this.cy = cy;
@@ -474,7 +488,7 @@ class Cycloid {
                 fillColor: 'transparent',
                 borderColor: getColor('white', 0.45),
                 traceLength: traceLength,
-                traceColor: getColor('blue'),
+                traceColor: traceColor,
                 borderThickness: 1,
                 drawCenterPoint: drawCenterPoint,
                 drawRadiusLine: drawRadiusLine,
@@ -493,6 +507,8 @@ class Cycloid {
      * @param {any} newValue - The new value to assign to the parameter.
      */
     update(keyName, newValue) {
+        console.log(keyName, newValue);
+
         // Update parameters for the bones (external and internal circles)
         this.skeleton.forEach(bone => {
             if( keyName === 'drawCenterPoint') {
@@ -511,8 +527,6 @@ class Cycloid {
                 });
             }
 
-
-
             // If the external radius is being updated, adjust related values
             if (bone.type === 'external' && keyName === 'externalRadius') {
                 let externalBone = bone;
@@ -520,6 +534,7 @@ class Cycloid {
                 
                 // Update the external circle's radius
                 externalBone.radius = newValue;
+                console.log(externalBone);
 
                 internals.forEach(internalBone => {
                     // Determine the offset direction: one internal circle moves upwards (1), the other downwards (-1)
