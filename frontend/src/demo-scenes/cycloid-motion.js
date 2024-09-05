@@ -11,11 +11,13 @@ let cycloidMotionScene = new Scene({
         'preset': {
             type: 'preset-dropdown-list',
             label: 'Preset',
-            selectedByDefault: 2,
+            selectedByDefault: 1,
             options: [
                 {name: 'Sandbox', allowedElements: ['*']}, 
-                {name: 'Test 1', allowedElements: []},
-                {name: 'Test 2', allowedElements: ['externalRadius', 'internalRadius']}
+                {name: 'Deltoid', allowedElements: ['speed', 'drawRadiusLine']},
+                {name: 'Astroid', allowedElements: ['speed', 'drawRadiusLine']},
+                {name: 'Pentoid', allowedElements: ['speed', 'drawRadiusLine']},
+                {name: 'Exoid', allowedElements: ['speed', 'drawRadiusLine']},
             ],
         },
 
@@ -127,6 +129,28 @@ let cycloidMotionScene = new Scene({
             if(key == 'invertRotationDirection') invertRotationDirection = newValue;
             if(key == 'radiusOfTracePoint') radiusOfTracePoint = newValue;
             if(key == 'drawRadiusLine') drawRadiusLine = newValue;
+
+            if(key == 'preset') {
+                if(newValue == 0) {
+
+                } else {
+                    let externalRadius_default = 120;
+                    let denuminator = 1;
+
+                    if(newValue == 1) {
+                        denuminator = 3;
+                    } else if(newValue == 2) {
+                        denuminator = 4;
+                    } else if(newValue == 3) {
+                        denuminator = 5;
+                    } else if(newValue == 4) {
+                        denuminator = 6;
+                    }
+
+                    internalRadius = externalRadius_default / denuminator;
+                    radiusOfTracePoint = internalRadius;
+                }
+            }
             
             // update cycloid params
             cycloid.update('externalRadius', externalRadius);
