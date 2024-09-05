@@ -45,6 +45,14 @@ let cycloidMotionScene = new Scene({
             maxValue: 100,
         },
 
+        'traceLength': {
+            type: 'input',
+            label: 'Trace length',
+            minValue: 200,
+            defaultValue: 200,
+            maxValue: 10000,
+        },
+
         'speed': {
             type: 'input',
             label: 'Speed',
@@ -70,7 +78,6 @@ let cycloidMotionScene = new Scene({
             label: 'Draw radius line',
             state: true,
         },
-
     },
 
     code: (root, display, settings) => {
@@ -99,20 +106,23 @@ let cycloidMotionScene = new Scene({
         let drawCenterPoint = settings.getState('drawCenterPoint');
         let drawRadiusLine = settings.getState('drawRadiusLine');
         let speed = settings.getState('speed');
+        let traceLength = settings.getState('traceLength');
         let invertRotationDirection = settings.getState('invertRotationDirection');
         let radiusOfTracePoint = settings.getState('radiusOfTracePoint');
         
 
         // create a new cycloid
         let cycloid = new Cycloid({
+            renderer: context,
             cx: centerX,
             cy: centerY,
+
             externalRadius: externalRadius,
             internalRadius: internalRadius,
             drawCenterPoint: drawCenterPoint,
             drawRadiusLine: drawRadiusLine,
             animationSpeed: speed,
-            renderer: context,
+            traceLength: traceLength,
             invertRotationDirection: invertRotationDirection,
             radiusOfTracePoint: radiusOfTracePoint,
         });
@@ -126,6 +136,7 @@ let cycloidMotionScene = new Scene({
             if(key == 'internalRadius') internalRadius = newValue;
             if(key == 'drawCenterPoint') drawCenterPoint = newValue;
             if(key == 'speed') speed = newValue;
+            if(key == 'traceLength') traceLength = newValue;
             if(key == 'invertRotationDirection') invertRotationDirection = newValue;
             if(key == 'radiusOfTracePoint') radiusOfTracePoint = newValue;
             if(key == 'drawRadiusLine') drawRadiusLine = newValue;
@@ -139,14 +150,19 @@ let cycloidMotionScene = new Scene({
 
                     if(newValue == 1) {
                         denuminator = 3;
+                        traceLength = 520;
                     } else if(newValue == 2) {
                         denuminator = 4;
+                        traceLength = 540;
                     } else if(newValue == 3) {
                         denuminator = 5;
+                        traceLength = 560;
                     } else if(newValue == 4) {
                         denuminator = 6;
+                        traceLength = 560;
                     }
 
+                    externalRadius = externalRadius_default;
                     internalRadius = externalRadius_default / denuminator;
                     radiusOfTracePoint = internalRadius;
                 }
@@ -157,6 +173,7 @@ let cycloidMotionScene = new Scene({
             cycloid.update('internalRadius', internalRadius);
             cycloid.update('drawCenterPoint', drawCenterPoint);
             cycloid.update('drawRadiusLine', drawRadiusLine);
+            cycloid.update('traceLength', traceLength);
             cycloid.update('animationSpeed', speed);
             cycloid.update('invertRotationDirection', invertRotationDirection);
             cycloid.update('radiusOfTracePoint', radiusOfTracePoint);
@@ -282,11 +299,13 @@ class CircleBone {
      * @param {boolean} param.invertRotationDirection - select direction of rotatioin
      */
     constructor({
-        parent, cx, cy, radius, angle = 0, origin, fillColor, traceColor = getColor('red'), borderColor, borderThickness, 
+        id = null, parent, cx, cy, radius, angle = 0, origin, fillColor, traceColor = getColor('red'), traceLength = 200, borderColor, borderThickness, 
         type, renderer, drawCenterPoint = false, drawRadiusLine = false, offset = 0, invertRotationDirection = false, radiusOfTracePoint,
     }){
         this.renderer = renderer;
         this.parent = parent;
+
+        this.id = id;
 
         this.cx = cx;
         this.cy = cy;
@@ -298,7 +317,7 @@ class CircleBone {
 
         this.trace = new Tracer({
             color: traceColor,
-            length: 2000, // 200
+            length: traceLength, // 200
             parent: this,
         });
 
@@ -412,7 +431,7 @@ class CircleBone {
  * Main class
  */
 class Cycloid {
-    constructor({cx, cy, animationSpeed, externalRadius, internalRadius, drawCenterPoint, drawRadiusLine, renderer, invertRotationDirection, radiusOfTracePoint}){
+    constructor({cx, cy, animationSpeed, externalRadius, internalRadius, drawCenterPoint, traceLength, drawRadiusLine, renderer, invertRotationDirection, radiusOfTracePoint}){
         this.renderer = renderer;
 
         this.cx = cx;
@@ -429,12 +448,14 @@ class Cycloid {
         this.skeleton = [
             // external bone
             new CircleBone({
+                id: 0,
                 type: 'external',
                 cx: this.cx,
                 cy: this.cy,
                 radius: externalRadius,
                 fillColor: 'transparent',
                 borderColor: getColor('white', 0.45),
+                traceLength: traceLength,
                 borderThickness: 1,
                 renderer: this.renderer,
                 drawCenterPoint: drawCenterPoint,
@@ -444,6 +465,7 @@ class Cycloid {
 
             // inner circle 1
             new CircleBone({
+                id: 1,
                 type: 'internal',
                 cx: this.cx,
                 cy: this.cy,
@@ -451,6 +473,7 @@ class Cycloid {
                 radius: internalRadius,
                 fillColor: 'transparent',
                 borderColor: getColor('white', 0.45),
+                traceLength: traceLength,
                 traceColor: getColor('blue'),
                 borderThickness: 1,
                 drawCenterPoint: drawCenterPoint,
@@ -459,26 +482,7 @@ class Cycloid {
                 renderer: this.renderer,
                 invertRotationDirection: invertRotationDirection,
                 radiusOfTracePoint: radiusOfTracePoint,
-            }),
-
-            // inner circle 2
-            new CircleBone({
-                type: 'internal',
-                cx: this.cx,
-                cy: this.cy,
-                offset: delta_radius,
-                radius: internalRadius,
-                fillColor: 'transparent',
-                borderColor: getColor('white', 0.45),
-                traceColor: getColor('red'),
-                borderThickness: 1,
-                drawCenterPoint: drawCenterPoint,
-                drawRadiusLine: true,
-                parent: this,
-                renderer: this.renderer,
-                invertRotationDirection: invertRotationDirection,
-                radiusOfTracePoint: radiusOfTracePoint,
-            }),
+            })
         ];
     }
 
@@ -498,6 +502,13 @@ class Cycloid {
             if(keyName === 'invertRotationDirection' || keyName === 'radiusOfTracePoint' || keyName == 'drawRadiusLine') {
                 let internals = this.skeleton.filter(bone => bone.type === 'internal');
                 internals.forEach(internalBone => { internalBone[keyName] = newValue });
+            }
+
+            if(keyName == 'traceLength') {
+                let internals = this.skeleton.filter(bone => bone.type === 'internal');
+                internals.forEach(bone => {
+                    bone.trace.length = newValue;
+                });
             }
 
 
