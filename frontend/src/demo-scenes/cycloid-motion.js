@@ -278,18 +278,30 @@ let cycloidMotionScene = new Scene({
             ],
         }
         
-        let preset = presets[0] || [];
+        let currentPresetIndex = 0;
+        let preset = presets[currentPresetIndex] || [];
         settings.subscribe((key, newValue, oldValue) => {
             // update params of cycloid from ui
             let updatedParams = getCycloidParams();
+            
+            // if current change is preset switching - update curr preset index and preset ref
+            if(key == 'preset') {
+                currentPresetIndex = newValue;
+                preset = presets[currentPresetIndex];
+            }
 
+            // update cycloid's params using update function
             preset.forEach(cycloid => {
                 for(let [key, value] of Object.entries(updatedParams)) {
+                    // ingnore some param changing from ui using 'continue' keyword for 'non-sandbox' presets
+                    if (currentPresetIndex !== 0 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
+                        continue;
+                    }
+
+                    // updating each param using 'key' and 'value'
                     cycloid.update(key, value);
                 }
             });
-
-            if(key == 'preset') preset = presets[newValue];
         });
 
 
