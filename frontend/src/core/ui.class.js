@@ -615,22 +615,6 @@ class UIDisplay{
         this.#html.root.appendChild(child);
     }
 
-
-    /**
-     * Hides entire HTML block with info
-     */
-    hide(){
-        this.#html.root.parentNode.classList.add('hidden-block');
-    }
-
-
-    /**
-     * Unhide entire HTML block with info
-     */
-    show(){
-        this.#html.root.parentNode.classList.remove('hidden-block');
-    }
-
     /**
      * Renders an infobox element at HTML info block with given param (elementObject). 
      * @param {string} elementName 

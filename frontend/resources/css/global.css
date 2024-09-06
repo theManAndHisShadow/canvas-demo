@@ -9,7 +9,7 @@ html, body {
     text-align: center;
 }
 
-.hidden-block, .hidden {
+.hidden {
     display: none;
 }
 
