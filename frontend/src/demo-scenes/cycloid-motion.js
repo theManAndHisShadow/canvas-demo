@@ -171,6 +171,111 @@ let cycloidMotionScene = new Scene({
                     traceColor: getColor('blue'),
                 }),
             ],
+
+            "2": [
+                new Cycloid({
+                    renderer: context,
+                    cx: (centerX * (1/2)),
+                    cy: (centerY * (2/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,     
+                    internalRadius: 22.5,      
+                    radiusOfTracePoint: 10,
+                    traceColor: getColor('red'),  
+                }),
+
+                new Cycloid({
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY + (centerY * (1/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,      
+                    internalRadius: 22.5,         
+                    radiusOfTracePoint: 22.5,   
+                    traceColor: getColor('green'),
+                }),
+
+                new Cycloid({
+                    renderer: context,
+                    cx: centerX + (centerX * (1/2)),
+                    cy: (centerY * (2/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,      
+                    internalRadius: 22.5,   
+                    radiusOfTracePoint: 32.5,   
+                    traceColor: getColor('blue'),
+                }),
+            ],
+
+            "3": [
+                new Cycloid({
+                    renderer: context,
+                    cx: (centerX * (1/2)),
+                    cy: (centerY * (2/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,     
+                    internalRadius: 18,      
+                    radiusOfTracePoint: 5,
+                    traceColor: getColor('red'),  
+                }),
+
+                new Cycloid({
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY + (centerY * (1/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,      
+                    internalRadius: 18,         
+                    radiusOfTracePoint: 18,   
+                    traceColor: getColor('green'),
+                }),
+
+                new Cycloid({
+                    renderer: context,
+                    cx: centerX + (centerX * (1/2)),
+                    cy: (centerY * (2/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,      
+                    internalRadius: 18,   
+                    radiusOfTracePoint: 28,   
+                    traceColor: getColor('blue'),
+                }),
+            ],
+
+            "4": [
+                new Cycloid({
+                    renderer: context,
+                    cx: (centerX * (1/2)),
+                    cy: (centerY * (2/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,     
+                    internalRadius: 15,      
+                    radiusOfTracePoint: 5,
+                    traceColor: getColor('red'),  
+                }),
+
+                new Cycloid({
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY + (centerY * (1/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,      
+                    internalRadius: 15,         
+                    radiusOfTracePoint: 15,   
+                    traceColor: getColor('green'),
+                }),
+
+                new Cycloid({
+                    renderer: context,
+                    cx: centerX + (centerX * (1/2)),
+                    cy: (centerY * (2/3)),
+                    ...getCycloidParams(),
+                    externalRadius: 90,      
+                    internalRadius: 15,   
+                    radiusOfTracePoint: 25,   
+                    traceColor: getColor('blue'),
+                }),
+            ],
         }
         
         let preset = presets[0] || [];
