@@ -609,10 +609,12 @@ class UIDisplay{
 
     /**
      * Appends new ready HTML element to 'Controls' HTML block
-     * @param {HTMLElement} child - ref to fullt ready html element
+     * @param {string} elementName
+     * @param {HTMLElement} element - ref to fullt ready html element
      */
-    appendToHTML(elementName, child){
-        this.#html.root.appendChild(child);
+    appendToHTML(elementName, element){
+        this.#html[elementName] = element;
+        this.#html.root.appendChild(element);
     }
 
     /**
@@ -770,7 +772,7 @@ class UIDisplay{
         let spacerContainer = document.createElement('div');
         spacerContainer.classList.add('display-spacer');
 
-        this.appendToHTML(elementName, spacerContainer);
+        this.appendToHTML('spacer', spacerContainer);
 
         return spacerContainer;
     }
