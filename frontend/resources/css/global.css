@@ -17,6 +17,16 @@ html, body {
     opacity: 0.3;
 }
 
+.display-item__list-item {
+    position: relative;
+    margin: 4px 0px;
+    display: inline-block;
+}
+
+.small-font {
+    font-size: 13px !important;
+}
+
 .disabled {
     opacity: 0.55 !important;
     cursor: default !important;
