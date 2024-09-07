@@ -166,35 +166,135 @@ function getColor(colorName, opacity = 1) {
 
     // Color palette based on Material Design standards
     const colors = {
+        // Reds
         red: [244, 67, 54],
-        pink: [233, 30, 99],
+        lightRed: [255, 205, 210],
+        darkRed: [200, 50, 40],
+        paleRed: [255, 182, 193],
+        softRed: [255, 105, 97],
+        brightRed: [255, 0, 0],
+        crimson: [220, 20, 60],
+    
+        // Pinks
+        magenta: [255, 0, 255],
+        deepMagenta: [211, 0, 211],
+        brightMagenta: [255, 51, 255],
+        fuchsia: [255, 0, 255],
+        hotPink: [255, 105, 180],
+        deepPink: [255, 20, 147],
+        orchid: [218, 112, 214],
+        mediumVioletRed: [199, 21, 133],
+        paleVioletRed: [219, 112, 147],
+        pink: [255, 192, 203],
+        lightPink: [255, 182, 193],
+        thistle: [216, 191, 216],
+        plum: [221, 160, 221],
+        violet: [238, 130, 238],
+        lavenderBlush: [255, 240, 245],
+        lightMagenta: [255, 153, 255],
+        darkMagenta: [139, 0, 139],
+    
+        // Violets
         purple: [156, 39, 176],
+        lightPurple: [225, 190, 231],
+        darkPurple: [130, 30, 150],
+        palePurple: [221, 160, 221],
+        softPurple: [219, 112, 219],
+        brightPurple: [186, 85, 211],
+    
+        // Deep Violets
         deepPurple: [103, 58, 183],
+        lightDeepPurple: [209, 196, 233],
+        darkDeepPurple: [80, 45, 150],
+    
+        // Blues
         indigo: [63, 81, 181],
+        lightIndigo: [197, 202, 233],
+        darkIndigo: [55, 70, 170],
+    
         blue: [33, 150, 243],
+        lightBlue: [187, 222, 251],
+        darkBlue: [25, 130, 200],
+        paleBlue: [173, 216, 230],
+        softBlue: [135, 206, 235],
+        brightBlue: [0, 191, 255],
+    
+        // Cyans
         cyan: [0, 188, 212],
+        lightCyan: [178, 235, 242],
+        darkCyan: [0, 150, 180],
+        paleCyan: [224, 255, 255],
+        softCyan: [0, 255, 255],
+        brightCyan: [0, 255, 255],
+    
+        // Teal
         teal: [0, 150, 136],
+        lightTeal: [178, 223, 219],
+        darkTeal: [0, 120, 110],
+        paleTeal: [175, 238, 238],
+        softTeal: [64, 224, 208],
+        brightTeal: [0, 128, 128],
+    
+        // Greens
         green: [76, 175, 80],
+        lightGreen: [220, 237, 200],
+        darkGreen: [60, 150, 70],
+        paleGreen: [152, 251, 152],
+        softGreen: [144, 238, 144],
+        neonGreen: [57, 255, 20],
+        brightGreen: [0, 255, 0],
+    
+        // Limes
         lime: [205, 220, 57],
+        darkLime: [170, 180, 45],
+    
+        // Yellows
         yellow: [255, 235, 59],
+        lightYellow: [255, 249, 196],
+        darkYellow: [210, 195, 45],
+        paleYellow: [255, 255, 224],
+        softYellow: [255, 255, 102],
+        brightYellow: [255, 255, 0],
+    
+        // Ambers
         amber: [255, 193, 7],
+        lightAmber: [255, 224, 178],
+        darkAmber: [210, 160, 5],
+        paleAmber: [255, 228, 181],
+        softAmber: [255, 223, 0],
+        brightAmber: [255, 191, 0],
+    
+        // Oranges
         orange: [255, 152, 0],
+        lightOrange: [255, 224, 178],
+        darkOrange: [210, 130, 0],
+        paleOrange: [255, 239, 213],
+        softOrange: [255, 165, 0],
+        neonOrange: [255, 165, 0],
+    
+        // Deep Oranges
         deepOrange: [255, 87, 34],
+        lightDeepOrange: [255, 204, 188],
+        darkDeepOrange: [210, 60, 30],
+    
+        // Browns
         brown: [121, 85, 72],
+        lightBrown: [215, 204, 200],
+        darkBrown: [100, 70, 60],
+    
+        // Grays
         grey: [158, 158, 158],
+        lightGrey: [245, 245, 245],
+        darkGrey: [130, 130, 130],
+    
+        // Blue Grey
         blueGrey: [96, 125, 139],
+        lightBlueGrey: [207, 216, 220],
+        darkBlueGrey: [80, 105, 120],
+    
+        // Black and white
         black: [0, 0, 0],
         white: [255, 255, 255],
-        lightRed: [255, 205, 210],
-        lightPink: [248, 187, 208],
-        lightPurple: [225, 190, 231],
-        lightDeepPurple: [209, 196, 233],
-        lightIndigo: [197, 202, 233],
-        lightBlue: [187, 222, 251],
-        lightCyan: [178, 235, 242],
-        lightTeal: [178, 223, 219],
-        lightGreen: [220, 237, 200],
-        lightAmber: [255, 224, 178]
     };
 
     // Default to black if the color name is not found
