@@ -399,7 +399,7 @@ window.exportedObjects.push(cycloidMotionScene);
  * A class that tracks the movement of a point along a trajectory and draws that trajectory
  */
 class Tracer {
-    #trace = []
+    #trace = [];
     constructor({color, length = 100, thickness = 1, parent}){
 
         this.length = length;
@@ -428,6 +428,24 @@ class Tracer {
 
 
     /**
+     * Returns trace last point.
+     * @returns {{x: number, y: number}} - last point of trace
+     */
+    getLastPoint(){
+        return this.#trace.length > 0 ? getArrayLast(this.#trace) : false;
+    }
+
+
+    /**
+     * Returns trace array length.
+     * @returns {Number} - length of trace array
+     */
+    getLength() {
+        return this.#trace.length;
+    }
+
+
+    /**
      * Resets Tracer points array.
      */
     clear(){
@@ -436,20 +454,28 @@ class Tracer {
 
 
     /**
-     * Render trace.
+     * Renders trace using efficient method.
      */
     render(){
+        this.parent.renderer.beginPath();
+        this.parent.renderer.strokeStyle = this.color;
+        this.parent.renderer.lineWidth = 1;
+
+        // checks if is first point
+        let firstPoint = true;
+
+        // draw trace fragmet by fragment using all current trace
         this.#trace.forEach(point => {
-            // draw each point
-            drawCircle(this.parent.renderer, {
-                cx: point.x,
-                cy: point.y,
-                r: this.thickness, 
-                borderThickness: 1,
-                borderColor: this.color,
-                fillColor: this.color,
-            });
+            if (firstPoint) {
+                this.parent.renderer.moveTo(point.x, point.y);
+                firstPoint = false;
+            } else {
+                this.parent.renderer.lineTo(point.x, point.y);
+            }
         });
+
+        // end trace
+        this.parent.renderer.stroke();
     }
 }
 
@@ -678,8 +704,31 @@ class DynamicCircleBone extends BasicCircelBone {
             });
         }
 
+        // loacal helper funcion
+        // limits the discreteness of tracing 
+        let discretLimiter = (newPoint, distanceLimit) => {
+            if(this.trace.length > 0) {
+                // get prev point
+                let prevPoint = this.trace.getLastPoint();
+
+                // get distanse between new point and prev point
+                let distance = getDistanseBetweenTwoPoint(prevPoint.x, prevPoint.y, newPoint.x, newPoint.y);
+
+                // if distance greater than limit - return true else - false
+                return distance >= distanceLimit ? true : false;
+            } else return false;
+        }
+
+        // new poin after rotations
         let rotatedPoint = rotatePoint(corrected_x, corrected_y, corrected_x, corrected_y + this.radiusOfTracePoint, this.angle);
-        this.trace.push(rotatedPoint);
+
+        // add point if
+        // - it first point of trace
+        // - or the discreteness function allows for addition
+        if(this.trace.getLength() == 0 || discretLimiter(rotatedPoint, 3)) {
+            this.trace.push(rotatedPoint);
+        }
+
 
         // radius line line from center to cicrlce line
         if(this.drawRadiusLine === true) {
