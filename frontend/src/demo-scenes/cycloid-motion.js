@@ -454,67 +454,166 @@ class Tracer {
 }
 
 
-
-/**
- * Class of single figure (bone)
- */
-class CircleBone {
+class BasicCircelBone {
     /**
      * 
      * @param {object} param.parent - parent object of class instance
      * @param {number} param.cx - x pos of circle center
      * @param {number} param.cy - y pos of circle center
      * @param {number} param.radius - radius of circle center
-     * @param {number} param.angle - angle of circle
-     * @param {{x: number, y: number}} param.origin - rotation origin of circle
      * @param {string} param.fillColor - color if circle fill
-     * @param {string} param.traceColor - color of circle point trace line
      * @param {string} param.borderColor - color of circle border line
      * @param {number} param.borderThickness - thickness of circle border
      * @param {number} param.type - type of circle (internal or external)
      * @param {boolean} param.drawCenterPoint - draw or not center point of circle
-     * @param {boolean} param.drawRadiusLine - draw or not radius line of circle
-     * @param {number} param.offset - offset between external circle center and internal center
+     * @param {boolean} param.drawRadiusLine - draw or not radius line of circle3
      * @param {CanvasRenderingContext2D} param.renderer - where the circle will be drawn
-     * @param {boolean} param.invertRotationDirection - select direction of rotatioin
      */
     constructor({
-        id = null, parent, cx, cy, radius, angle = 0, origin, fillColor, traceColor = getColor('red'), traceLength = 1000, borderColor, borderThickness, 
-        type, renderer, drawCenterPoint = false, drawRadiusLine = false, offset = 0, traceThickness, invertRotationDirection = false, radiusOfTracePoint,
+        id = null, 
+        type, 
+        parent, 
+        renderer, 
+        cx, cy, radius, 
+        borderColor, borderThickness, fillColor, 
+        drawCenterPoint = false, drawRadiusLine = false
+    }) {
+        this.id = id; 
+        this.parent = parent; 
+        this.cx = cx; 
+        this.cy = cy; 
+        this.radius = radius; 
+        this.fillColor = fillColor; 
+        this.borderColor = borderColor; 
+        this.borderThickness = borderThickness; 
+        this.type = type; 
+        this.renderer = renderer; 
+        this.drawCenterPoint = drawCenterPoint; 
+        this.drawRadiusLine = drawRadiusLine;
+    }
+
+    /**
+     * Renders circle bone
+     */
+    render(){    
+        // circle line
+        drawCircle(this.renderer, {
+            cx: this.cx,
+            cy: this.cy,
+            r: this.radius, 
+            borderThickness: this.borderThickness,
+            borderColor: this.borderColor,
+            fillColor: this.fillColor,
+        });
+
+        if(this.drawCenterPoint === true) {
+            // circle's center
+            drawCircle(this.renderer, {
+                cx: this.cx,
+                cy: this.cy,
+                r: 1, 
+                borderThickness: this.borderThickness,
+                borderColor: this.borderColor,
+                fillColor: this.borderColor, // not typo!
+            });
+        }
+    }
+}
+
+
+
+class StaticCircleBone extends BasicCircelBone {
+    /**
+     * 
+     * @param {object} param.parent - parent object of class instance
+     * @param {number} param.cx - x pos of circle center
+     * @param {number} param.cy - y pos of circle center
+     * @param {number} param.radius - radius of circle center
+     * @param {string} param.fillColor - color if circle fill
+     * @param {string} param.borderColor - color of circle border line
+     * @param {number} param.borderThickness - thickness of circle border
+     * @param {number} param.type - type of circle (internal or external)
+     * @param {boolean} param.drawCenterPoint - draw or not center point of circle
+     * @param {boolean} param.drawRadiusLine - draw or not radius line of circle3
+     * @param {CanvasRenderingContext2D} param.renderer - where the circle will be drawn
+     */
+    constructor({
+        id = null, 
+        type, 
+        parent, 
+        renderer, 
+        cx, cy, radius, 
+        borderColor, borderThickness, fillColor, 
+        drawCenterPoint = false, drawRadiusLine = false
+    }) {
+        super(arguments[0]);
+    }
+}
+
+
+class DynamicCircleBone extends BasicCircelBone {
+    /**
+     * super class params
+     * @param {object} param.parent - parent object of class instance
+     * @param {number} param.cx - x pos of circle center
+     * @param {number} param.cy - y pos of circle center
+     * @param {number} param.radius - radius of circle center
+     * @param {string} param.fillColor - color if circle fill
+     * @param {string} param.borderColor - color of circle border line
+     * @param {number} param.borderThickness - thickness of circle border
+     * @param {number} param.type - type of circle (internal or external)
+     * @param {boolean} param.drawCenterPoint - draw or not center point of circle
+     * @param {boolean} param.drawRadiusLine - draw or not radius line of circle3
+     * @param {CanvasRenderingContext2D} param.renderer - where the circle will be drawn
+     * 
+     * new class params
+     * @param {{x: number, y: number}} param.origin - center rotation (epicenter)
+     * @param {number} param.offset - offset between instance and static circle
+     * @param {number} param.angle - local angle of circle (nears it center)
+     * @param {number} param.traceLength - length of trace
+     * @param {string} param.traceColor - color of trace
+     * @param {number} param.traceThickness - thickness of trace line
+     * @param {number} param.radiusOfTracePoint - radius of trace point 
+     * @param {boolean} param.invertRotationDirection - direction of rotation
+     */
+    constructor({
+        id = null, 
+        type, 
+        parent, 
+        renderer, 
+        cx, cy, radius, 
+        borderColor, borderThickness, fillColor, 
+        drawCenterPoint = false, drawRadiusLine = false,
+        
+        origin, offset, angle = 0,
+        traceLength = 1000, traceColor = getColor('red'), traceThickness, radiusOfTracePoint,
+        invertRotationDirection = false, 
     }){
-        this.renderer = renderer;
-        this.parent = parent;
-
-        this.id = id;
-
-        this.cx = cx;
-        this.cy = cy;
-        this.staticCX = cx;
-        this.staticCY = cy - offset;
+        super({id, type, parent, renderer, cx, cy, radius, borderColor, borderThickness, fillColor, drawCenterPoint, drawRadiusLine});
+        
+        // set positioning parameters (pivot point, angle, global angle, etc.)
+        this.origin = origin || {x: this.parent.cx, y: this.parent.cy};
+        this.offset = offset;
         this.angle = angle;
         this.globalAngle = 0;
-        this.origin = origin || {x: this.parent.cx, y: this.parent.cy};
 
+        // se satic cx and cy for correct rotation
+        this.staticCX = cx;
+        this.staticCY = cy - offset;
+
+        // set trace objet
         this.trace = new Tracer({
             color: traceColor,
             length: traceLength, // 200
             thickness: traceThickness,
             parent: this,
         });
-
-        this.radiusOfTracePoint = radiusOfTracePoint,
-
-        this.radius = radius;
-        this.fillColor = fillColor;
-        this.borderColor = borderColor;
-        this.borderThickness = borderThickness;
-        this.offset = offset;
-        
-        this.drawCenterPoint = drawCenterPoint;
-        this.drawRadiusLine = drawRadiusLine;
-        this.type = type;
+         
+        // misc aprams
+        this.radiusOfTracePoint = radiusOfTracePoint;  
         this.invertRotationDirection = invertRotationDirection;
     }
+
 
 
     /**
@@ -581,6 +680,7 @@ class CircleBone {
 
         let rotatedPoint = rotatePoint(corrected_x, corrected_y, corrected_x, corrected_y + this.radiusOfTracePoint, this.angle);
         this.trace.push(rotatedPoint);
+
         // radius line line from center to cicrlce line
         if(this.drawRadiusLine === true) {
             // radius line of circle
@@ -642,25 +742,23 @@ class Cycloid {
         // create 2 bone - external and internal
         this.skeleton = [
             // external bone
-            new CircleBone({
+            new StaticCircleBone({
                 id: 0,
                 type: 'external',
                 cx: this.cx,
                 cy: this.cy,
+                parent: this,
                 radius: externalRadius,
                 fillColor: 'transparent',
                 borderColor: getColor('white', 0.45),
-                traceLength: traceLength,
-                traceThickness: traceThickness,
                 borderThickness: 1,
                 renderer: this.renderer,
                 drawCenterPoint: drawCenterPoint,
                 drawRadiusLine: drawRadiusLine,
-                parent: this,
             }),
 
             // inner circle 1
-            new CircleBone({
+            new DynamicCircleBone({
                 id: 1,
                 type: 'internal',
                 cx: this.cx,
@@ -681,6 +779,8 @@ class Cycloid {
                 radiusOfTracePoint: radiusOfTracePoint,
             })
         ];
+
+        console.log(this);
     }
 
 
