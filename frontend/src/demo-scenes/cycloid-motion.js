@@ -18,8 +18,9 @@ let cycloidMotionScene = new Scene({
             label: 'Preset',
             selectedByDefault: 0,
             options: [
-                {name: 'Sandbox', allowedElements: ['*']}, 
                 {name: 'Hypocyloid overview', allowedElements: []},
+                {name: 'Experimental overview', allowedElements: []},
+                {name: 'Sandbox', allowedElements: ['*']}, 
             ],
         },
 
@@ -130,18 +131,7 @@ let cycloidMotionScene = new Scene({
         // If you don't need specific parameter adjustments, get the composed rest part of the parameters using '...getCycloidParams()'
         // All manual adjustments should be made after receiving the '...getCycloidParams()', for their subsequent rewriting default values
         let presets = {
-            '0': [
-                new Cycloid({
-                    label: 'Custom curve',
-                    renderer: context,
-                    cx: centerX,
-                    cy: centerY,
-                    ...getCycloidParams(),
-                    traceColor: getColor('red'),  
-                }),
-            ], 
-
-            "1": [
+            "0": [
                 new Cycloid({
                     label: 'Deltoid',
                     renderer: context,
@@ -299,37 +289,224 @@ let cycloidMotionScene = new Scene({
                     traceThickness: 0.1,
                 }),
             ],
+
+
+            "1": [
+                new Cycloid({
+                    label: 'Test 1',
+                    renderer: context,
+                    cx: centerX - (centerX * (7/10)),
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 25,      
+                    radiusOfTracePoint: 25,
+                    traceColor: getColor('brightRed'),  
+                    traceThickness: 0.1,
+                    invertRotationDirection: false,
+                }),
+
+                new Cycloid({
+                    label: 'Test 2',
+                    renderer: context,
+                    cx: centerX - (centerX * (7/10)),
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 16.6666666666,   
+                    radiusOfTracePoint: 16.6666666666, 
+                    traceColor: getColor('deepOrange'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false,
+                }),
+
+                new Cycloid({
+                    label: 'Deltoid',
+                    renderer: context,
+                    cx: centerX - (centerX * (7/10)),
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),   
+                    externalRadius: 50,     
+                    internalRadius: 12.5,      
+                    radiusOfTracePoint: 12.5, 
+                    traceColor: getColor('amber'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Astroid',
+                    renderer: context,
+                    cx: centerX - (centerX * (2/10)) - 10,
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 9.99,      
+                    radiusOfTracePoint: 6,
+                    traceColor: getColor('green'),  
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Astroid',
+                    renderer: context,
+                    cx: centerX - (centerX * (2/10)) - 10,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 9.99,      
+                    radiusOfTracePoint: 9.99,
+                    traceColor: getColor('teal'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Astroid',
+                    renderer: context,
+                    cx: centerX - (centerX * (2/10)) - 10,
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 9.99,      
+                    radiusOfTracePoint: 20,
+                    traceColor: getColor('blue'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Pentoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (3/10)) - 20,
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 8.33333,      
+                    radiusOfTracePoint: 3,
+                    traceColor: getColor('indigo'),  
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Pentoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (3/10)) - 20,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 8.33333,      
+                    radiusOfTracePoint: 8.33333, 
+                    traceColor: getColor('deepPurple'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Pentoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (3/10))  - 20,
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 8.33333,      
+                    radiusOfTracePoint: 18, 
+                    traceColor: getColor('fuchsia'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+
+                new Cycloid({
+                    label: 'Exoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (7/10)),
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 7.1,      
+                    radiusOfTracePoint: 3,
+                    traceColor: getColor('mediumVioletRed'),  
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Exoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (7/10)),
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 7.1,      
+                    radiusOfTracePoint: 7.1, 
+                    traceColor: getColor('crimson'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Exoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (7/10)),
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 7.1,      
+                    radiusOfTracePoint: 18, 
+                    traceColor: getColor('brightRed'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+            ],
+
+            '2': [
+                new Cycloid({
+                    label: 'Custom curve',
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    traceColor: getColor('red'),  
+                }),
+            ], 
         }
         
+        // by default - 0
         let currentPresetIndex = 0;
         let preset = presets[currentPresetIndex] || [];
-        let renderedCurvestextInfo = ``;
+        let renderedCurvesTextInfo = ``;
         settings.subscribe((key, newValue, oldValue) => {
-            // update params of cycloid from ui
-            let updatedParams = getCycloidParams();
-            
             // if current change is preset switching - update curr preset index and preset ref
             if(key == 'preset') {
                 currentPresetIndex = newValue;
                 preset = presets[currentPresetIndex];
-                renderedCurvestextInfo = ``;
+                renderedCurvesTextInfo = ``;
             }
 
-            // update cycloid's params using update function
+            // update sandbox cycloid's params using update function
             preset.forEach((cycloid, i) => {
-                for(let [key, value] of Object.entries(updatedParams)) {
-                    // ingnore some param changing from ui using 'continue' keyword for 'non-sandbox' presets
-                    if (currentPresetIndex !== 0 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
-                        continue;
-                    }
+                // 2 - index of sandbox preset
+                if(currentPresetIndex == 2) {
+                    // update params of sandbox cycloid from ui
+                    let updatedParams = getCycloidParams();
 
-                    // updating each param using 'key' and 'value'
-                    cycloid.update(key, value);
+                    for(let [key, value] of Object.entries(updatedParams)) {
+                        // ignore some param changing from ui using 'continue' keyword for 'non-sandbox' presets
+                        if (currentPresetIndex !== 2 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
+                            continue;
+                        }
+    
+                        // updating each param using 'key' and 'value'
+                        cycloid.update(key, value);
+                    }
                 }
 
                 // hotfix bug on 'sandbox' preset
-                if(currentPresetIndex == 0) {
-                    renderedCurvestextInfo = `
+                if(currentPresetIndex == 2) {
+                    renderedCurvesTextInfo = `
                         <br>
                         <span class="small-font display-item__list-item">
                             <span 
@@ -339,7 +516,7 @@ let cycloidMotionScene = new Scene({
                         </span>
                     `;
                 } else {
-                    renderedCurvestextInfo += `
+                    renderedCurvesTextInfo += `
                         <br>
                         <span class="small-font display-item__list-item">
                             <span 
@@ -351,7 +528,7 @@ let cycloidMotionScene = new Scene({
                 }
             });
 
-            display.updateValue('cycloids_info', `${renderedCurvestextInfo}`);
+            display.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
         });
 
 
@@ -828,8 +1005,6 @@ class Cycloid {
                 radiusOfTracePoint: radiusOfTracePoint,
             })
         ];
-
-        console.log(this);
     }
 
 
