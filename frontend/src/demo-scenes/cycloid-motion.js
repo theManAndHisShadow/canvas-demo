@@ -18,9 +18,9 @@ let cycloidMotionScene = new Scene({
             label: 'Preset',
             selectedByDefault: 0,
             options: [
-                {name: 'Hypocyloid overview', allowedElements: []},
-                {name: 'Experimental overview', allowedElements: []},
-                {name: 'Spiral', allowedElements: []},
+                {name: 'Hypocyloid overview', allowedElements: ['speed']},
+                {name: 'Experimental overview', allowedElements: ['speed']},
+                {name: 'Spiral', allowedElements: ['speed']},
                 {name: 'Sandbox', allowedElements: ['*']}, 
             ],
         },
@@ -62,7 +62,7 @@ let cycloidMotionScene = new Scene({
             label: 'Speed',
             minValue: 0,
             defaultValue: 3,
-            maxValue: 10,
+            maxValue: 20,
         },
 
         'invertRotationDirection': {
@@ -506,9 +506,11 @@ let cycloidMotionScene = new Scene({
                 renderedCurvesTextInfo = ``;
             }
 
+            
+
             // update sandbox cycloid's params using update function
             preset.forEach((cycloid, i) => {
-                // 2 - index of sandbox preset
+                // 3 - index of sandbox preset
                 if(currentPresetIndex == 3) {
                     // update params of sandbox cycloid from ui
                     let updatedParams = getCycloidParams();
@@ -521,6 +523,10 @@ let cycloidMotionScene = new Scene({
     
                         // updating each param using 'key' and 'value'
                         cycloid.update(key, value);
+                    }
+                } else {
+                    if(key == 'speed') {
+                        speed = newValue;
                     }
                 }
 
@@ -536,15 +542,15 @@ let cycloidMotionScene = new Scene({
                         </span>
                     `;
                 } else {
-                    renderedCurvesTextInfo += `
-                        <br>
-                        <span class="small-font display-item__list-item">
-                            <span 
-                                class="small-font gray-word-bubble" 
-                                style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
-                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
-                        </span>
-                    `;
+                    // renderedCurvesTextInfo += `
+                    //     <br>
+                    //     <span class="small-font display-item__list-item">
+                    //         <span 
+                    //             class="small-font gray-word-bubble" 
+                    //             style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
+                    //         >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
+                    //     </span>
+                    // `;
                 }
             });
 
