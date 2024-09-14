@@ -138,10 +138,13 @@ class UIControls {
 
     /**
      * Appends new ready HTML element to 'Controls' HTML root block
-     * @param {HTMLElement} element - ref to fullt ready html element
+     * @param {string} elementName - element name at UIControls class instance '#html' structure tree 
+     * @param {{element: HTMLElement, label: HTMLElement, value: HTMLElement}} renderedElementObject - {element - ref to whole rendered element, label - ref to label, value - ref to value element}
      */
-    appendToHTML(elementName, element){
-        this.#html[elementName] = element;
+    appendToHTML(elementName, renderedElementObject){
+        let {element, label, value} = renderedElementObject;
+
+        this.#html[elementName] = renderedElementObject;
         this.#html.root.appendChild(element);
     }
 
@@ -228,7 +231,7 @@ class UIControls {
         element.appendChild(label);
         element.appendChild(checkbox);
 
-        this.appendToHTML(elementName, element);
+        this.appendToHTML(elementName, {element, label, value: checkbox});
     }
 
 
@@ -276,7 +279,7 @@ class UIControls {
         element.appendChild(label);
         element.appendChild(input);
 
-        this.appendToHTML(elementName, element);
+        this.appendToHTML(elementName, {element, label, value: input});
     }
 
     /**
@@ -319,7 +322,7 @@ class UIControls {
         element.appendChild(range);
         element.appendChild(endLabel);
 
-        this.appendToHTML(elementName, element);
+        this.appendToHTML(elementName, {element, label: [startLabel, endLabel], value: range});
     }
 
 
@@ -351,7 +354,7 @@ class UIControls {
         element.appendChild(label);
         element.appendChild(button);
 
-        this.appendToHTML(elementName, element);
+        this.appendToHTML(elementName, {element, label, value: button});
     }
 
         /**
@@ -417,7 +420,7 @@ class UIControls {
                 });
             }
     
-            this.appendToHTML(elementName, element);
+            this.appendToHTML(elementName, {element, label: null, value: button});
         }
 
 
@@ -468,7 +471,7 @@ class UIControls {
         element.appendChild(optionContainer);
         console.log(element);
 
-        this.appendToHTML(elementName, element);
+        this.appendToHTML(elementName, {element, label, value: optionContainer});
     }
 
 
@@ -516,7 +519,7 @@ class UIControls {
         element.appendChild(label);
         element.appendChild(dropdownContainer);
 
-        this.appendToHTML(elementName, element);
+        this.appendToHTML(elementName, {element, label, value: dropdownContainer});
 
         return element;
     }
@@ -557,11 +560,14 @@ class UIControls {
 
             // Toggle visibility of elements
             allElementIds.forEach(id => {
-                const element = this.#html[id];
-                if (elementsToHide.includes(id)) {
-                    element.classList.add('hidden');
-                } else {
-                    element.classList.remove('hidden');
+                if(id !== 'root') {
+                    const element = this.#html[id].element;
+                    console.log(this.#html, id);
+                    if (elementsToHide.includes(id)) {
+                        element.classList.add('hidden');
+                    } else {
+                        element.classList.remove('hidden');
+                    }
                 }
             });
         }
@@ -595,7 +601,7 @@ class UIDisplay{
      * @param {number|string|boolean} newValue 
      */
     updateValue(elementName, newValue){
-        this.#html[elementName].innerHTML = newValue;
+        this.#html[elementName].value.innerHTML = newValue;
     }
 
 
@@ -609,26 +615,14 @@ class UIDisplay{
 
     /**
      * Appends new ready HTML element to 'Controls' HTML block
-     * @param {HTMLElement} child - ref to fullt ready html element
+     * @param {string} elementName - element name at UIControls class instance '#html' structure tree 
+     * @param {{element: HTMLElement, label: HTMLElement, value: HTMLElement}} renderedElementObject - {element - ref to whole rendered element, label - ref to label, value - ref to value element}
      */
-    appendToHTML(elementName, child){
-        this.#html.root.appendChild(child);
-    }
+    appendToHTML(elementName, renderedElementObject){
+        let {element, label, value} = renderedElementObject;
 
-
-    /**
-     * Hides entire HTML block with info
-     */
-    hide(){
-        this.#html.root.parentNode.classList.add('hidden-block');
-    }
-
-
-    /**
-     * Unhide entire HTML block with info
-     */
-    show(){
-        this.#html.root.parentNode.classList.remove('hidden-block');
+        this.#html[elementName] = renderedElementObject;
+        this.#html.root.appendChild(element);
     }
 
     /**
@@ -654,7 +648,7 @@ class UIDisplay{
 
         element.appendChild(label);
         element.appendChild(text);
-        this.appendToHTML(elementName, element);
+        this.appendToHTML(elementName, {element, label, value: text});
     }
 
 
@@ -786,7 +780,7 @@ class UIDisplay{
         let spacerContainer = document.createElement('div');
         spacerContainer.classList.add('display-spacer');
 
-        this.appendToHTML(elementName, spacerContainer);
+        this.appendToHTML('spacer', {element: spacerContainer, label: spacerContainer, value: null});
 
         return spacerContainer;
     }
@@ -833,7 +827,7 @@ class UIDisplay{
 
         this.#html[elementName] = valueContainer;
 
-        this.appendToHTML(elementName, element);
+        this.appendToHTML(elementName, {element, label, value: valueContainer});
 
         return element;
     }

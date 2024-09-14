@@ -8,16 +8,19 @@ let cycloidMotionScene = new Scene({
             text: 'A cycloid is the curve traced by a point on the circumference of a circle as it rolls along a straight line. The key condition in this motion is that the circle rolls without slipping. A specific example of a cycloid is the epicycloid, where a circle rolls inside a larger circle. An example of an hypocycloid is demonstrated in the interactive scene.',
         },
 
+        'cycloids_info': {
+            type: 'display-item',
+            label: 'Rendered curves',
+        },
+
         'preset': {
             type: 'preset-dropdown-list',
             label: 'Preset',
             selectedByDefault: 0,
             options: [
+                {name: 'Hypocyloid overview', allowedElements: []},
+                {name: 'Experimental overview', allowedElements: []},
                 {name: 'Sandbox', allowedElements: ['*']}, 
-                {name: 'Deltoid', allowedElements: ['speed', 'drawRadiusLine']},
-                {name: 'Astroid', allowedElements: ['speed', 'drawRadiusLine']},
-                {name: 'Pentoid', allowedElements: ['speed', 'drawRadiusLine']},
-                {name: 'Exoid', allowedElements: ['speed', 'drawRadiusLine']},
             ],
         },
 
@@ -128,63 +131,404 @@ let cycloidMotionScene = new Scene({
         // If you don't need specific parameter adjustments, get the composed rest part of the parameters using '...getCycloidParams()'
         // All manual adjustments should be made after receiving the '...getCycloidParams()', for their subsequent rewriting default values
         let presets = {
-            '0': [
+            "0": [
                 new Cycloid({
+                    label: 'Deltoid',
+                    renderer: context,
+                    cx: centerX - (centerX * (7/10)),
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 16.66666666,      
+                    radiusOfTracePoint: 10,
+                    traceColor: getColor('brightRed'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Deltoid',
+                    renderer: context,
+                    cx: centerX - (centerX * (7/10)),
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 16.66666666,      
+                    radiusOfTracePoint: 16.66666666, 
+                    traceColor: getColor('deepOrange'),
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Deltoid',
+                    renderer: context,
+                    cx: centerX - (centerX * (7/10)),
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 16.66666666,      
+                    radiusOfTracePoint: 31, 
+                    traceColor: getColor('amber'),
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Astroid',
+                    renderer: context,
+                    cx: centerX - (centerX * (2/10)) - 10,
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 12.5,      
+                    radiusOfTracePoint: 5,
+                    traceColor: getColor('green'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Astroid',
+                    renderer: context,
+                    cx: centerX - (centerX * (2/10)) - 10,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 12.5,      
+                    radiusOfTracePoint: 12.5, 
+                    traceColor: getColor('teal'),
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Astroid',
+                    renderer: context,
+                    cx: centerX - (centerX * (2/10)) - 10,
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 12.5,      
+                    radiusOfTracePoint: 25, 
+                    traceColor: getColor('blue'),
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Pentoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (3/10)) - 20,
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 10,      
+                    radiusOfTracePoint: 3,
+                    traceColor: getColor('indigo'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Pentoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (3/10)) - 20,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 10,      
+                    radiusOfTracePoint: 10, 
+                    traceColor: getColor('deepPurple'),
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Pentoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (3/10))  - 20,
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 10,      
+                    radiusOfTracePoint: 20, 
+                    traceColor: getColor('fuchsia'),
+                    traceThickness: 0.1,
+                }),
+
+
+                new Cycloid({
+                    label: 'Exoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (7/10)),
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 8.33333,      
+                    radiusOfTracePoint: 3,
+                    traceColor: getColor('mediumVioletRed'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Exoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (7/10)),
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 8.33333,      
+                    radiusOfTracePoint: 8.33333, 
+                    traceColor: getColor('crimson'),
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Exoid',
+                    renderer: context,
+                    cx: centerX + (centerX * (7/10)),
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 8.33333,      
+                    radiusOfTracePoint: 18, 
+                    traceColor: getColor('brightRed'),
+                    traceThickness: 0.1,
+                }),
+            ],
+
+
+            "1": [
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX - (centerX * (7/10)),
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 25,      
+                    radiusOfTracePoint: 25,
+                    traceColor: getColor('brightRed'),  
+                    traceThickness: 0.1,
+                    invertRotationDirection: false,
+                }),
+
+                new Cycloid({
+                    label: 'Cardioid',
+                    renderer: context,
+                    cx: centerX - (centerX * (7/10)),
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 16.6666666666,   
+                    radiusOfTracePoint: 16.6666666666, 
+                    traceColor: getColor('deepOrange'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false,
+                }),
+
+                new Cycloid({
+                    label: 'Two leaf rose',
+                    renderer: context,
+                    cx: centerX - (centerX * (7/10)),
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),   
+                    externalRadius: 50,     
+                    internalRadius: 12.5,      
+                    radiusOfTracePoint: 12.5, 
+                    traceColor: getColor('amber'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Three leaf rose',
+                    renderer: context,
+                    cx: centerX - (centerX * (2/10)) - 10,
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 9.99,      
+                    radiusOfTracePoint: 6,
+                    traceColor: getColor('green'),  
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Three leaf rose',
+                    renderer: context,
+                    cx: centerX - (centerX * (2/10)) - 10,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 9.99,      
+                    radiusOfTracePoint: 9.99,
+                    traceColor: getColor('teal'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Three leaf rose',
+                    renderer: context,
+                    cx: centerX - (centerX * (2/10)) - 10,
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 9.99,      
+                    radiusOfTracePoint: 20,
+                    traceColor: getColor('blue'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Four leaf rose',
+                    renderer: context,
+                    cx: centerX + (centerX * (3/10)) - 20,
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 8.33333,      
+                    radiusOfTracePoint: 3,
+                    traceColor: getColor('indigo'),  
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Four leaf rose',
+                    renderer: context,
+                    cx: centerX + (centerX * (3/10)) - 20,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 8.33333,      
+                    radiusOfTracePoint: 8.33333, 
+                    traceColor: getColor('deepPurple'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Four leaf rose',
+                    renderer: context,
+                    cx: centerX + (centerX * (3/10))  - 20,
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 8.33333,      
+                    radiusOfTracePoint: 18, 
+                    traceColor: getColor('fuchsia'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+
+                new Cycloid({
+                    label: 'Five leaf rose',
+                    renderer: context,
+                    cx: centerX + (centerX * (7/10)),
+                    cy: centerY - (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 7.1,      
+                    radiusOfTracePoint: 3,
+                    traceColor: getColor('mediumVioletRed'),  
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Five leaf rose',
+                    renderer: context,
+                    cx: centerX + (centerX * (7/10)),
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 7.1,      
+                    radiusOfTracePoint: 7.1, 
+                    traceColor: getColor('crimson'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+
+                new Cycloid({
+                    label: 'Five leaf rose',
+                    renderer: context,
+                    cx: centerX + (centerX * (7/10)),
+                    cy: centerY + (centerY * (3/5)),
+                    ...getCycloidParams(),
+                    externalRadius: 50,     
+                    internalRadius: 7.1,      
+                    radiusOfTracePoint: 18, 
+                    traceColor: getColor('brightRed'),
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+            ],
+
+            '2': [
+                new Cycloid({
+                    label: 'Custom curve',
                     renderer: context,
                     cx: centerX,
                     cy: centerY,
                     ...getCycloidParams(),
-                }),
-            ], 
-
-            "1": [
-                new Cycloid({
-                    renderer: context,
-                    cx: (centerX * (1/2)),
-                    cy: (centerY * (2/3)),
-                    ...getCycloidParams(),
-                    externalRadius: 90,     
-                    internalRadius: 30,      
-                    radiusOfTracePoint: 10,
                     traceColor: getColor('red'),  
                 }),
-
-                new Cycloid({
-                    renderer: context,
-                    cx: centerX,
-                    cy: centerY + (centerY * (1/3)),
-                    ...getCycloidParams(),
-                    externalRadius: 90,      
-                    internalRadius: 30,       
-                    radiusOfTracePoint: 30,   
-                    traceColor: getColor('green'),
-                }),
-
-                new Cycloid({
-                    renderer: context,
-                    cx: centerX + (centerX * (1/2)),
-                    cy: (centerY * (2/3)),
-                    ...getCycloidParams(),
-                    externalRadius: 90,      
-                    internalRadius: 30,       
-                    radiusOfTracePoint: 45,   
-                    traceColor: getColor('blue'),
-                }),
-            ],
+            ], 
         }
         
-        let preset = presets[0] || [];
+        // by default - 0
+        let currentPresetIndex = 0;
+        let preset = presets[currentPresetIndex] || [];
+        let renderedCurvesTextInfo = ``;
         settings.subscribe((key, newValue, oldValue) => {
-            // update params of cycloid from ui
-            let updatedParams = getCycloidParams();
+            // if current change is preset switching - update curr preset index and preset ref
+            if(key == 'preset') {
+                currentPresetIndex = newValue;
+                preset = presets[currentPresetIndex];
+                renderedCurvesTextInfo = ``;
+            }
 
-            preset.forEach(cycloid => {
-                for(let [key, value] of Object.entries(updatedParams)) {
-                    cycloid.update(key, value);
+            // update sandbox cycloid's params using update function
+            preset.forEach((cycloid, i) => {
+                // 2 - index of sandbox preset
+                if(currentPresetIndex == 2) {
+                    // update params of sandbox cycloid from ui
+                    let updatedParams = getCycloidParams();
+
+                    for(let [key, value] of Object.entries(updatedParams)) {
+                        // ignore some param changing from ui using 'continue' keyword for 'non-sandbox' presets
+                        if (currentPresetIndex !== 2 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
+                            continue;
+                        }
+    
+                        // updating each param using 'key' and 'value'
+                        cycloid.update(key, value);
+                    }
+                }
+
+                // hotfix bug on 'sandbox' preset
+                if(currentPresetIndex == 2) {
+                    renderedCurvesTextInfo = `
+                        <br>
+                        <span class="small-font display-item__list-item">
+                            <span 
+                                class="small-font gray-word-bubble" 
+                                style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
+                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
+                        </span>
+                    `;
+                } else {
+                    renderedCurvesTextInfo += `
+                        <br>
+                        <span class="small-font display-item__list-item">
+                            <span 
+                                class="small-font gray-word-bubble" 
+                                style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
+                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
+                        </span>
+                    `;
                 }
             });
 
-            if(key == 'preset') preset = presets[newValue];
+            display.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
         });
 
 
@@ -232,11 +576,12 @@ window.exportedObjects.push(cycloidMotionScene);
  * A class that tracks the movement of a point along a trajectory and draws that trajectory
  */
 class Tracer {
-    #trace = []
-    constructor({color, length = 100, parent}){
+    #trace = [];
+    constructor({color, length = 100, thickness = 1, parent}){
 
         this.length = length;
         this.color = color;
+        this.thickness = thickness,
 
         this.parent = parent;
     }
@@ -260,6 +605,24 @@ class Tracer {
 
 
     /**
+     * Returns trace last point.
+     * @returns {{x: number, y: number}} - last point of trace
+     */
+    getLastPoint(){
+        return this.#trace.length > 0 ? getArrayLast(this.#trace) : false;
+    }
+
+
+    /**
+     * Returns trace array length.
+     * @returns {Number} - length of trace array
+     */
+    getLength() {
+        return this.#trace.length;
+    }
+
+
+    /**
      * Resets Tracer points array.
      */
     clear(){
@@ -268,84 +631,192 @@ class Tracer {
 
 
     /**
-     * Render trace.
+     * Renders trace using efficient method.
      */
     render(){
+        this.parent.renderer.beginPath();
+        this.parent.renderer.strokeStyle = this.color;
+        this.parent.renderer.lineWidth = 1;
+
+        // checks if is first point
+        let firstPoint = true;
+
+        // draw trace fragmet by fragment using all current trace
         this.#trace.forEach(point => {
-            // draw each point
-            drawCircle(this.parent.renderer, {
-                cx: point.x,
-                cy: point.y,
-                r: 1, 
-                borderThickness: 1,
-                borderColor: this.color,
-                fillColor: this.color,
-            });
+            if (firstPoint) {
+                this.parent.renderer.moveTo(point.x, point.y);
+                firstPoint = false;
+            } else {
+                this.parent.renderer.lineTo(point.x, point.y);
+            }
         });
+
+        // end trace
+        this.parent.renderer.stroke();
     }
 }
 
 
-
-/**
- * Class of single figure (bone)
- */
-class CircleBone {
+class BasicCircelBone {
     /**
      * 
      * @param {object} param.parent - parent object of class instance
      * @param {number} param.cx - x pos of circle center
      * @param {number} param.cy - y pos of circle center
      * @param {number} param.radius - radius of circle center
-     * @param {number} param.angle - angle of circle
-     * @param {{x: number, y: number}} param.origin - rotation origin of circle
      * @param {string} param.fillColor - color if circle fill
-     * @param {string} param.traceColor - color of circle point trace line
      * @param {string} param.borderColor - color of circle border line
      * @param {number} param.borderThickness - thickness of circle border
      * @param {number} param.type - type of circle (internal or external)
      * @param {boolean} param.drawCenterPoint - draw or not center point of circle
-     * @param {boolean} param.drawRadiusLine - draw or not radius line of circle
-     * @param {number} param.offset - offset between external circle center and internal center
+     * @param {boolean} param.drawRadiusLine - draw or not radius line of circle3
      * @param {CanvasRenderingContext2D} param.renderer - where the circle will be drawn
-     * @param {boolean} param.invertRotationDirection - select direction of rotatioin
      */
     constructor({
-        id = null, parent, cx, cy, radius, angle = 0, origin, fillColor, traceColor = getColor('red'), traceLength = 1000, borderColor, borderThickness, 
-        type, renderer, drawCenterPoint = false, drawRadiusLine = false, offset = 0, invertRotationDirection = false, radiusOfTracePoint,
+        id = null, 
+        type, 
+        parent, 
+        renderer, 
+        cx, cy, radius, 
+        borderColor, borderThickness, fillColor, 
+        drawCenterPoint = false, drawRadiusLine = false
+    }) {
+        this.id = id; 
+        this.parent = parent; 
+        this.cx = cx; 
+        this.cy = cy; 
+        this.radius = radius; 
+        this.fillColor = fillColor; 
+        this.borderColor = borderColor; 
+        this.borderThickness = borderThickness; 
+        this.type = type; 
+        this.renderer = renderer; 
+        this.drawCenterPoint = drawCenterPoint; 
+        this.drawRadiusLine = drawRadiusLine;
+    }
+
+    /**
+     * Renders circle bone
+     */
+    render(){    
+        // circle line
+        drawCircle(this.renderer, {
+            cx: this.cx,
+            cy: this.cy,
+            r: this.radius, 
+            borderThickness: this.borderThickness,
+            borderColor: this.borderColor,
+            fillColor: this.fillColor,
+        });
+
+        if(this.drawCenterPoint === true) {
+            // circle's center
+            drawCircle(this.renderer, {
+                cx: this.cx,
+                cy: this.cy,
+                r: 1, 
+                borderThickness: this.borderThickness,
+                borderColor: this.borderColor,
+                fillColor: this.borderColor, // not typo!
+            });
+        }
+    }
+}
+
+
+
+class StaticCircleBone extends BasicCircelBone {
+    /**
+     * 
+     * @param {object} param.parent - parent object of class instance
+     * @param {number} param.cx - x pos of circle center
+     * @param {number} param.cy - y pos of circle center
+     * @param {number} param.radius - radius of circle center
+     * @param {string} param.fillColor - color if circle fill
+     * @param {string} param.borderColor - color of circle border line
+     * @param {number} param.borderThickness - thickness of circle border
+     * @param {number} param.type - type of circle (internal or external)
+     * @param {boolean} param.drawCenterPoint - draw or not center point of circle
+     * @param {boolean} param.drawRadiusLine - draw or not radius line of circle3
+     * @param {CanvasRenderingContext2D} param.renderer - where the circle will be drawn
+     */
+    constructor({
+        id = null, 
+        type, 
+        parent, 
+        renderer, 
+        cx, cy, radius, 
+        borderColor, borderThickness, fillColor, 
+        drawCenterPoint = false, drawRadiusLine = false
+    }) {
+        super(arguments[0]);
+    }
+}
+
+
+class DynamicCircleBone extends BasicCircelBone {
+    /**
+     * super class params
+     * @param {object} param.parent - parent object of class instance
+     * @param {number} param.cx - x pos of circle center
+     * @param {number} param.cy - y pos of circle center
+     * @param {number} param.radius - radius of circle center
+     * @param {string} param.fillColor - color if circle fill
+     * @param {string} param.borderColor - color of circle border line
+     * @param {number} param.borderThickness - thickness of circle border
+     * @param {number} param.type - type of circle (internal or external)
+     * @param {boolean} param.drawCenterPoint - draw or not center point of circle
+     * @param {boolean} param.drawRadiusLine - draw or not radius line of circle3
+     * @param {CanvasRenderingContext2D} param.renderer - where the circle will be drawn
+     * 
+     * new class params
+     * @param {{x: number, y: number}} param.origin - center rotation (epicenter)
+     * @param {number} param.offset - offset between instance and static circle
+     * @param {number} param.angle - local angle of circle (nears it center)
+     * @param {number} param.traceLength - length of trace
+     * @param {string} param.traceColor - color of trace
+     * @param {number} param.traceThickness - thickness of trace line
+     * @param {number} param.radiusOfTracePoint - radius of trace point 
+     * @param {boolean} param.invertRotationDirection - direction of rotation
+     */
+    constructor({
+        id = null, 
+        type, 
+        parent, 
+        renderer, 
+        cx, cy, radius, 
+        borderColor, borderThickness, fillColor, 
+        drawCenterPoint = false, drawRadiusLine = false,
+        
+        origin, offset, angle = 0,
+        traceLength = 1000, traceColor = getColor('red'), traceThickness, radiusOfTracePoint,
+        invertRotationDirection = false, 
     }){
-        this.renderer = renderer;
-        this.parent = parent;
-
-        this.id = id;
-
-        this.cx = cx;
-        this.cy = cy;
-        this.staticCX = cx;
-        this.staticCY = cy - offset;
+        super({id, type, parent, renderer, cx, cy, radius, borderColor, borderThickness, fillColor, drawCenterPoint, drawRadiusLine});
+        
+        // set positioning parameters (pivot point, angle, global angle, etc.)
+        this.origin = origin || {x: this.parent.cx, y: this.parent.cy};
+        this.offset = offset;
         this.angle = angle;
         this.globalAngle = 0;
-        this.origin = origin || {x: this.parent.cx, y: this.parent.cy};
 
+        // se satic cx and cy for correct rotation
+        this.staticCX = cx;
+        this.staticCY = cy - offset;
+
+        // set trace objet
         this.trace = new Tracer({
             color: traceColor,
             length: traceLength, // 200
+            thickness: traceThickness,
             parent: this,
         });
-
-        this.radiusOfTracePoint = radiusOfTracePoint,
-
-        this.radius = radius;
-        this.fillColor = fillColor;
-        this.borderColor = borderColor;
-        this.borderThickness = borderThickness;
-        this.offset = offset;
-        
-        this.drawCenterPoint = drawCenterPoint;
-        this.drawRadiusLine = drawRadiusLine;
-        this.type = type;
+         
+        // misc aprams
+        this.radiusOfTracePoint = radiusOfTracePoint;  
         this.invertRotationDirection = invertRotationDirection;
     }
+
 
 
     /**
@@ -410,8 +881,32 @@ class CircleBone {
             });
         }
 
+        // loacal helper funcion
+        // limits the discreteness of tracing 
+        let discretLimiter = (newPoint, distanceLimit) => {
+            if(this.trace.length > 0) {
+                // get prev point
+                let prevPoint = this.trace.getLastPoint();
+
+                // get distanse between new point and prev point
+                let distance = getDistanseBetweenTwoPoint(prevPoint.x, prevPoint.y, newPoint.x, newPoint.y);
+
+                // if distance greater than limit - return true else - false
+                return distance >= distanceLimit ? true : false;
+            } else return false;
+        }
+
+        // new poin after rotations
         let rotatedPoint = rotatePoint(corrected_x, corrected_y, corrected_x, corrected_y + this.radiusOfTracePoint, this.angle);
-        this.trace.push(rotatedPoint);
+
+        // add point if
+        // - it first point of trace
+        // - or the discreteness function allows for addition
+        if(this.trace.getLength() == 0 || discretLimiter(rotatedPoint, 3)) {
+            this.trace.push(rotatedPoint);
+        }
+
+
         // radius line line from center to cicrlce line
         if(this.drawRadiusLine === true) {
             // radius line of circle
@@ -443,17 +938,29 @@ class CircleBone {
  * Main class
  */
 class Cycloid {
-    constructor({cx, cy, animationSpeed, externalRadius, internalRadius, drawCenterPoint, traceColor = getColor('white'), traceLength, drawRadiusLine, renderer, invertRotationDirection, radiusOfTracePoint}){
+    constructor({
+        cx, cy, label = '', animationSpeed, externalRadius, internalRadius, drawCenterPoint, 
+        traceColor = getColor('white'), traceThickness = 1, traceLength, drawRadiusLine, renderer, 
+        invertRotationDirection, radiusOfTracePoint
+    }){
         this.renderer = renderer;
-
-        console.log(externalRadius);
 
         this.cx = cx;
         this.cy = cy;
 
+        this.label = label;
+
         this.animationSpeed = animationSpeed;
 
         this.drawCenterPoint = drawCenterPoint;
+
+        this.traceColor = traceColor;
+
+        this.proportion = {
+            externalRadius: externalRadius,
+            internalRadius: internalRadius,
+            radiusOfTracePoint: radiusOfTracePoint,
+        }
 
         // some helper value
         let delta_radius = externalRadius - internalRadius;
@@ -461,24 +968,23 @@ class Cycloid {
         // create 2 bone - external and internal
         this.skeleton = [
             // external bone
-            new CircleBone({
+            new StaticCircleBone({
                 id: 0,
                 type: 'external',
                 cx: this.cx,
                 cy: this.cy,
+                parent: this,
                 radius: externalRadius,
                 fillColor: 'transparent',
                 borderColor: getColor('white', 0.45),
-                traceLength: traceLength,
                 borderThickness: 1,
                 renderer: this.renderer,
                 drawCenterPoint: drawCenterPoint,
                 drawRadiusLine: drawRadiusLine,
-                parent: this,
             }),
 
             // inner circle 1
-            new CircleBone({
+            new DynamicCircleBone({
                 id: 1,
                 type: 'internal',
                 cx: this.cx,
@@ -488,6 +994,7 @@ class Cycloid {
                 fillColor: 'transparent',
                 borderColor: getColor('white', 0.45),
                 traceLength: traceLength,
+                traceThickness: traceThickness,
                 traceColor: traceColor,
                 borderThickness: 1,
                 drawCenterPoint: drawCenterPoint,
@@ -507,8 +1014,6 @@ class Cycloid {
      * @param {any} newValue - The new value to assign to the parameter.
      */
     update(keyName, newValue) {
-        console.log(keyName, newValue);
-
         // Update parameters for the bones (external and internal circles)
         this.skeleton.forEach(bone => {
             if( keyName === 'drawCenterPoint') {
@@ -534,7 +1039,6 @@ class Cycloid {
                 
                 // Update the external circle's radius
                 externalBone.radius = newValue;
-                console.log(externalBone);
 
                 internals.forEach(internalBone => {
                     // Determine the offset direction: one internal circle moves upwards (1), the other downwards (-1)

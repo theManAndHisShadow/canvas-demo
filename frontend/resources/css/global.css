@@ -9,12 +9,22 @@ html, body {
     text-align: center;
 }
 
-.hidden-block, .hidden {
+.hidden {
     display: none;
 }
 
 .pale {
     opacity: 0.3;
+}
+
+.display-item__list-item {
+    position: relative;
+    margin: 4px 0px;
+    display: inline-block;
+}
+
+.small-font {
+    font-size: 13px !important;
 }
 
 .disabled {
