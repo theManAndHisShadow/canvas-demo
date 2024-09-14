@@ -293,7 +293,7 @@ let cycloidMotionScene = new Scene({
 
             "1": [
                 new Cycloid({
-                    label: 'Test 1',
+                    label: 'Circle',
                     renderer: context,
                     cx: centerX - (centerX * (7/10)),
                     cy: centerY - (centerY * (3/5)),
@@ -307,7 +307,7 @@ let cycloidMotionScene = new Scene({
                 }),
 
                 new Cycloid({
-                    label: 'Test 2',
+                    label: 'Cardioid',
                     renderer: context,
                     cx: centerX - (centerX * (7/10)),
                     cy: centerY,
@@ -321,7 +321,7 @@ let cycloidMotionScene = new Scene({
                 }),
 
                 new Cycloid({
-                    label: 'Deltoid',
+                    label: 'Two leaf rose',
                     renderer: context,
                     cx: centerX - (centerX * (7/10)),
                     cy: centerY + (centerY * (3/5)),
@@ -335,7 +335,7 @@ let cycloidMotionScene = new Scene({
                 }),
 
                 new Cycloid({
-                    label: 'Astroid',
+                    label: 'Three leaf rose',
                     renderer: context,
                     cx: centerX - (centerX * (2/10)) - 10,
                     cy: centerY - (centerY * (3/5)),
@@ -349,7 +349,7 @@ let cycloidMotionScene = new Scene({
                 }),
 
                 new Cycloid({
-                    label: 'Astroid',
+                    label: 'Three leaf rose',
                     renderer: context,
                     cx: centerX - (centerX * (2/10)) - 10,
                     cy: centerY,
@@ -363,7 +363,7 @@ let cycloidMotionScene = new Scene({
                 }),
 
                 new Cycloid({
-                    label: 'Astroid',
+                    label: 'Three leaf rose',
                     renderer: context,
                     cx: centerX - (centerX * (2/10)) - 10,
                     cy: centerY + (centerY * (3/5)),
@@ -377,7 +377,7 @@ let cycloidMotionScene = new Scene({
                 }),
 
                 new Cycloid({
-                    label: 'Pentoid',
+                    label: 'Four leaf rose',
                     renderer: context,
                     cx: centerX + (centerX * (3/10)) - 20,
                     cy: centerY - (centerY * (3/5)),
@@ -391,7 +391,7 @@ let cycloidMotionScene = new Scene({
                 }),
 
                 new Cycloid({
-                    label: 'Pentoid',
+                    label: 'Four leaf rose',
                     renderer: context,
                     cx: centerX + (centerX * (3/10)) - 20,
                     cy: centerY,
@@ -405,7 +405,7 @@ let cycloidMotionScene = new Scene({
                 }),
 
                 new Cycloid({
-                    label: 'Pentoid',
+                    label: 'Four leaf rose',
                     renderer: context,
                     cx: centerX + (centerX * (3/10))  - 20,
                     cy: centerY + (centerY * (3/5)),
@@ -420,7 +420,7 @@ let cycloidMotionScene = new Scene({
 
 
                 new Cycloid({
-                    label: 'Exoid',
+                    label: 'Five leaf rose',
                     renderer: context,
                     cx: centerX + (centerX * (7/10)),
                     cy: centerY - (centerY * (3/5)),
@@ -434,7 +434,7 @@ let cycloidMotionScene = new Scene({
                 }),
 
                 new Cycloid({
-                    label: 'Exoid',
+                    label: 'Five leaf rose',
                     renderer: context,
                     cx: centerX + (centerX * (7/10)),
                     cy: centerY,
@@ -448,7 +448,7 @@ let cycloidMotionScene = new Scene({
                 }),
 
                 new Cycloid({
-                    label: 'Exoid',
+                    label: 'Five leaf rose',
                     renderer: context,
                     cx: centerX + (centerX * (7/10)),
                     cy: centerY + (centerY * (3/5)),
@@ -512,7 +512,7 @@ let cycloidMotionScene = new Scene({
                             <span 
                                 class="small-font gray-word-bubble" 
                                 style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
-                            >${cycloid.label} #${i +1}</span><span> - R${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)} / r1, curve distance ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
+                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
                         </span>
                     `;
                 } else {
@@ -522,7 +522,7 @@ let cycloidMotionScene = new Scene({
                             <span 
                                 class="small-font gray-word-bubble" 
                                 style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
-                            >${cycloid.label} #${i +1}</span><span> - R${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)} / r1, curve distance ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
+                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
                         </span>
                     `;
                 }
