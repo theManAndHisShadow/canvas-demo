@@ -20,6 +20,7 @@ let cycloidMotionScene = new Scene({
             options: [
                 {name: 'Hypocyloid overview', allowedElements: []},
                 {name: 'Experimental overview', allowedElements: []},
+                {name: 'Spiral', allowedElements: []},
                 {name: 'Sandbox', allowedElements: ['*']}, 
             ],
         },
@@ -464,6 +465,25 @@ let cycloidMotionScene = new Scene({
 
             '2': [
                 new Cycloid({
+                    label: 'Spiral curve',
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    traceColor: getColor('indigo'),  
+                    externalRadius: 100,     
+                    internalRadius: 50,      
+                    internalInitialAngle: -180,
+                    internalRotationGain: 1.015,
+                    radiusOfTracePoint: 50, 
+                    traceLength: 10000,
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
+                }),
+            ], 
+
+            '3': [
+                new Cycloid({
                     label: 'Custom curve',
                     renderer: context,
                     cx: centerX,
@@ -489,13 +509,13 @@ let cycloidMotionScene = new Scene({
             // update sandbox cycloid's params using update function
             preset.forEach((cycloid, i) => {
                 // 2 - index of sandbox preset
-                if(currentPresetIndex == 2) {
+                if(currentPresetIndex == 3) {
                     // update params of sandbox cycloid from ui
                     let updatedParams = getCycloidParams();
 
                     for(let [key, value] of Object.entries(updatedParams)) {
                         // ignore some param changing from ui using 'continue' keyword for 'non-sandbox' presets
-                        if (currentPresetIndex !== 2 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
+                        if (currentPresetIndex !== 3 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
                             continue;
                         }
     
@@ -505,7 +525,7 @@ let cycloidMotionScene = new Scene({
                 }
 
                 // hotfix bug on 'sandbox' preset
-                if(currentPresetIndex == 2) {
+                if(currentPresetIndex == 3) {
                     renderedCurvesTextInfo = `
                         <br>
                         <span class="small-font display-item__list-item">
@@ -941,7 +961,7 @@ class Cycloid {
     constructor({
         cx, cy, label = '', animationSpeed, externalRadius, internalRadius, drawCenterPoint, 
         traceColor = getColor('white'), traceThickness = 1, traceLength, drawRadiusLine, renderer, 
-        invertRotationDirection, radiusOfTracePoint
+        invertRotationDirection, radiusOfTracePoint, internalRotationGain = 1, internalInitialAngle = 0
     }){
         this.renderer = renderer;
 
@@ -951,6 +971,9 @@ class Cycloid {
         this.label = label;
 
         this.animationSpeed = animationSpeed;
+
+        // for spirals, by default = 1
+        this.internalRotationGain = internalRotationGain;
 
         this.drawCenterPoint = drawCenterPoint;
 
@@ -989,6 +1012,7 @@ class Cycloid {
                 type: 'internal',
                 cx: this.cx,
                 cy: this.cy,
+                angle: internalInitialAngle,
                 offset: -delta_radius,
                 radius: internalRadius,
                 fillColor: 'transparent',
@@ -1100,9 +1124,11 @@ class Cycloid {
             // Calculate the angle multiplier using the exact formula
             let m = (externalCircle.radius - bone.radius) / bone.radius;
             let rotationSpeed = (bone.invertRotationDirection === true ? -1 : 1) * speed;
+
+            let rotationGain = bone.parent.internalRotationGain;
             
             // rotate particular bone using the calculated multiplier
-            bone.rotate(rotationSpeed * m);
+            bone.rotate((rotationSpeed * m) * rotationGain);
     
             // move the bone around the origin
             bone.moveAroundOrigin(speed);
