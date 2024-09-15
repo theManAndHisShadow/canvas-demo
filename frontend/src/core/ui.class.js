@@ -562,7 +562,7 @@ class UIControls {
             allElementIds.forEach(id => {
                 if(id !== 'root') {
                     const element = this.#html[id].element;
-                    console.log(this.#html, id);
+
                     if (elementsToHide.includes(id)) {
                         element.classList.add('hidden');
                     } else {
