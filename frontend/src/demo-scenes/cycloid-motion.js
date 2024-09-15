@@ -22,7 +22,8 @@ let cycloidMotionScene = new Scene({
                 {name: 'Hypocycloid overview', allowedElements: ['speed']},
                 {name: 'Flat roses curves overview', allowedElements: ['speed']},
                 {name: 'Spiral', allowedElements: ['speed']},
-                {name: 'Star', allowedElements: ['speed']},
+                {name: 'S A T A N', allowedElements: ['speed']},
+                {name: 'Stars', allowedElements: ['speed']},
             ],
         },
 
@@ -495,7 +496,7 @@ let cycloidMotionScene = new Scene({
 
             '4': [
                 new Cycloid({
-                    label: 'Spiral curve',
+                    label: 'Star',
                     renderer: context,
                     cx: centerX,
                     cy: centerY,
@@ -508,6 +509,88 @@ let cycloidMotionScene = new Scene({
                     traceThickness: 0.1,
                 }),
             ], 
+
+            "5": [
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX - (centerX/2),
+                    cy: centerY - (centerY/3) - 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 16.25,   
+                    radiusOfTracePoint: 16.25, 
+                    traceColor: getColor('white'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY - (centerY/3) - 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 26,   
+                    radiusOfTracePoint: 26, 
+                    traceColor: getColor('amber'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX + (centerX/2),
+                    cy: centerY - (centerY/3) - 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 27.8571,   
+                    radiusOfTracePoint: 27.8571, 
+                    traceColor: getColor('deepOrange'),  
+                    traceThickness: 0.1,
+                }),
+
+
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX - (centerX/2),
+                    cy: centerY + (centerY/3) + 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 14.44444444,   
+                    radiusOfTracePoint: 14.44444444, 
+                    traceColor: getColor('indigo'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY + (centerY/3) + 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 20.3125,   
+                    radiusOfTracePoint: 20.3125, 
+                    traceColor: getColor('purple'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX + (centerX/2),
+                    cy: centerY + (centerY/3) + 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 28.88888888,   
+                    radiusOfTracePoint: 28.88888888, 
+                    traceColor: getColor('brightRed'),  
+                    traceThickness: 0.1,
+                }),
+
+            ],
         }
         
         // by default - 1
