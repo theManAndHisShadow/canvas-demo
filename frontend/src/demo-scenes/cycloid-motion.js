@@ -16,12 +16,13 @@ let cycloidMotionScene = new Scene({
         'preset': {
             type: 'preset-dropdown-list',
             label: 'Preset',
-            selectedByDefault: 0,
+            selectedByDefault: 1,
             options: [
+                {name: 'Playground', allowedElements: ['*']}, 
                 {name: 'Hypocycloid overview', allowedElements: ['speed']},
                 {name: 'Flat roses curves overview', allowedElements: ['speed']},
                 {name: 'Spiral', allowedElements: ['speed']},
-                {name: 'Playground', allowedElements: ['*']}, 
+                {name: 'Star', allowedElements: ['speed']},
             ],
         },
 
@@ -132,7 +133,17 @@ let cycloidMotionScene = new Scene({
         // If you don't need specific parameter adjustments, get the composed rest part of the parameters using '...getCycloidParams()'
         // All manual adjustments should be made after receiving the '...getCycloidParams()', for their subsequent rewriting default values
         let presets = {
-            "0": [
+            '0': [
+                new Cycloid({
+                    label: 'Custom curve',
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    traceColor: getColor('red'),  
+                }),
+            ], 
+            "1": [
                 new Cycloid({
                     label: 'Deltoid',
                     renderer: context,
@@ -292,7 +303,7 @@ let cycloidMotionScene = new Scene({
             ],
 
 
-            "1": [
+            "2": [
                 new Cycloid({
                     label: 'Circle',
                     renderer: context,
@@ -463,7 +474,7 @@ let cycloidMotionScene = new Scene({
                 }),
             ],
 
-            '2': [
+            '3': [
                 new Cycloid({
                     label: 'Spiral curve',
                     renderer: context,
@@ -482,20 +493,25 @@ let cycloidMotionScene = new Scene({
                 }),
             ], 
 
-            '3': [
+            '4': [
                 new Cycloid({
-                    label: 'Custom curve',
+                    label: 'Spiral curve',
                     renderer: context,
                     cx: centerX,
                     cy: centerY,
                     ...getCycloidParams(),
-                    traceColor: getColor('red'),  
+                    traceColor: getColor('brightRed'),  
+                    externalRadius: 150,     
+                    internalRadius: 60,      
+                    radiusOfTracePoint: 60, 
+                    traceLength: 10000,
+                    traceThickness: 0.1,
                 }),
             ], 
         }
         
-        // by default - 0
-        let currentPresetIndex = 0;
+        // by default - 1
+        let currentPresetIndex = 1;
         let preset = presets[currentPresetIndex] || [];
         let renderedCurvesTextInfo = ``;
         settings.subscribe((key, newValue, oldValue) => {
@@ -508,16 +524,16 @@ let cycloidMotionScene = new Scene({
 
             
 
-            // update sandbox cycloid's params using update function
+            // update playground cycloid's params using update function
             preset.forEach((cycloid, i) => {
-                // 3 - index of sandbox preset
-                if(currentPresetIndex == 3) {
-                    // update params of sandbox cycloid from ui
+                // 3 - index of playground preset
+                if(currentPresetIndex == 0) {
+                    // update params of playground cycloid from ui
                     let updatedParams = getCycloidParams();
 
                     for(let [key, value] of Object.entries(updatedParams)) {
-                        // ignore some param changing from ui using 'continue' keyword for 'non-sandbox' presets
-                        if (currentPresetIndex !== 3 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
+                        // ignore some param changing from ui using 'continue' keyword for 'non-playground' presets
+                        if (currentPresetIndex !== 0 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
                             continue;
                         }
     
@@ -530,8 +546,8 @@ let cycloidMotionScene = new Scene({
                     }
                 }
 
-                // hotfix bug on 'sandbox' preset
-                if(currentPresetIndex == 3) {
+                // hotfix bug on 'playground' preset
+                if(currentPresetIndex == 0) {
                     renderedCurvesTextInfo = `
                         <br>
                         <span class="small-font display-item__list-item">
