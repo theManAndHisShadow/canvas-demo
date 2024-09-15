@@ -16,11 +16,14 @@ let cycloidMotionScene = new Scene({
         'preset': {
             type: 'preset-dropdown-list',
             label: 'Preset',
-            selectedByDefault: 0,
+            selectedByDefault: 1,
             options: [
-                {name: 'Hypocyloid overview', allowedElements: []},
-                {name: 'Experimental overview', allowedElements: []},
-                {name: 'Sandbox', allowedElements: ['*']}, 
+                {name: 'Playground', allowedElements: ['*']}, 
+                {name: 'Hypocycloid overview', allowedElements: ['speed']},
+                {name: 'Flat roses curves overview', allowedElements: ['speed']},
+                {name: 'Spiral', allowedElements: ['speed']},
+                {name: 'S A T A N', allowedElements: ['speed']},
+                {name: 'Stars', allowedElements: ['speed']},
             ],
         },
 
@@ -61,7 +64,7 @@ let cycloidMotionScene = new Scene({
             label: 'Speed',
             minValue: 0,
             defaultValue: 3,
-            maxValue: 10,
+            maxValue: 20,
         },
 
         'invertRotationDirection': {
@@ -131,7 +134,17 @@ let cycloidMotionScene = new Scene({
         // If you don't need specific parameter adjustments, get the composed rest part of the parameters using '...getCycloidParams()'
         // All manual adjustments should be made after receiving the '...getCycloidParams()', for their subsequent rewriting default values
         let presets = {
-            "0": [
+            '0': [
+                new Cycloid({
+                    label: 'Custom curve',
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    traceColor: getColor('red'),  
+                }),
+            ], 
+            "1": [
                 new Cycloid({
                     label: 'Deltoid',
                     renderer: context,
@@ -291,7 +304,7 @@ let cycloidMotionScene = new Scene({
             ],
 
 
-            "1": [
+            "2": [
                 new Cycloid({
                     label: 'Circle',
                     renderer: context,
@@ -462,20 +475,126 @@ let cycloidMotionScene = new Scene({
                 }),
             ],
 
-            '2': [
+            '3': [
                 new Cycloid({
-                    label: 'Custom curve',
+                    label: 'Spiral curve',
                     renderer: context,
                     cx: centerX,
                     cy: centerY,
                     ...getCycloidParams(),
-                    traceColor: getColor('red'),  
+                    traceColor: getColor('indigo'),  
+                    externalRadius: 190,     
+                    internalRadius: 95,      
+                    internalInitialAngle: -180,
+                    internalRotationGain: 1.015,
+                    radiusOfTracePoint: 95, 
+                    traceLength: 10000,
+                    traceThickness: 0.1,
+                    invertRotationDirection: false, 
                 }),
             ], 
+
+            '4': [
+                new Cycloid({
+                    label: 'Star',
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY,
+                    ...getCycloidParams(),
+                    traceColor: getColor('brightRed'),  
+                    externalRadius: 150,     
+                    internalRadius: 60,      
+                    radiusOfTracePoint: 60, 
+                    traceLength: 10000,
+                    traceThickness: 0.1,
+                }),
+            ], 
+
+            "5": [
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX - (centerX/2),
+                    cy: centerY - (centerY/3) - 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 16.25,   
+                    radiusOfTracePoint: 16.25, 
+                    traceColor: getColor('white'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY - (centerY/3) - 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 26,   
+                    radiusOfTracePoint: 26, 
+                    traceColor: getColor('amber'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX + (centerX/2),
+                    cy: centerY - (centerY/3) - 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 27.8571,   
+                    radiusOfTracePoint: 27.8571, 
+                    traceColor: getColor('deepOrange'),  
+                    traceThickness: 0.1,
+                }),
+
+
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX - (centerX/2),
+                    cy: centerY + (centerY/3) + 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 14.44444444,   
+                    radiusOfTracePoint: 14.44444444, 
+                    traceColor: getColor('indigo'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX,
+                    cy: centerY + (centerY/3) + 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 20.3125,   
+                    radiusOfTracePoint: 20.3125, 
+                    traceColor: getColor('purple'),  
+                    traceThickness: 0.1,
+                }),
+
+                new Cycloid({
+                    label: 'Circle',
+                    renderer: context,
+                    cx: centerX + (centerX/2),
+                    cy: centerY + (centerY/3) + 10,
+                    ...getCycloidParams(),
+                    externalRadius: 65,     
+                    internalRadius: 28.88888888,   
+                    radiusOfTracePoint: 28.88888888, 
+                    traceColor: getColor('brightRed'),  
+                    traceThickness: 0.1,
+                }),
+
+            ],
         }
         
-        // by default - 0
-        let currentPresetIndex = 0;
+        // by default - 1
+        let currentPresetIndex = 1;
         let preset = presets[currentPresetIndex] || [];
         let renderedCurvesTextInfo = ``;
         settings.subscribe((key, newValue, oldValue) => {
@@ -486,26 +605,32 @@ let cycloidMotionScene = new Scene({
                 renderedCurvesTextInfo = ``;
             }
 
-            // update sandbox cycloid's params using update function
+            
+
+            // update playground cycloid's params using update function
             preset.forEach((cycloid, i) => {
-                // 2 - index of sandbox preset
-                if(currentPresetIndex == 2) {
-                    // update params of sandbox cycloid from ui
+                // 3 - index of playground preset
+                if(currentPresetIndex == 0) {
+                    // update params of playground cycloid from ui
                     let updatedParams = getCycloidParams();
 
                     for(let [key, value] of Object.entries(updatedParams)) {
-                        // ignore some param changing from ui using 'continue' keyword for 'non-sandbox' presets
-                        if (currentPresetIndex !== 2 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
+                        // ignore some param changing from ui using 'continue' keyword for 'non-playground' presets
+                        if (currentPresetIndex !== 0 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
                             continue;
                         }
     
                         // updating each param using 'key' and 'value'
                         cycloid.update(key, value);
                     }
+                } else {
+                    if(key == 'speed') {
+                        speed = newValue;
+                    }
                 }
 
-                // hotfix bug on 'sandbox' preset
-                if(currentPresetIndex == 2) {
+                // hotfix bug on 'playground' preset
+                if(currentPresetIndex == 0) {
                     renderedCurvesTextInfo = `
                         <br>
                         <span class="small-font display-item__list-item">
@@ -516,15 +641,15 @@ let cycloidMotionScene = new Scene({
                         </span>
                     `;
                 } else {
-                    renderedCurvesTextInfo += `
-                        <br>
-                        <span class="small-font display-item__list-item">
-                            <span 
-                                class="small-font gray-word-bubble" 
-                                style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
-                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
-                        </span>
-                    `;
+                    // renderedCurvesTextInfo += `
+                    //     <br>
+                    //     <span class="small-font display-item__list-item">
+                    //         <span 
+                    //             class="small-font gray-word-bubble" 
+                    //             style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
+                    //         >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
+                    //     </span>
+                    // `;
                 }
             });
 
@@ -941,7 +1066,7 @@ class Cycloid {
     constructor({
         cx, cy, label = '', animationSpeed, externalRadius, internalRadius, drawCenterPoint, 
         traceColor = getColor('white'), traceThickness = 1, traceLength, drawRadiusLine, renderer, 
-        invertRotationDirection, radiusOfTracePoint
+        invertRotationDirection, radiusOfTracePoint, internalRotationGain = 1, internalInitialAngle = 0
     }){
         this.renderer = renderer;
 
@@ -951,6 +1076,9 @@ class Cycloid {
         this.label = label;
 
         this.animationSpeed = animationSpeed;
+
+        // for spirals, by default = 1
+        this.internalRotationGain = internalRotationGain;
 
         this.drawCenterPoint = drawCenterPoint;
 
@@ -989,6 +1117,7 @@ class Cycloid {
                 type: 'internal',
                 cx: this.cx,
                 cy: this.cy,
+                angle: internalInitialAngle,
                 offset: -delta_radius,
                 radius: internalRadius,
                 fillColor: 'transparent',
@@ -1100,9 +1229,11 @@ class Cycloid {
             // Calculate the angle multiplier using the exact formula
             let m = (externalCircle.radius - bone.radius) / bone.radius;
             let rotationSpeed = (bone.invertRotationDirection === true ? -1 : 1) * speed;
+
+            let rotationGain = bone.parent.internalRotationGain;
             
             // rotate particular bone using the calculated multiplier
-            bone.rotate(rotationSpeed * m);
+            bone.rotate((rotationSpeed * m) * rotationGain);
     
             // move the bone around the origin
             bone.moveAroundOrigin(speed);
