@@ -134,7 +134,7 @@ header {
 main {
     /* background: #dbc1db; */
     background-color: #dde2eb;
-    height: 95%;
+    height: fit-content;
 }
 
 .section-block {
