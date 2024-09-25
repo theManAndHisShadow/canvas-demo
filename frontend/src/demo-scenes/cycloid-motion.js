@@ -154,9 +154,22 @@ let cycloidMotionScene = new Scene({
                 currentPresetIndex = newValue;
                 preset = presets[currentPresetIndex];
                 renderedCurvesTextInfo = ``;
-            }
 
-            
+                // each time when preset is changed - redraw info about current preset cuves
+                preset.forEach((cycloid, i) => {
+                    renderedCurvesTextInfo += `
+                        <br>
+                        <span class="small-font display-item__list-item">
+                            <span 
+                                class="small-font gray-word-bubble" 
+                                style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
+                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
+                        </span>
+                    `;
+                });
+                
+                display.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
+            }
 
             // update playground cycloid's params using update function
             preset.forEach((cycloid, i) => {
@@ -179,32 +192,7 @@ let cycloidMotionScene = new Scene({
                         speed = newValue;
                     }
                 }
-
-                // hotfix bug on 'playground' preset
-                if(currentPresetIndex == 0) {
-                    renderedCurvesTextInfo = `
-                        <br>
-                        <span class="small-font display-item__list-item">
-                            <span 
-                                class="small-font gray-word-bubble" 
-                                style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
-                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
-                        </span>
-                    `;
-                } else {
-                    renderedCurvesTextInfo += `
-                        <br>
-                        <span class="small-font display-item__list-item">
-                            <span 
-                                class="small-font gray-word-bubble" 
-                                style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
-                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
-                        </span>
-                    `;
-                }
             });
-
-            display.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
         });
 
 
@@ -238,7 +226,7 @@ let cycloidMotionScene = new Scene({
         window.runningAnimations.add(loop);
 
         // some trick to render info about already rendered curves
-        settings.setState('speed', settings.getState('seed'));
+        settings.setState('preset', settings.getState('preset'));
     }
 });
 
