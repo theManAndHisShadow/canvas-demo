@@ -192,15 +192,15 @@ let cycloidMotionScene = new Scene({
                         </span>
                     `;
                 } else {
-                    // renderedCurvesTextInfo += `
-                    //     <br>
-                    //     <span class="small-font display-item__list-item">
-                    //         <span 
-                    //             class="small-font gray-word-bubble" 
-                    //             style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
-                    //         >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
-                    //     </span>
-                    // `;
+                    renderedCurvesTextInfo += `
+                        <br>
+                        <span class="small-font display-item__list-item">
+                            <span 
+                                class="small-font gray-word-bubble" 
+                                style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
+                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
+                        </span>
+                    `;
                 }
             });
 
@@ -236,6 +236,9 @@ let cycloidMotionScene = new Scene({
 
         // animate
         window.runningAnimations.add(loop);
+
+        // some trick to render info about already rendered curves
+        settings.setState('speed', settings.getState('seed'));
     }
 });
 
