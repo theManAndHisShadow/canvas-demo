@@ -1205,6 +1205,7 @@ function getStarsPreset(context, centerX, centerY, paramsFromUI){
             cy: centerY - (centerY/3) - 10,
             ...paramsFromUI,
             externalRadius: 65,     
+            internalRadius: 16.25, 
             radiusOfTracePoint: 16.25, 
             traceColor: getColor('white'),  
             traceThickness: 0.1,
