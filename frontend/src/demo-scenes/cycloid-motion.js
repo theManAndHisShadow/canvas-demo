@@ -1198,7 +1198,7 @@ function getStarsPreset(context, centerX, centerY, paramsFromUI){
             externalRadius: 65,     
             internalRadius: 16.25, 
             radiusOfTracePoint: 16.25, 
-            traceColor: getColor('white'),  
+            traceColor: getColor('yellow'),  
             traceThickness: 0.1,
         }),
 
@@ -1271,6 +1271,20 @@ function getStarsPreset(context, centerX, centerY, paramsFromUI){
 }
 
 function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
+    let localColors = [
+        "rgba(220, 20, 60, 1)",
+        "rgba(210, 40, 80, 1)",
+        "rgba(200, 60, 100, 1)",
+        "rgba(190, 80, 120, 1)",
+        "rgba(180, 100, 140, 1)",
+        "rgba(170, 120, 160, 1)",
+        "rgba(160, 140, 180, 1)",
+        "rgba(150, 160, 200, 1)",
+        "rgba(140, 180, 220, 1)",
+        "rgba(130, 200, 238, 1)",
+        "rgba(238, 130, 238, 1)"
+    ];
+
     return [
         new Cycloid({
             label: 'Circle',
@@ -1283,7 +1297,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 47.5,
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white', 0.1),  
+            traceColor: localColors[0], 
             traceThickness: 0.1,
         }),
 
@@ -1298,7 +1312,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 42.5, 
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white', 0.2),  
+            traceColor: localColors[1], 
             traceThickness: 0.1,
         }),
 
@@ -1313,7 +1327,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 37.5, 
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white', 0.3),  
+            traceColor: localColors[2], 
             traceThickness: 0.1,
         }),
 
@@ -1328,7 +1342,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 32.5, 
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white', 0.4),  
+            traceColor: localColors[3], 
             traceThickness: 0.1,
         }),
 
@@ -1343,7 +1357,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 27.5, 
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white', 0.5),  
+            traceColor: localColors[4], 
             traceThickness: 0.1,
         }),
 
@@ -1358,7 +1372,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 22.5, 
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white', 0.6),  
+            traceColor: localColors[5], 
             traceThickness: 0.1,
         }),
         new Cycloid({
@@ -1372,7 +1386,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 17.5, 
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white', 0.7),  
+            traceColor: localColors[6], 
             traceThickness: 0.1,
         }),
 
@@ -1387,7 +1401,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 12.5, 
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white', 0.8),  
+            traceColor: localColors[7],  
             traceThickness: 0.1,
         }),
 
@@ -1402,7 +1416,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 7.5, 
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white', 0.9),  
+            traceColor: localColors[8],  
             traceThickness: 0.1,
         }),
 
@@ -1417,7 +1431,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 5, 
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white', 0.95),  
+            traceColor: localColors[9],  
             traceThickness: 0.1,
         }),
 
@@ -1432,7 +1446,7 @@ function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
             radiusOfTracePoint: 2.5, 
             externalBorderColor: getColor('white', 0.1),
             internalBorderColor: getColor('white', 0.1),
-            traceColor: getColor('white'),  
+            traceColor: localColors[10],  
             traceThickness: 0.1,
         }),
     ];
