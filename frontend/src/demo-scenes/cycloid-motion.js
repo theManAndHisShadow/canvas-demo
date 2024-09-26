@@ -158,10 +158,10 @@ let cycloidMotionScene = new Scene({
                         // updating each param using 'key' and 'value'
                         cycloid.update(key, value);
                     }
-                } else {
-                    if(key == 'speed') {
-                        speed = newValue;
-                    }
+                }
+
+                if(key == 'speed') {
+                    speed = newValue;
                 }
             });
 
