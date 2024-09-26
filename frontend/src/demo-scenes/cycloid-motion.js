@@ -5,7 +5,7 @@ let cycloidMotionScene = new Scene({
         'description': {
             type: 'display-infobox',
             label: 'Description',
-            text: 'A cycloid is the curve traced by a point on the circumference of a circle as it rolls along a straight line. The key condition in this motion is that the circle rolls without slipping. A specific example of a cycloid is the epicycloid, where a circle rolls inside a larger circle. An example of an hypocycloid is demonstrated in the interactive scene.',
+            text: 'A cycloid is the curve traced by a point on the circumference of a circle as it rolls along a straight line. The key condition in this motion is that the circle rolls without slipping. A specific example of a cycloid is the epicycloid, where a circle rolls inside a larger circle. An example of an hypocycloid is demonstrated in this interactive scene.',
         },
 
         'cycloids_info': {
@@ -22,7 +22,6 @@ let cycloidMotionScene = new Scene({
                 {name: 'Hypocycloid overview', allowedElements: ['speed']},
                 {name: 'Flat roses curves overview', allowedElements: ['speed']},
                 {name: 'Spiral', allowedElements: ['speed']},
-                {name: 'S A T A N', allowedElements: ['speed']},
                 {name: 'Stars', allowedElements: ['speed']},
                 {name: 'Astroids', allowedElements: ['speed']},
             ],
@@ -139,9 +138,8 @@ let cycloidMotionScene = new Scene({
             "1": getHypocycloidOverviewPreset(context, centerX, centerY, getParamsFromUI()),
             "2": getFlatRosesPreset(context, centerX, centerY, getParamsFromUI()),
             '3': getSpiralPreset(context, centerX, centerY, getParamsFromUI()), 
-            '4': getSatanicStarPreset(context, centerX, centerY, getParamsFromUI()), 
-            "5": getStarsPreset(context, centerX, centerY, getParamsFromUI()),
-            "6": getAstroidsPreset(context, centerX, centerY, getParamsFromUI()),
+            "4": getStarsPreset(context, centerX, centerY, getParamsFromUI()),
+            "5": getAstroidsPreset(context, centerX, centerY, getParamsFromUI()),
         }
         
         // by default - 1
@@ -160,10 +158,10 @@ let cycloidMotionScene = new Scene({
                         // updating each param using 'key' and 'value'
                         cycloid.update(key, value);
                     }
-                } else {
-                    if(key == 'speed') {
-                        speed = newValue;
-                    }
+                }
+
+                if(key == 'speed') {
+                    speed = newValue;
                 }
             });
 
@@ -1032,7 +1030,7 @@ function getFlatRosesPreset(context, centerX, centerY, paramsFromUI) {
             cy: centerY - (centerY * (3/5)),
             ...paramsFromUI,
             externalRadius: 50,     
-            internalRadius: 9.99,      
+            internalRadius: 10,      
             radiusOfTracePoint: 6,
             traceColor: getColor('green'),  
             traceThickness: 0.1,
@@ -1046,7 +1044,7 @@ function getFlatRosesPreset(context, centerX, centerY, paramsFromUI) {
             cy: centerY,
             ...paramsFromUI,
             externalRadius: 50,     
-            internalRadius: 9.99,      
+            internalRadius: 10,      
             radiusOfTracePoint: 9.99,
             traceColor: getColor('teal'),
             traceThickness: 0.1,
@@ -1060,7 +1058,7 @@ function getFlatRosesPreset(context, centerX, centerY, paramsFromUI) {
             cy: centerY + (centerY * (3/5)),
             ...paramsFromUI,
             externalRadius: 50,     
-            internalRadius: 9.99,      
+            internalRadius: 10,      
             radiusOfTracePoint: 20,
             traceColor: getColor('blue'),
             traceThickness: 0.1,
@@ -1117,7 +1115,7 @@ function getFlatRosesPreset(context, centerX, centerY, paramsFromUI) {
             cy: centerY - (centerY * (3/5)),
             ...paramsFromUI,
             externalRadius: 50,     
-            internalRadius: 7.1,      
+            internalRadius: 7.142857142857143,      
             radiusOfTracePoint: 3,
             traceColor: getColor('mediumVioletRed'),  
             traceThickness: 0.1,
@@ -1131,8 +1129,8 @@ function getFlatRosesPreset(context, centerX, centerY, paramsFromUI) {
             cy: centerY,
             ...paramsFromUI,
             externalRadius: 50,     
-            internalRadius: 7.1,      
-            radiusOfTracePoint: 7.1, 
+            internalRadius: 7.142857142857143,      
+            radiusOfTracePoint: 7.142857142857143, 
             traceColor: getColor('crimson'),
             traceThickness: 0.1,
             invertRotationDirection: false, 
@@ -1145,7 +1143,7 @@ function getFlatRosesPreset(context, centerX, centerY, paramsFromUI) {
             cy: centerY + (centerY * (3/5)),
             ...paramsFromUI,
             externalRadius: 50,     
-            internalRadius: 7.1,      
+            internalRadius: 7.142857142857143,      
             radiusOfTracePoint: 18, 
             traceColor: getColor('brightRed'),
             traceThickness: 0.1,
@@ -1171,24 +1169,6 @@ function getSpiralPreset(context, centerX, centerY, paramsFromUI) {
             traceLength: 10000,
             traceThickness: 0.1,
             invertRotationDirection: false, 
-        }),
-    ];
-}
-
-function getSatanicStarPreset(context, centerX, centerY, paramsFromUI) {
-    return [
-        new Cycloid({
-            label: 'Star',
-            renderer: context,
-            cx: centerX,
-            cy: centerY,
-            ...paramsFromUI,
-            traceColor: getColor('brightRed'),  
-            externalRadius: 150,     
-            internalRadius: 60,      
-            radiusOfTracePoint: 60, 
-            traceLength: 10000,
-            traceThickness: 0.1,
         }),
     ];
 }
@@ -1278,18 +1258,18 @@ function getStarsPreset(context, centerX, centerY, paramsFromUI){
 
 function getAstroidsPreset(context, centerX, centerY, paramsFromUI) {
     let localColors = [
-        "rgba(220, 20, 60, 1)",
-        "rgba(210, 40, 80, 1)",
-        "rgba(200, 60, 100, 1)",
-        "rgba(190, 80, 120, 1)",
-        "rgba(180, 100, 140, 1)",
-        "rgba(170, 120, 160, 1)",
-        "rgba(160, 140, 180, 1)",
-        "rgba(150, 160, 200, 1)",
-        "rgba(140, 180, 220, 1)",
-        "rgba(130, 200, 238, 1)",
-        "rgba(238, 130, 238, 1)"
-    ];
+            "rgba(220, 20, 60, 1.0)",
+            "rgba(202, 18, 79, 1.0)",
+            "rgba(185, 16, 99, 1.0)",
+            "rgba(168, 14, 118, 1.0)",
+            "rgba(150, 12, 138, 1.0)",
+            "rgba(133, 10, 157, 1.0)",
+            "rgba(116, 8, 177, 1.0)",
+            "rgba(98, 6, 196, 1.0)",
+            "rgba(81, 4, 216, 1.0)",
+            "rgba(64, 2, 235, 1.0)",
+            "rgba(47, 0, 255, 1.0)"
+        ];
 
     return [
         new Cycloid({
