@@ -15,18 +15,18 @@ let cartesianPlane = new Scene({
         },
 
         'selectedPreset': {
-            type: 'option-selector',
-            label: 'Choose preset',
-            optionNames: [
-                'Single points',            // 0
-                'Segments',                 // 1
-                'Line',                     // 2
-                'Quadratic parabola',       // 3
-                'Cubic parabola',           // 4
-                'Hyperbola',                // 5
-                'Exponential curve',        // 6
+            type: 'preset-dropdown-list',
+            label: 'Preset',
+            selectedByDefault: 0,
+            options: [
+                {name: 'Single points', allowedElements: ['*']}, 
+                {name: 'Segments', allowedElements: ['*']},
+                {name: 'Line', allowedElements: ['*']},
+                {name: 'Quadratic parabola', allowedElements: ['*']},
+                {name: 'Cubic parabola', allowedElements: ['*']},
+                {name: 'Hyperbola', allowedElements: ['*']},
+                {name: 'Exponential curve', allowedElements: ['*']},
             ],
-            defaultValue: 0,
         },
     },
 
