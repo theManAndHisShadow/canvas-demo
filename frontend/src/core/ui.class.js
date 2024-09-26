@@ -87,7 +87,6 @@ class UI extends SceneEventTarget {
                  */
                 if(renderQueue.length == 0) {
                     this.dispatchEvent('renderEnd');
-                    console.log(this);
                 }
             }
         }
@@ -469,7 +468,6 @@ class UIControls {
 
         element.appendChild(label);
         element.appendChild(optionContainer);
-        console.log(element);
 
         this.appendToHTML(elementName, {element, label, value: optionContainer});
     }

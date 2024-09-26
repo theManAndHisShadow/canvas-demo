@@ -1084,15 +1084,11 @@ class Graph extends PlanePrimitive {
             
             let y = rawY * (this.parent.gridCellSize*2) + this.parent.subpixel;
             let x = rawX * (this.parent.gridCellSize*2) + this.parent.subpixel;
-            // console.log(i, x);
 
-            
             let transformed = {
                 x: this.parent.cx + x,
                 y: this.parent.cy - y
             };
-            
-            // console.log(transformed.x, transformed.y); 
 
             let y_threshold = this.parent.gridCellSize * 5;
 
