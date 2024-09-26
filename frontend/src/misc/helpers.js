@@ -48,6 +48,18 @@ function decimalToFraction(decimal) {
 
 
 /**
+ * Truncates last zero numbers of flaot num.
+ * @param {Number} flotNum - float number to truncate
+ * @param {Number} fixedTo 
+ * @returns {String} - string which contains truncated float num
+ */
+function truncateFloatNum(flotNum, fixedTo = 3) {
+    return flotNum.toFixed(fixedTo).replace(/\.?0+$/, '');
+}
+
+
+
+/**
  * 
  * @param {string} fraction  - fraction to transform
  * @returns {number} - converted fraction

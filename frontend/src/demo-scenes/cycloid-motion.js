@@ -149,28 +149,6 @@ let cycloidMotionScene = new Scene({
         let preset = presets[currentPresetIndex] || [];
         let renderedCurvesTextInfo = ``;
         settings.subscribe((key, newValue, oldValue) => {
-            // if current change is preset switching - update curr preset index and preset ref
-            if(key == 'preset') {
-                currentPresetIndex = newValue;
-                preset = presets[currentPresetIndex];
-                renderedCurvesTextInfo = ``;
-
-                // each time when preset is changed - redraw info about current preset cuves
-                preset.forEach((cycloid, i) => {
-                    renderedCurvesTextInfo += `
-                        <br>
-                        <span class="small-font display-item__list-item">
-                            <span 
-                                class="small-font gray-word-bubble" 
-                                style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
-                            >${cycloid.label} #${i +1}</span><span> - R/r = ${(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius).toFixed(0)}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
-                        </span>
-                    `;
-                });
-                
-                display.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
-            }
-
             // update playground cycloid's params using update function
             preset.forEach((cycloid, i) => {
                 // 3 - index of playground preset
@@ -178,12 +156,7 @@ let cycloidMotionScene = new Scene({
                     // update params of playground cycloid from ui
                     let updatedParams = getParamsFromUI();
 
-                    for(let [key, value] of Object.entries(updatedParams)) {
-                        // ignore some param changing from ui using 'continue' keyword for 'non-playground' presets
-                        if (currentPresetIndex !== 0 && (key === 'externalRadius' || key === 'internalRadius' || key === 'radiusOfTracePoint')) {
-                            continue;
-                        }
-    
+                    for(let [key, value] of Object.entries(updatedParams)) {    
                         // updating each param using 'key' and 'value'
                         cycloid.update(key, value);
                     }
@@ -193,6 +166,32 @@ let cycloidMotionScene = new Scene({
                     }
                 }
             });
+
+            // if current change is preset switching - update curr preset index and preset ref
+            if(key == 'preset' || key == 'internalRadius' || key == 'externalRadius' || key == 'radiusOfTracePoint') {
+                currentPresetIndex = settings.getState('preset');
+                preset = presets[currentPresetIndex];
+                renderedCurvesTextInfo = ``;
+
+                
+                // each time when preset is changed - redraw info about current preset cuves
+                preset.forEach((cycloid, i) => {
+                    // remove '.000' in float nums
+                    let proportion = truncateFloatNum(cycloid.proportion.externalRadius/cycloid.proportion.internalRadius, 3);
+
+                    renderedCurvesTextInfo += `
+                        <br>
+                        <span class="small-font display-item__list-item">
+                            <span 
+                                class="small-font gray-word-bubble" 
+                                style="color: ${cycloid.traceColor}; background: ${changeColorOpacity(cycloid.traceColor, 0.25)};"
+                            >${cycloid.label} #${i +1}</span><span> - R/r = ${proportion}/1, d ${cycloid.proportion.internalRadius == cycloid.proportion.radiusOfTracePoint ? '=' :  cycloid.proportion.radiusOfTracePoint > cycloid.proportion.internalRadius  ? '>' : '<'} r</span>
+                        </span>
+                    `;
+                });
+                
+                display.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
+            }
         });
 
 
@@ -686,6 +685,7 @@ class Cycloid {
      * @param {any} newValue - The new value to assign to the parameter.
      */
     update(keyName, newValue) {
+        
         // Update parameters for the bones (external and internal circles)
         this.skeleton.forEach(bone => {
             if( keyName === 'drawCenterPoint') {
@@ -695,6 +695,10 @@ class Cycloid {
             if(keyName === 'invertRotationDirection' || keyName === 'radiusOfTracePoint' || keyName == 'drawRadiusLine') {
                 let internals = this.skeleton.filter(bone => bone.type === 'internal');
                 internals.forEach(internalBone => { internalBone[keyName] = newValue });
+
+                if(keyName === 'radiusOfTracePoint') {
+                    this.proportion.radiusOfTracePoint = newValue;
+                }
             }
 
             if(keyName == 'traceLength') {
@@ -711,6 +715,7 @@ class Cycloid {
                 
                 // Update the external circle's radius
                 externalBone.radius = newValue;
+                this.proportion.externalRadius = newValue;
 
                 internals.forEach(internalBone => {
                     // Determine the offset direction: one internal circle moves upwards (1), the other downwards (-1)
@@ -737,6 +742,7 @@ class Cycloid {
 
                 // Update the internal circle's radius
                 internalBone.radius = newValue;
+                this.proportion.internalRadius = newValue;
 
                 // Determine the offset direction again
                 let direction = internalBone.offset >= 0 ? 1 : -1;
