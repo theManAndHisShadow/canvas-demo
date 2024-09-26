@@ -15,18 +15,18 @@ let cartesianPlane = new Scene({
         },
 
         'selectedPreset': {
-            type: 'option-selector',
-            label: 'Choose preset',
-            optionNames: [
-                'Single points',            // 0
-                'Segments',                 // 1
-                'Line',                     // 2
-                'Quadratic parabola',       // 3
-                'Cubic parabola',           // 4
-                'Hyperbola',                // 5
-                'Exponential curve',        // 6
+            type: 'preset-dropdown-list',
+            label: 'Preset',
+            selectedByDefault: 0,
+            options: [
+                {name: 'Single points', allowedElements: ['*']}, 
+                {name: 'Segments', allowedElements: ['*']},
+                {name: 'Line', allowedElements: ['*']},
+                {name: 'Quadratic parabola', allowedElements: ['*']},
+                {name: 'Cubic parabola', allowedElements: ['*']},
+                {name: 'Hyperbola', allowedElements: ['*']},
+                {name: 'Exponential curve', allowedElements: ['*']},
             ],
-            defaultValue: 0,
         },
     },
 
@@ -271,8 +271,8 @@ let cartesianPlane = new Scene({
                         [
                             new Graph('e^x', getColor('red')),
                             new Graph('e^{5/10x}', getColor('amber')),
-                            new Graph('e^{3/10x}', getColor('lightAmber')),
-                            new Graph('e^{2/10x}', getColor('lightBlue')),
+                            new Graph('e^{3/10x}', getColor('yellow')),
+                            new Graph('e^{2/10x}', getColor('green')),
                             new Graph('e^1/10x', getColor('blue')),
 
                             new Graph('-e^1/10x', getColor('deepPurple')),

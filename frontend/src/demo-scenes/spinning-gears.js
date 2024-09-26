@@ -23,18 +23,19 @@ let spinningGears = new Scene({
         },
 
         'selectedPreset': {
-            type: 'option-selector',
-            label: 'Choose preset',
-            optionNames: [
-                'Big driver gear', 
-                'Small driver gear', 
-                'Chain of equal gears',
-                'Chain 1:2:4',
-                'Smooth increase',
-                'Planetary gearbox'
+            type: 'preset-dropdown-list',
+            label: 'Preset',
+            selectedByDefault: 0,
+            options: [
+                {name: 'Big driver gear', allowedElements: ['*']}, 
+                {name: 'Small driver gear', allowedElements: ['*']},
+                {name: 'Chain of equal gears', allowedElements: ['*']},
+                {name: 'Chain 1:2:4', allowedElements: ['*']},
+                {name: 'Smooth increase', allowedElements: ['*']},
+                {name: 'Planetary gearbox', allowedElements: ['*']},
             ],
-            defaultValue: 0,
         },
+        
     },
 
     code: (root, display, settings) => {
