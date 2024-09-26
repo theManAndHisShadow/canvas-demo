@@ -271,8 +271,8 @@ let cartesianPlane = new Scene({
                         [
                             new Graph('e^x', getColor('red')),
                             new Graph('e^{5/10x}', getColor('amber')),
-                            new Graph('e^{3/10x}', getColor('lightAmber')),
-                            new Graph('e^{2/10x}', getColor('lightBlue')),
+                            new Graph('e^{3/10x}', getColor('yellow')),
+                            new Graph('e^{2/10x}', getColor('green')),
                             new Graph('e^1/10x', getColor('blue')),
 
                             new Graph('-e^1/10x', getColor('deepPurple')),
