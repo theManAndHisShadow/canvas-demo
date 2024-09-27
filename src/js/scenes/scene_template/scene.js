@@ -1,4 +1,6 @@
-let colorPicker = new Scene({
+import { Scene } from "../../core/scene.class";
+
+let someScene = new Scene({
     title: 'Scene template', 
 
     ui: {
@@ -31,7 +33,7 @@ let colorPicker = new Scene({
 
 
 // Exproting scene
-window.exportedObjects.push(colorPicker);
+window.exportedObjects.push(someScene);
 
 /**
 * Scene file internal helper function defenitions

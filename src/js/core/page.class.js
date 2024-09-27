@@ -1,3 +1,5 @@
+import { UI } from './ui.class.js';
+
 /**
  * N.B.:
  * I know that modifying built-in objects is bad form for a modern language standard. 
@@ -63,7 +65,7 @@ window.runningAnimations = {
     }
 };
 
-class Page {
+export class Page {
     // some important attributes names
     static #linkDataAttribute = "data-link-to-demo";
     static #importedSceneAttribute = "data-improted-scene";
@@ -74,7 +76,7 @@ class Page {
     static #controlsContainerElementID = '#controls';
 
     // location of demo scenes
-    static #scenesLocation = './src/demo-scenes/';
+    static #scenesLocation = './js/scenes/';
     static #basicWindowTitle = 'Canvas demo';
 
     constructor(){

@@ -1,4 +1,4 @@
-class Scene {
+export class Scene {
 
     /**
      * @param {string} param.title - title name of scene

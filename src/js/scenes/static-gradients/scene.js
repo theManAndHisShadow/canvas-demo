@@ -1,3 +1,5 @@
+import { Scene } from "../../core/scene.class";
+
 let staticGadients = new Scene({
     title: 'Static gradients', 
 

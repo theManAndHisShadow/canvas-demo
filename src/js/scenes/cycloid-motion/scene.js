@@ -1,3 +1,5 @@
+import { Scene } from "../../core/scene.class";
+
 let cycloidMotionScene = new Scene({
     title: 'Cycloid motion', 
 

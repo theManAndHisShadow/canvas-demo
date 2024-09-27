@@ -1,3 +1,5 @@
+import { StateManager } from "./states.class.js";
+
 /**
  * Helper class.
  */
@@ -26,7 +28,7 @@ class SceneEventTarget {
 /**
  * Parent class that manages work of UIControls and UIDisplay classes. Also stores StateManager of UI.
  */
-class UI extends SceneEventTarget {
+export class UI extends SceneEventTarget {
     constructor({display, controls, timestamp}){
         super();
 

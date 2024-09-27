@@ -1,3 +1,5 @@
+import { Scene } from "../../core/scene.class";
+
 let concentricCircles = new Scene({
     title: 'Concentric circles', 
 

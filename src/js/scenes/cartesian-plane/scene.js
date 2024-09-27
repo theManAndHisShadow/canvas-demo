@@ -1,3 +1,5 @@
+import { Scene } from "../../core/scene.class";
+
 let cartesianPlane = new Scene({
     title: 'Cartesian plane demo', 
 

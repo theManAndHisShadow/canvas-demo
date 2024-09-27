@@ -1,3 +1,5 @@
+import { Scene } from "../../core/scene.class";
+
 let colorPicker = new Scene({
     title: 'Color picker demo scene', 
 

@@ -2,7 +2,7 @@
  * Helper class for managing UI class states
  * implements reactive behavior in other parts of the project.
  */
-class StateManager {
+export class StateManager {
     #states = {};
     #listeners = [];
 

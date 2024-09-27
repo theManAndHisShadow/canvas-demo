@@ -1,3 +1,5 @@
+import { Scene } from "../../core/scene.class";
+
 let binarySearch = new Scene({
     title: 'Binary search', 
 
