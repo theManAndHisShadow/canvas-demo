@@ -7,6 +7,7 @@ function ConcentricCirclesScene() {
     return (
         <SceneTemplate
             title="Concentric circles"
+            desciption="A simple scene, training with rotating shapes and interacting with mouse events"
             code={code}
         />
     );

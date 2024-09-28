@@ -36,35 +36,10 @@ function App() {
                         </div>
                     </div>
 
-                    <div class="section-block center-section-block">
-                        <div class="section-block__inner">
-                            <div class="wide-block rounded-block block">
-                                <div id="root">
-                                    <Routes>
-                                        <Route path="/concentric-circles" element={<ConcentricCirclesScene/>} />
-                                        <Route path="/color-picker" element={<ColorPickerScene/>} />
-                                    </Routes>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section-block right-section-block">
-                        <div class="section-block__inner">
-                            <div class="medium-block rounded-block block">
-                                <h3>Scene info</h3>
-                                <div id="scene-info">
-
-                                </div>
-                            </div>
-                            <div class="medium-block rounded-block block">
-                                <h3>Controls</h3>
-                                <div id="controls">
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <Routes>
+                        <Route path="/concentric-circles" element={<ConcentricCirclesScene/>} />
+                        <Route path="/color-picker" element={<ColorPickerScene/>} />
+                    </Routes>
                 </main>
 
                 <footer>

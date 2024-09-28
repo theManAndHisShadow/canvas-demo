@@ -7,6 +7,7 @@ function ColorPickerScene() {
     return (
         <SceneTemplate
             title="Color picker demo scene"
+            desciption="Color picker based on multicolor radial gradient and mouse events. Move range slider to adjust color. Click on the desired location on the circle to get color data."
             code={code}
         />
     );
