@@ -1,5 +1,6 @@
-import { BasicCircelBone } from "./basicCircle.class";
+import { BasicCircelBone } from "./basic_circle.class";
 import { Tracer } from "./tracer.class";
+import {  getDistanseBetweenTwoPoint, rotatePoint, getColor, drawCircle, drawLine } from "../../../misc/helpers";
 
 export class DynamicCircleBone extends BasicCircelBone {
     /**
