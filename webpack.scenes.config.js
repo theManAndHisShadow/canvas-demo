@@ -6,7 +6,7 @@ module.exports = {
     entry: () => {
         const entries = {};
 
-        glob.sync((path.resolve(__dirname, './src/js/scenes/**/scene.js'))).forEach(file => {
+        glob.sync((path.resolve(__dirname, './src/js/scenes/**/scene.jsx'))).forEach(file => {
             const dirName = path.dirname(file).split('/').pop();
             const fileName = path.basename(file, '.js');
 
@@ -16,6 +16,11 @@ module.exports = {
         return entries;
     }, 
 
+
+    resolve: {
+        extensions: ['.js', '.jsx'], 
+    },
+
     output: {
         filename: '[name].js', // Output file after build
         path: path.resolve(__dirname, './build/js/scenes'),
@@ -24,7 +29,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader', // Allows use of ES6/ESNext syntax
