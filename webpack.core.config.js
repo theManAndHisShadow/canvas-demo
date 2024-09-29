@@ -1,19 +1,21 @@
-const glob = require('glob');
 const path = require('path');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
     // The input file where your imported class is used
-    entry: {
-        'js/core': './src/js/index.jsx',
-        'js/helpers': './src/js/misc/helpers.js',
-    }, 
+    entry: [
+        './src/js/index.jsx',
+        './src/js/misc/helpers.js'
+    ], 
+
 
     output: {
-        filename: '[name].js', // Output file after build
+        filename: 'js/chunks/[name].[contenthash].js', // Output file after build
         path: path.resolve(__dirname, './build'),
+        publicPath: '/',
     },
 
     module: {
@@ -35,7 +37,6 @@ module.exports = {
     plugins:[
         new HtmlWebpackPlugin({
           template: path.resolve(__dirname, './src/index.html'),
-          inject: false,
         }),
 
         new CopyWebpackPlugin({
@@ -44,7 +45,15 @@ module.exports = {
                 to: "./css/",
             }],
         }),
+
+        new CleanWebpackPlugin(),
     ],
+
+    optimization: {
+        splitChunks: {
+          chunks: 'async',
+        },
+      },
 
     mode: 'production', // Specify the mode (development/production)
 };

@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { Suspense }from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Routes, Link, BrowserRouter } from 'react-router-dom';
 
-import ConcentricCirclesScene from './scenes/concentric-circles/scene.jsx';
-import ColorPickerScene from './scenes/color-picker/scene.jsx';
-import StaticGradientScene from './scenes/static-gradients/scene.jsx';
-import SpinningGearsScene from './scenes/spinning-gears/scene.jsx';
-import CartesianPlaneScene from './scenes/cartesian-plane/scene.jsx';
-import CycloidMotionScene from './scenes/cycloid-motion/scene.jsx';
+const ConcentricCirclesScene = React.lazy(() => import('./scenes/concentric-circles/scene.jsx'));
+const ColorPickerScene = React.lazy(() => import('./scenes/color-picker/scene.jsx'));
+const StaticGradientScene = React.lazy(() => import('./scenes/static-gradients/scene.jsx'));
+const SpinningGearsScene = React.lazy(() => import('./scenes/spinning-gears/scene.jsx'));
+const CartesianPlaneScene = React.lazy(() => import('./scenes/cartesian-plane/scene.jsx'));
+const CycloidMotionScene = React.lazy(() => import('./scenes/cycloid-motion/scene.jsx'));
 
 function App() {
     return (
@@ -37,14 +37,16 @@ function App() {
                         </div>
                     </div>
 
-                    <Routes>
-                        <Route path="/concentric-circles" element={<ConcentricCirclesScene/>} />
-                        <Route path="/color-picker" element={<ColorPickerScene/>} />
-                        <Route path="/static-gradients" element={<StaticGradientScene/>} />
-                        <Route path="/spinning-gears" element={<SpinningGearsScene/>} />
-                        <Route path="/cartesian-plane" element={<CartesianPlaneScene/>} />
-                        <Route path="/cycloid-motion" element={<CycloidMotionScene/>} />
-                    </Routes>
+                    <Suspense fallback={<div>Loading scene...</div>}>
+                        <Routes>
+                            <Route path="/concentric-circles" element={<ConcentricCirclesScene />} />
+                            <Route path="/color-picker" element={<ColorPickerScene />} />
+                            <Route path="/static-gradients" element={<StaticGradientScene />} />
+                            <Route path="/spinning-gears" element={<SpinningGearsScene />} />
+                            <Route path="/cartesian-plane" element={<CartesianPlaneScene />} />
+                            <Route path="/cycloid-motion" element={<CycloidMotionScene />} />
+                        </Routes>
+                    </Suspense>
                 </main>
 
                 <footer>
