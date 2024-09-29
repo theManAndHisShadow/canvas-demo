@@ -1,5 +1,6 @@
 import { PlanePrimitive } from "./primitive.class.js";
 import { Point } from "./point.class.js";
+import { getDistanseBetweenTwoPoint, drawLine } from "../../../misc/helpers.js";
 
 /**
  * Segment element class.
