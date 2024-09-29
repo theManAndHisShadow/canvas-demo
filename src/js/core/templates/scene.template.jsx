@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import UI from "./ui.class.js";
+import UI from "../classes/ui.class.js";
 
 const SceneTemplate = ({ title, desciption, uiTree, code }) => {
     useEffect(() => {
