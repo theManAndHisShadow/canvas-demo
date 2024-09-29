@@ -15,7 +15,7 @@ module.exports = {
     output: {
         filename: 'js/chunks/[name].[contenthash].js', // Output file after build
         path: path.resolve(__dirname, './build'),
-        publicPath: '/',
+        publicPath: './',
     },
 
     module: {
