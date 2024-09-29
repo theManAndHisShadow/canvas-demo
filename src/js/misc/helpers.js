@@ -632,6 +632,20 @@ export function getBezierCurveValue(t) {
 
 
 /**
+ * Сounts the number of milliseconds spent on executing the measured function and return time
+ * @param {Function} tatrgetFunc - target function the execution speed of which needs to be calculated
+ * @param  {...any} targetFuncArgs - arguments of target function
+ * @returns {Number} - function execution time in milliseconds
+ */
+export function measurePerformance(tatrgetFunc, ...targetFuncArgs) {
+    const start = performance.now();
+    tatrgetFunc(...targetFuncArgs);
+    const end = performance.now();
+
+    return end - start;
+}
+
+/**
  * Replace element with clone to reset all event listeners
  * @param {HTMLElement} target - target to reset
  * @param {string} id - dynamic id
