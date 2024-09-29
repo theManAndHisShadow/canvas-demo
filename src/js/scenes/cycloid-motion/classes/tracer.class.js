@@ -1,3 +1,5 @@
+import { getArrayLast } from "../../../misc/helpers";
+
 /**
  * A class that tracks the movement of a point along a trajectory and draws that trajectory
  */

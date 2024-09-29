@@ -1,4 +1,5 @@
 import { PlanePrimitive } from "./primitive.class.js";
+import { drawText, drawCircle } from "../../../misc/helpers.js";
 
 /**
  * Point element class.

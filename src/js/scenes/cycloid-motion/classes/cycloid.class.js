@@ -1,10 +1,12 @@
-import { StaticCircleBone } from './staticCircle.class.js';
-import { DynamicCircleBone } from './dynamicCicle.class.js';
+import { StaticCircleBone }  from './static_circle.class.js'
+import { DynamicCircleBone } from './dynamic_circle.class.js';
+
+import { getColor } from '../../../misc/helpers.js';
 
 /**
  * Main class
  */
-export class Cycloid {
+export default class Cycloid {
     constructor({
         cx, cy, label = '', animationSpeed, externalRadius, internalRadius, drawCenterPoint, 
         externalBorderColor = getColor('white', 0.45), internalBorderColor = getColor('white', 0.45),

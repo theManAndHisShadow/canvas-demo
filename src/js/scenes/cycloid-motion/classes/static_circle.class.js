@@ -1,4 +1,4 @@
-import { BasicCircelBone } from "./basicCircle.class";
+import { BasicCircelBone } from "./basic_circle.class";
 
 export class StaticCircleBone extends BasicCircelBone {
     /**

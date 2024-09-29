@@ -7,7 +7,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     // The input file where your imported class is used
     entry: {
-        'js/core': './src/js/index.js',
+        'js/core': './src/js/index.jsx',
+        'js/helpers': './src/js/misc/helpers.js',
     }, 
 
     output: {
@@ -18,13 +19,17 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader', // Allows use of ES6/ESNext syntax
                 },
             },
         ],
+    },
+
+    resolve: {
+        extensions: ['.js', '.jsx'], 
     },
 
     plugins:[
@@ -39,14 +44,7 @@ module.exports = {
                 to: "./css/",
             }],
         }),
-
-        new CopyWebpackPlugin({
-            patterns: [{ 
-                from: path.resolve(__dirname, './src/js/misc/'), 
-                to: "./js/",
-            }],
-        }),
-      ],
+    ],
 
     mode: 'production', // Specify the mode (development/production)
 };

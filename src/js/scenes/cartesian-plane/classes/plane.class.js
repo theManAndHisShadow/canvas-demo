@@ -2,6 +2,8 @@ import { Point } from "./point.class";
 import { Segment } from "./segment.class";
 import { Graph } from "./graph.class";
 
+import { drawRect, drawText } from "../../../misc/helpers";
+
 
 /**
  * Helper class for managing custom events

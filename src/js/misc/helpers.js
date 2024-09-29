@@ -10,7 +10,7 @@
  * @param {number} max - range end value (including max value)
  * @returns {number} - random number
  */
-function getRandomNumber(min, max) {
+export function getRandomNumber(min, max) {
     let randomNUmber = min + Math.random() * (max + 1 - min);
   
     return Math.floor(randomNUmber);
@@ -23,7 +23,7 @@ function getRandomNumber(min, max) {
  * @param {number} decimal - original decimal value
  * @returns - fraction from decimal
  */
-function decimalToFraction(decimal) {
+export function decimalToFraction(decimal) {
     let numerator = decimal;
     let denominator = 1;
 
@@ -53,7 +53,7 @@ function decimalToFraction(decimal) {
  * @param {Number} fixedTo 
  * @returns {String} - string which contains truncated float num
  */
-function truncateFloatNum(flotNum, fixedTo = 3) {
+export function truncateFloatNum(flotNum, fixedTo = 3) {
     return flotNum.toFixed(fixedTo).replace(/\.?0+$/, '');
 }
 
@@ -64,7 +64,7 @@ function truncateFloatNum(flotNum, fixedTo = 3) {
  * @param {string} fraction  - fraction to transform
  * @returns {number} - converted fraction
  */
-function fractionToDecimal(fraction) {
+export function fractionToDecimal(fraction) {
     // deviding string by /
     const parts = fraction.split('/');
     
@@ -83,7 +83,7 @@ function fractionToDecimal(fraction) {
  * @param {number} n - number for check
  * @returns {boolean} - true or false
  */
-function isFloat(n) {
+export function isFloat(n) {
     return Number(n) === n && n % 1 !== 0;
 }
 
@@ -94,7 +94,7 @@ function isFloat(n) {
  * @param {array} array - target array
  * @returns {any} - last item
  */
-function getArrayLast(array){
+export function getArrayLast(array){
     return array[array.length - 1];
 }
 
@@ -106,7 +106,7 @@ function getArrayLast(array){
 *   @param {boolean} [upperCase=false] - Indicates whether the letter should be in upper case.
 *   @returns {string} - The letter corresponding to the given index.
 */
-function translateIndexToLetter(i, upperCase = false) {
+export function translateIndexToLetter(i, upperCase = false) {
     let letter = String.fromCharCode(97 + i);
 
     if(upperCase == true) letter = letter.toUpperCase();
@@ -120,7 +120,7 @@ function translateIndexToLetter(i, upperCase = false) {
  * @param {object} targetObject - target object
  * @returns {object} - clone of target object
  */
-function deepClone(targetObject){
+export function deepClone(targetObject){
     /**
      * N.B.: In some cases, the cloning process may be interrupted due to a “circular reference error”
      */
@@ -138,7 +138,7 @@ function deepClone(targetObject){
  * @param {number} angleInDegrees - angle of rotation
  * @returns 
  */
-function rotatePoint(cx, cy, pointX, pointY, angleInDegrees) {
+export function rotatePoint(cx, cy, pointX, pointY, angleInDegrees) {
     let angleInRadians = angleInDegrees * Math.PI / 180;
     let cosTheta = Math.cos(angleInRadians);
     let sinTheta = Math.sin(angleInRadians);
@@ -157,7 +157,7 @@ function rotatePoint(cx, cy, pointX, pointY, angleInDegrees) {
  * @param {MouseEvent} event - mousemove or mouseover event objects
  * @returns {{x: number, y: number}} - object of mouse position
  */
-function getMousePos(canvas, event) {
+export function getMousePos(canvas, event) {
     let rect = canvas.getBoundingClientRect();
 
     return {
@@ -173,7 +173,7 @@ function getMousePos(canvas, event) {
  * @param {number} opacity - float number of color opacity
  * @returns {string}
  */ 
-function getColor(colorName, opacity = 1) {
+export function getColor(colorName, opacity = 1) {
     opacity = Math.max(0, Math.min(opacity, 1));
 
     // Color palette based on Material Design standards
@@ -323,7 +323,7 @@ function getColor(colorName, opacity = 1) {
  * @param {number} newOpacity - float number
  * @returns {string}
  */
-function changeColorOpacity(rgba, newOpacity){
+export function changeColorOpacity(rgba, newOpacity){
     newOpacity = Math.max(0, Math.min(newOpacity, 1));
 
     // split to components and change alpha component, then compose and return
@@ -341,7 +341,7 @@ function changeColorOpacity(rgba, newOpacity){
  * 
  * @returns {string} The HEX color value including the alpha channel in the format `#RRGGBBAA`.
  */
-function rgba2hex(r, g, b, a) {
+export function rgba2hex(r, g, b, a) {
     // Validate input
     if (
         typeof r !== 'number' || r < 0 || r > 255 ||
@@ -371,7 +371,7 @@ function rgba2hex(r, g, b, a) {
  * @param {string} rgbaColor - A string in the format 'rgba(r, g, b, a)'.
  * @returns {string} - A new color string in 'rgba' format, with increased vibrancy.
  */
-function getColorDominantComponent(rgbaColor) {
+export function getColorDominantComponent(rgbaColor) {
     // Extract the RGBA components from the string
     const rgba = rgbaColor
         .replace(/^rgba?\(|\s+|\)$/g, '') // Remove 'rgba(', 'rgb(', ')', and spaces
@@ -414,7 +414,7 @@ function getColorDominantComponent(rgbaColor) {
  * @param {number} param.thickness  - thickness of line
  * @param {string} param.color  - color of line
  */
-function drawLine (context, {x1, y1, x2, y2, thickness, color} = {}){
+export function drawLine (context, {x1, y1, x2, y2, thickness, color} = {}){
     context.fillStyle = color;
     context.strokeStyle = color;
     context.lineWidth = thickness;
@@ -439,7 +439,7 @@ function drawLine (context, {x1, y1, x2, y2, thickness, color} = {}){
  * @param {number} param.height - height of rect
  * @param {string} param.fillColor - color of rect
  */
-function drawRect (context, {x, y, width, height, fillColor}){
+export function drawRect (context, {x, y, width, height, fillColor}){
     context.fillStyle = fillColor;
     context.fillRect(x, y, width, height);
 }
@@ -454,7 +454,7 @@ function drawRect (context, {x, y, width, height, fillColor}){
  * @param {number} by - second point y pos
  * @returns {number} - angle between two points
  */
-function getAngleBetweenTwoPoints(ax, ay, bx, by) {
+export function getAngleBetweenTwoPoints(ax, ay, bx, by) {
     let dy = by - ay;
     let dx = bx - ax;
     let theta = Math.atan2(dy, dx);
@@ -475,7 +475,7 @@ function getAngleBetweenTwoPoints(ax, ay, bx, by) {
  * @param {number} y2 - y coordinate of the second point
  * @returns {number} - The normalized angle between the two points
  */
-function getNormalizedAngle(x1, y1, x2, y2) {
+export function getNormalizedAngle(x1, y1, x2, y2) {
     // Calculate the angle in radians between the two points
     const angleInRadians = Math.atan2(y2 - y1, x2 - x1);
 
@@ -498,7 +498,7 @@ function getNormalizedAngle(x1, y1, x2, y2) {
  * @param {number} by - second point y pos
  * @returns {number} - distance value
  */
-function getDistanseBetweenTwoPoint(ax, ay, bx, by){
+export function getDistanseBetweenTwoPoint(ax, ay, bx, by){
     // first short side of triangle
     let a = ax - bx;
 
@@ -523,7 +523,7 @@ function getDistanseBetweenTwoPoint(ax, ay, bx, by){
  * @param {string} param.borderColor - circle border line color
  * @param {string} param.fillColor - circle inner fill color
  */
-function drawCircle(context, {cx, cy, r, fillColor, borderThickness, borderColor}){
+export function drawCircle(context, {cx, cy, r, fillColor, borderThickness, borderColor}){
     context.lineWidth = borderThickness;
 
     context.beginPath();
@@ -545,7 +545,7 @@ function drawCircle(context, {cx, cy, r, fillColor, borderThickness, borderColor
  * @param {number} param.lineThickness - thickness of grid line
  * @param {string} param.lineColor - color of grid line
  */
-function drawGrid(context, {cellSize, lineThickness, lineColor}){
+export function drawGrid(context, {cellSize, lineThickness, lineColor}){
     const width = context.canvas.width;
     const height = context.canvas.height;
     const columns = width / cellSize;
@@ -609,7 +609,7 @@ function drawGrid(context, {cellSize, lineThickness, lineColor}){
  * @param {string} param.align - text align (left, center, right)
  * @param {string} param.baseline - text baseline
  */
-function drawText(context, {x, y, text, color ='white', fontFamily = 'Arial', fontSize = 12, fontWeight = '', align = 'center', baseline = 'middle'}){
+export function drawText(context, {x, y, text, color ='white', fontFamily = 'Arial', fontSize = 12, fontWeight = '', align = 'center', baseline = 'middle'}){
     context.fillStyle = color;
     context.font = `${fontWeight} ${fontSize}px ${fontFamily}`; 
     context.textAlign = align;
@@ -626,10 +626,24 @@ function drawText(context, {x, y, text, color ='white', fontFamily = 'Arial', fo
  * @param {number} t - Curve parameter, where 0 <= t <= 1. Defines the position on the curve.
  * @returns {number} - The value on the Bezier curve corresponding to the parameter t.
  */
-function getBezierCurveValue(t) {
+export function getBezierCurveValue(t) {
     return t * t * (3 - 2 * t);
 }
 
+
+/**
+ * Сounts the number of milliseconds spent on executing the measured function and return time
+ * @param {Function} tatrgetFunc - target function the execution speed of which needs to be calculated
+ * @param  {...any} targetFuncArgs - arguments of target function
+ * @returns {Number} - function execution time in milliseconds
+ */
+export function measurePerformance(tatrgetFunc, ...targetFuncArgs) {
+    const start = performance.now();
+    tatrgetFunc(...targetFuncArgs);
+    const end = performance.now();
+
+    return end - start;
+}
 
 /**
  * Replace element with clone to reset all event listeners
@@ -637,7 +651,7 @@ function getBezierCurveValue(t) {
  * @param {string} id - dynamic id
  * @returns {HTMLElement}
  */
-function resetElement(target, id){
+export function resetElement(target, id){
     let clone = target.cloneNode(true);
     
     if(id && id.length > 0) {

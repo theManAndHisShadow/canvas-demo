@@ -1,3 +1,5 @@
+import { fractionToDecimal } from "../../../misc/helpers";
+
 /**
  * An auxiliary class that determines the type of a function and extracts the coefficients of its monomials
  */

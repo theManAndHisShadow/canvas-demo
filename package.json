@@ -1,15 +1,27 @@
 {
     "devDependencies": {
+        "@babel/core": "^7.25.2",
+        "@babel/plugin-proposal-class-properties": "^7.18.6",
+        "@babel/plugin-proposal-private-methods": "^7.18.6",
+        "@babel/preset-env": "^7.25.4",
+        "@babel/preset-react": "^7.24.7",
         "babel-loader": "^9.2.1",
         "copy-webpack-plugin": "^12.0.2",
         "glob": "^11.0.0",
         "html-webpack-plugin": "^5.6.0",
+        "install": "^0.13.0",
+        "npm": "^10.8.3",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-router-dom": "^6.26.2",
         "webpack": "^5.95.0",
-        "webpack-cli": "^5.1.4"
+        "webpack-cli": "^5.1.4",
+        "webpack-dev-server": "^5.1.0"
     },
     "scripts": {
         "build:core": "webpack --config webpack.core.config.js",
         "build:scenes": "webpack --config webpack.scenes.config.js",
-        "build:all": "npm run build:core && npm run build:scenes"
+        "build:all": "npm run build:core && npm run build:scenes",
+        "server": "webpack serve --config webpack.server.config.js --open"
     }
 }
