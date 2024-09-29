@@ -3,6 +3,8 @@ const path = require('path');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
+const publicPath = process.env.PUBLIC_URL || '/';
+
 module.exports = {
     // The input file where your imported class is used
     entry: () => {
@@ -26,7 +28,7 @@ module.exports = {
     output: {
         filename: '[name].[contenthash].js', // Output file after build
         path: path.resolve(__dirname, './build/js/scenes'),
-        publicPath: '/',
+        publicPath: publicPath,
     },
 
     module: {

@@ -4,6 +4,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
+const publicPath = process.env.PUBLIC_URL || '/';
+
+console.log(publicPath);
+
 module.exports = {
     // The input file where your imported class is used
     entry: [
@@ -15,7 +19,7 @@ module.exports = {
     output: {
         filename: 'js/chunks/[name].[contenthash].js', // Output file after build
         path: path.resolve(__dirname, './build'),
-        publicPath: './',
+        publicPath: publicPath,
     },
 
     module: {
