@@ -4,6 +4,10 @@ import { BrowserRouter as Router, Route, Routes, Link, BrowserRouter } from 'rea
 
 import ConcentricCirclesScene from './scenes/concentric-circles/scene.jsx';
 import ColorPickerScene from './scenes/color-picker/scene.jsx';
+import StaticGradientScene from './scenes/static-gradients/scene.jsx';
+import SpinningGearsScene from './scenes/spinning-gears/scene.jsx';
+import CartesianPlaneScene from './scenes/cartesian-plane/scene.jsx';
+import CycloidMotionScene from './scenes/cycloid-motion/scene.jsx';
 
 function App() {
     return (
@@ -23,13 +27,10 @@ function App() {
                                     <ul>
                                         <li><Link to="/concentric-circles">concentric-circles</Link></li>
                                         <li><Link to="/color-picker">color-picker</Link></li>
-                                        {/* Deprecated */}
-                                        {/* <li><a href="#" data-link-to-demo="cycloid-motion/scene">cycloid-motion</a></li>
-                                        <li><a href="#" data-link-to-demo="binary-search/scene">binary-search</a></li>
-                                        <li><a href="#" data-link-to-demo="cartesian-plane/scene">cartesian-plane</a></li>
-                                        <li><a href="#" data-link-to-demo="static-gradients/scene">static-gradients</a></li>
-                                        <li><a href="#" data-link-to-demo="color-picker/scene">color-picker</a></li>
-                                        <li><a href="#" data-link-to-demo="spinning-gears/scene">spinning-gears</a></li> */}
+                                        <li><Link to="/static-gradients">static-gradients</Link></li>
+                                        <li><Link to="/spinning-gears">spinning-gears</Link></li>
+                                        <li><Link to="/cartesian-plane">cartesian-plane</Link></li>
+                                        <li><Link to="/cycloid-motion">cycloid-motion</Link></li>
                                     </ul>
                                 </nav>
                             </div>
@@ -39,6 +40,10 @@ function App() {
                     <Routes>
                         <Route path="/concentric-circles" element={<ConcentricCirclesScene/>} />
                         <Route path="/color-picker" element={<ColorPickerScene/>} />
+                        <Route path="/static-gradients" element={<StaticGradientScene/>} />
+                        <Route path="/spinning-gears" element={<SpinningGearsScene/>} />
+                        <Route path="/cartesian-plane" element={<CartesianPlaneScene/>} />
+                        <Route path="/cycloid-motion" element={<CycloidMotionScene/>} />
                     </Routes>
                 </main>
 
