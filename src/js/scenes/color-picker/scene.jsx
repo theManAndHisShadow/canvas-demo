@@ -1,24 +1,57 @@
 
 import React from "react";
-import SceneTemplate from "../../core/scene.template.jsx";
-import { getMousePos, drawLine, getDistanseBetweenTwoPoint, rotatePoint, getNormalizedAngle, getBezierCurveValue, changeColorOpacity} from '../../misc/helpers.js';
+import SceneTemplate from "../../core/templates/scene.template.jsx";
+import { 
+    getMousePos, getDistanseBetweenTwoPoint, rotatePoint, getNormalizedAngle, getBezierCurveValue, 
+    getColorDominantComponent, changeColorOpacity, rgba2hex, 
+    drawLine 
+} from '../../misc/helpers.js';
 
 function ColorPickerScene() {
     return (
         <SceneTemplate
             title="Color picker demo scene"
+
             desciption="Color picker based on multicolor radial gradient and mouse events. Move range slider to adjust color. Click on the desired location on the circle to get color data."
+
+            uiTree={{
+                'description': {
+                    type: 'display-infobox',
+                    label: 'Description',
+                    text: 'Color picker based on multicolor radial gradient and mouse events. Move range slider to adjust color. Click on the desired location on the circle to get color data.'
+                },
+        
+                'currentColor': {
+                    type: 'display-item',
+                    label: 'Picker',
+                },
+        
+                'use-hex': {
+                    type: 'checkbox',
+                    label: 'Use HEX colors',
+                },
+        
+                'adjustment-slider': {
+                    type: 'range-slider',
+                    startLabel: 'Darker',
+                    endLabel: 'Lighter',
+                    minValue: 0,
+                    maxValue: 100,
+                    defaultValue: 50,
+                },
+            }}
+
             code={code}
         />
     );
 }
 
-function code(){
+function code(display, settings){
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
 
-    const width = canvas.width;
+    const width  = canvas.width;
     const height = canvas.height;
 
     // scene values
@@ -80,18 +113,18 @@ function code(){
     draw(defaultValue);
 
     // subscribing to settings changes
-    // settings.subscribe((key, newValue, oldValue) => {
-    //     if(key == 'adjustment-slider') {
-    //         // redraw spectrum
-    //         draw(newValue);
+    settings.subscribe((key, newValue, oldValue) => {
+        if(key == 'adjustment-slider') {
+            // redraw spectrum
+            draw(newValue);
 
-    //         pickColor();
-    //     }
+            pickColor();
+        }
 
-    //     if(key == 'use-hex') {
-    //         pickColor();
-    //     }
-    // });
+        if(key == 'use-hex') {
+            pickColor();
+        }
+    });
 
     /**
      * Select correct color for some special cases
@@ -115,9 +148,6 @@ function code(){
      * Select color under mouse and updates info at html display.
      */
     let pickColor = () => {
-        // mockup
-        let settings = {};
-        
         // check is pickerPos is not false
         if(pickerPos) {
             // get pixel data
@@ -139,29 +169,29 @@ function code(){
             let cssBackgroundColor = changeColorOpacity(color, 0.35);
 
             // update value of 'Current color' display option
-            // display.updateValue('currentColor',
-            //     // some DARK CSS MAGIC xD
-            //         // if true - draw round colored element with color string text
-            //         `<span style="
-            //                 background: ${color}; 
-            //                 width: 9px;
-            //                 height: 9px;
-            //                 position: relative;
-            //                 display: inline-block;
-            //                 border-radius: 100%;
-            //                 border: 2px solid rgba(0, 0, 0, 0.25);
-            //                 padding: 1px;
-            //                 left: 3px;
-            //                 top: 3px;
-            //             "></span>
-            //             <span class="gray-word-bubble" style="
-            //                 font-size: 13px;
-            //                 background: ${cssBackgroundColor};
-            //                 color: ${cssTextColor}
-            //             ">
-            //                 ${colorText}
-            //             </span>`
-            // );
+            display.updateValue('currentColor',
+                // some DARK CSS MAGIC xD
+                    // if true - draw round colored element with color string text
+                    `<span style="
+                            background: ${color}; 
+                            width: 9px;
+                            height: 9px;
+                            position: relative;
+                            display: inline-block;
+                            border-radius: 100%;
+                            border: 2px solid rgba(0, 0, 0, 0.25);
+                            padding: 1px;
+                            left: 3px;
+                            top: 3px;
+                        "></span>
+                        <span class="gray-word-bubble" style="
+                            font-size: 13px;
+                            background: ${cssBackgroundColor};
+                            color: ${cssTextColor}
+                        ">
+                            ${colorText}
+                        </span>`
+            );
         }
     }
 
@@ -317,33 +347,6 @@ function drawColorLabels(context, {radius, colorOrder, brightness}){
     }
 }
 
-/**
- * Draws a point shadow with a wide spread field
- * @param {CanvasRenderingContext2D} context 
- * @param {Number} param.radius - radius of shadow circle
- */
-function drawShadow(context, {radius}){
-    const width = context.canvas.width;
-    const height = context.canvas.height;
-    const centerX = width / 2;
-    const centerY = height / 2;
-   
-    /**
-     * Here we simulate a shadow using a radial gradient
-     */
-    const gradient = context.createRadialGradient(width / 2, height / 2, 20, width / 2, height / 2, height / 2);
-
-    gradient.addColorStop(0, 'black');
-    gradient.addColorStop(1, 'white');
-    
-    context.beginPath();
-    context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-    
-    context.fillStyle = gradient;
-    context.fill();
-    context.closePath();
-}
-
 
 /**
  * Draws a spectrum circle
@@ -484,7 +487,7 @@ function drawPickerPointer(context, {radius = 10, x, y, forElement}){
         parent.appendChild(pickerRound);
     } else {
         pickerRound.style.left = x + 23 + 'px';
-        pickerRound.style.top = y + 51 + 'px';
+        pickerRound.style.top = y + 55 + 'px';
     }
 }
 
