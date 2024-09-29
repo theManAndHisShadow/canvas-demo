@@ -22,7 +22,7 @@ const SceneTemplate = ({ title, desciption, uiTree, code }) => {
             <div class="section-block center-section-block">
                 <div class="section-block__inner">
                     <div class="wide-block rounded-block block">
-                        <h1>{title}</h1>
+                        <h2>{title}</h2>
                         <canvas width={600} height={400}></canvas>
                     </div>
                 </div>
