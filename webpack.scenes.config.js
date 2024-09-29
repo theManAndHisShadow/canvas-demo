@@ -1,6 +1,8 @@
 const glob = require('glob');
 const path = require('path');
 
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
 module.exports = {
     // The input file where your imported class is used
     entry: () => {
@@ -8,7 +10,7 @@ module.exports = {
 
         glob.sync((path.resolve(__dirname, './src/js/scenes/**/scene.jsx'))).forEach(file => {
             const dirName = path.dirname(file).split('/').pop();
-            const fileName = path.basename(file, '.js');
+            const fileName = path.basename(file, '.jsx');
 
             entries[`${dirName}/${fileName}`] = file;
         });
@@ -22,8 +24,9 @@ module.exports = {
     },
 
     output: {
-        filename: '[name].js', // Output file after build
+        filename: '[name].[contenthash].js', // Output file after build
         path: path.resolve(__dirname, './build/js/scenes'),
+        publicPath: '/',
     },
 
     module: {
@@ -36,6 +39,16 @@ module.exports = {
                 },
             },
         ],
+    },
+
+    plugins: [
+        new CleanWebpackPlugin(),
+    ],
+
+    optimization: {
+        splitChunks: {
+          chunks: 'async',
+        },
     },
 
     mode: 'production', // Specify the mode (development/production)
