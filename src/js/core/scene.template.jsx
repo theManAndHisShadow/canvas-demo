@@ -1,8 +1,20 @@
 import React, { useEffect } from "react";
+import UI from "./ui.class.js";
 
-const SceneTemplate = ({ title, desciption, code }) => {
+const SceneTemplate = ({ title, desciption, uiTree, code }) => {
     useEffect(() => {
-        code();
+        // N.B.: A temporary solution is to integrate the old class with the new react component.
+        const sceneUI = new UI({
+            timestamp: Date.now(),
+            display: document.querySelector('#scene-info'),
+            controls: document.querySelector('#controls'),
+        });
+
+        // render UI using uiTree from component param
+        sceneUI.render(uiTree);
+
+        // give access to 'display ui' and 'contrls ui' from code
+        code(sceneUI.display, sceneUI.states);
     }, [code]);
 
     return (
