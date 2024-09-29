@@ -1,19 +1,49 @@
 
 import React from "react";
-import SceneTemplate from "../../core/scene.template.jsx";
-import { getMousePos, drawGrid, drawCircle, drawLine, getDistanseBetweenTwoPoint} from '../../misc/helpers.js';
+import SceneTemplate from "../../core/templates/scene.template.jsx";
+import { 
+    getMousePos, getDistanseBetweenTwoPoint, getAngleBetweenTwoPoints,
+    drawRect,drawCircle, drawLine, 
+} from '../../misc/helpers.js';
 
 function ConcentricCirclesScene() {
     return (
         <SceneTemplate
             title="Concentric circles"
+
             desciption="A simple scene, training with rotating shapes and interacting with mouse events"
+
+            uiTree={{
+                'description': {
+                    type: 'display-item-infobox',
+                    label: 'Description',
+                    text: 'A simple scene, training with rotating shapes and interacting with mouse events.'
+                },
+        
+                'distance': {
+                    type: 'display-item',
+                    label: ' - distance to center',
+                },
+        
+                'angle': {
+                    type: 'display-item',
+                    label: ' - angle of view',
+                },
+        
+                'circlesAmount': {
+                    type: 'input',
+                    label: 'Circles',
+                    maxValue: 55,
+                    defaultValue: 5,
+                },
+            }}
+            
             code={code}
         />
     );
 }
 
-function code(){
+function code(display, settings){
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
@@ -27,26 +57,32 @@ function code(){
     const centerY = height / 2;
     const outerRadius = 150;
     const gainFactor = 0.0002;
+    let amount = 5;
 
     // some dynamic values (updates in 'mousemove' event)
     let mousePos = {x: false, y: false};
     let distance = null;
 
-    const amount = 10;
-    let loop = () => {
-        // const amount = settings.getState("circlesAmount");
+    settings.subscribe((key, newValue, oldValue) => {
+        if(key == 'circlesAmount') {
+            amount = newValue;
+            redrawFrame();
+        }
+    });
 
+    let redrawFrame = () => {
         context.clearRect(
             0, 0,
             width,
             height
         );
 
-        // draw background grid
-        drawGrid(context, {
-            cellSize: 10,
-            lineThickness: 1,
-            lineColor: 'rgba(0, 0, 0, 0.0032)',
+        drawRect(context, {
+            x: 0,
+            y: 0,
+            width: width,
+            height: height,
+            fillColor: 'rgba(0, 0, 0, 0.1)',
         });
 
         // draw concetric circles
@@ -147,15 +183,15 @@ function code(){
     }
 
     root.addEventListener('mousemove', event => {
-        loop();
+        redrawFrame();
         
         // updating some values when mouse moves
         mousePos = getMousePos(canvas, event);
         distance = Math.round(getDistanseBetweenTwoPoint(mousePos.x, mousePos.y, centerX, centerY));
 
         // add some additional info
-        // display.updateValue('distance', distance + ' px.');
-        // display.updateValue('angle', Math.round(getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y)) + ' °');
+        display.updateValue('distance', distance + ' px.');
+        display.updateValue('angle', Math.round(getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y)) + ' °');
     });
 }
 
