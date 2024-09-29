@@ -1,4 +1,6 @@
 
+import { drawCircle, drawLine, rotatePoint } from "../../misc/helpers";
+
 class SynteticEventTarget {
     constructor (){
         this.events = {};
