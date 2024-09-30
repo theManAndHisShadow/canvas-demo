@@ -10,6 +10,11 @@ a, a:visited {
     text-decoration: none;
 }
 
+a:hover {
+    color: #4493f8 !important;
+    text-decoration: underline;
+}
+
 header, main, footer {
     position: relative;
     width: 100%;
@@ -29,6 +34,7 @@ main {
     height: fit-content;
     background-color: #0d1117;
     color: white;
+    min-height: 530px;
 }
 
 footer {
@@ -64,11 +70,12 @@ footer {
 }
 
 .left-section-block {
-    width: 23%;
+    width: 70%;
 }
 
 .left-section-block .section-block__inner {
     float: right;
+    width: 100%;
 }
 
 .left-section-block nav ul {
@@ -90,12 +97,11 @@ footer {
 }
 
 .block {
-    padding: 7px 15px;
     background-color: white;
-    margin: 0px auto;
-    display: inline-block;
+    display: block;
     background-color: #0d1117;
     color: white;
+    float: left;
 }
 
 .rounded-block {
@@ -112,7 +118,7 @@ footer {
 }
 
 .wide-block {
-    width: 95%;
+    width: 70%;
 }
 
 .separated-block {
@@ -123,6 +129,80 @@ footer {
 .text-block {
     line-height: 1.5;
     font-size: 16px;
+}
+
+.scene-viewer {
+    border: 1px solid #2f353d;
+    height: fit-content;
+    display: flex;
+    border-radius: 5px;
+    top: 15px;
+    width: 850px;
+    position: relative;
+    margin-right: 16px;
+    float: right;
+    right: 12px;
+}
+
+.scene-viewer .list {
+    width: 180px;
+    border-right: 1px solid #2f353d;
+    overflow: hidden;
+}
+
+.scene-viewer .list ul {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    top: -17px;
+}
+
+
+.list-title {
+    background: #151b23;
+    padding: 6px;
+    position: relative;
+    float: left;
+    width: 103%;
+    left: -4px;
+    top: -17px;
+    border-bottom: 1px solid #2f353d;
+}
+
+.list-title h3 {
+    position: relative;
+    left: 10px;
+    top: 10px;
+    font-size: 14px;
+    color: #9198a1;
+}
+
+.scene-viewer .list ul li:nth-child(even) {
+
+}
+
+.scene-viewer .list ul li:nth-child(odd) {
+    background: #01040969;
+}
+
+.scene-viewer .list ul li {
+    padding: 7px 10px;
+    min-height: 18px;
+    font-size: 14px;
+}
+
+
+.scene-viewer .wide-block h2 {
+    position: relative;
+    left: 42px;
+    top: -3px;
+}
+
+.scene-viewer .wide-block canvas {
+    position: relative;
+    left: 39px;
+    bottom: 14px;
+    border-radius: 5px;
 }
 
 .hr-line-separator {
