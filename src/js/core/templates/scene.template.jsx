@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import UI from "../classes/ui.class.js";
 
+import RightSidebarComponent from "../../components/ritght_sidebar.component.jsx";
+
 const SceneTemplate = ({ title, description, tags, uiTree, code }) => {
     useEffect(() => {
         // N.B.: A temporary solution is to integrate the old class with the new react component.
@@ -28,36 +30,10 @@ const SceneTemplate = ({ title, description, tags, uiTree, code }) => {
                 </div>
             </div>
 
-            <div class="section-block right-section-block">
-                <div class="section-block__inner">
-                <div class="medium-block block separated-block text-block">
-                        <h3>Description</h3>
-                        <div>{description}</div>
-                        <ul class="concepions-tags">
-                            {tags.map((tag, index) => (
-                                <li key={index}>{tag}</li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div class="medium-block block separated-block" style={{display: 'none'}}>
-                        <h3>Scene info</h3>
-                        <div id="scene-info">
-                            <div class="display-infobox">
-                                <h4>Description</h4>
-                                <div>{description}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="medium-block block separated-block">
-                        <h3>Controls</h3>
-                        <div id="controls">
-
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <RightSidebarComponent
+                description={description}
+                tags={tags}
+            />
         </div>
     );
 }
