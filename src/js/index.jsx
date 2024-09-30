@@ -21,7 +21,7 @@ function App() {
                 <main>
                     <div class="section-block left-section-block">
                         <div class="section-block__inner">
-                            <div class="mini-block rounded-block block">
+                            <div class="mini-block block">
                                 <h3>Navigation</h3>
                                 <nav>
                                     <ul>
