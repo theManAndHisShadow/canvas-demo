@@ -1,6 +1,7 @@
 import React from "react";
 
 const RightSidebarComponent = ({ description, tags }) => {
+    tags = tags || [];
 
     return (
         <div class="section-block right-section-block">
