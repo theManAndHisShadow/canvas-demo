@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import UI from "../classes/ui.class.js";
 
-const SceneTemplate = ({ title, desciption, uiTree, code }) => {
+const SceneTemplate = ({ title, description, tags, uiTree, code }) => {
     useEffect(() => {
         // N.B.: A temporary solution is to integrate the old class with the new react component.
         const sceneUI = new UI({
@@ -21,7 +21,7 @@ const SceneTemplate = ({ title, desciption, uiTree, code }) => {
         <div>
             <div class="section-block center-section-block">
                 <div class="section-block__inner">
-                    <div class="wide-block rounded-block block">
+                    <div class="wide-block block">
                         <h2>{title}</h2>
                         <canvas width={600} height={400}></canvas>
                     </div>
@@ -30,16 +30,27 @@ const SceneTemplate = ({ title, desciption, uiTree, code }) => {
 
             <div class="section-block right-section-block">
                 <div class="section-block__inner">
-                    <div class="medium-block rounded-block block">
+                <div class="medium-block block separated-block text-block">
+                        <h3>Description</h3>
+                        <div>{description}</div>
+                        <ul class="concepions-tags">
+                            {tags.map((tag, index) => (
+                                <li key={index}>{tag}</li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div class="medium-block block separated-block" style={{display: 'none'}}>
                         <h3>Scene info</h3>
                         <div id="scene-info">
                             <div class="display-infobox">
-                                <span class="scene-info__display-infobox-label scene-info__item-label">⇢ Description</span>
-                                <div>{desciption}</div>
+                                <h4>Description</h4>
+                                <div>{description}</div>
                             </div>
                         </div>
                     </div>
-                    <div class="medium-block rounded-block block">
+
+                    <div class="medium-block block separated-block">
                         <h3>Controls</h3>
                         <div id="controls">
 
