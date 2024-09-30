@@ -6,7 +6,7 @@ import Cycloid from './classes/cycloid.class.js';
 
 import { getColor, changeColorOpacity, truncateFloatNum, drawRect} from "../../misc/helpers.js";
 
-function CycloidMotionScene() {
+function CycloidMotionScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Cycloid motion"
@@ -98,6 +98,8 @@ function CycloidMotionScene() {
             }}
 
             code={code}
+            setDescription={setDescription}
+            setTags={setTags}
         />
     );
 }

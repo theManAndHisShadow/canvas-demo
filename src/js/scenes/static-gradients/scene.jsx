@@ -4,7 +4,7 @@ import SceneTemplate from "../../core/templates/scene.template.jsx";
 
 import { getRandomNumber, measurePerformance,getDistanseBetweenTwoPoint, getNormalizedAngle } from "../../misc/helpers.js";
 
-function StaticGradientScene() {
+function StaticGradientScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Static gradients"
@@ -52,6 +52,8 @@ function StaticGradientScene() {
             }}
 
             code={code}
+            setDescription={setDescription}
+            setTags={setTags}
         />
     );
 }

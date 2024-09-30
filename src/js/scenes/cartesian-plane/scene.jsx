@@ -9,7 +9,7 @@ import { CartesianPlane } from "./classes/plane.class.js";
 
 import { getMousePos, getColor, changeColorOpacity } from "../../misc/helpers.js";
 
-function CartesianPlaneScene() {
+function CartesianPlaneScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Cartesian plane demo"
@@ -46,6 +46,8 @@ function CartesianPlaneScene() {
             }}
 
             code={code}
+            setDescription={setDescription}
+            setTags={setTags}
         />
     );
 }

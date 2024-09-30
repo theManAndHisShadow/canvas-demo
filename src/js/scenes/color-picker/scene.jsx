@@ -7,7 +7,7 @@ import {
     drawLine 
 } from '../../misc/helpers.js';
 
-function ColorPickerScene() {
+function ColorPickerScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Color picker demo scene"
@@ -42,6 +42,8 @@ function ColorPickerScene() {
             }}
 
             code={code}
+            setDescription={setDescription}
+            setTags={setTags}
         />
     );
 }

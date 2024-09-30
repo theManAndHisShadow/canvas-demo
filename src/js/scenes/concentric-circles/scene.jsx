@@ -1,12 +1,12 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import SceneTemplate from "../../core/templates/scene.template.jsx";
 import { 
     getMousePos, getDistanseBetweenTwoPoint, getAngleBetweenTwoPoints,
     drawRect,drawCircle, drawLine, 
 } from '../../misc/helpers.js';
 
-function ConcentricCirclesScene() {
+function ConcentricCirclesScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Concentric circles"
@@ -40,6 +40,8 @@ function ConcentricCirclesScene() {
             }}
             
             code={code}
+            setDescription={setDescription}
+            setTags={setTags}
         />
     );
 }

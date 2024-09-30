@@ -6,7 +6,7 @@ import { Gear } from "./gear.class.js";
 import { translateIndexToLetter, drawRect, drawGrid } from "../../misc/helpers.js";
 
  
-function SpinningGearsScene() {
+function SpinningGearsScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Spinning gears"
@@ -52,6 +52,8 @@ function SpinningGearsScene() {
             }}
 
             code={code}
+            setDescription={setDescription}
+            setTags={setTags}
         />
     );
 }
