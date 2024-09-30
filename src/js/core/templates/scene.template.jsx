@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import UI from "../classes/ui.class.js";
 
-import RightSidebarComponent from "../../components/ritght_sidebar.component.jsx";
-
-const SceneTemplate = ({ title, description, tags, uiTree, code }) => {
+const SceneTemplate = ({ title, description, tags, uiTree, setDescription, setTags, code }) => {
     useEffect(() => {
+        setDescription(description);
+        setTags(tags);
+
         // N.B.: A temporary solution is to integrate the old class with the new react component.
         const sceneUI = new UI({
             timestamp: Date.now(),
@@ -17,23 +18,12 @@ const SceneTemplate = ({ title, description, tags, uiTree, code }) => {
 
         // give access to 'display ui' and 'contrls ui' from code
         code(sceneUI.display, sceneUI.states);
-    }, [code]);
+    }, [setDescription, setTags, code]);
 
     return (
-        <div>
-            <div class="section-block center-section-block">
-                <div class="section-block__inner">
-                    <div class="wide-block block">
-                        <h2>{title}</h2>
-                        <canvas width={600} height={400}></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <RightSidebarComponent
-                description={description}
-                tags={tags}
-            />
+        <div className="wide-block block">
+            <h2>{title}</h2>
+            <canvas width={600} height={400}></canvas>
         </div>
     );
 }
