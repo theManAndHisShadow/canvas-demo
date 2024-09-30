@@ -11,8 +11,9 @@ function ConcentricCirclesScene() {
         <SceneTemplate
             title="Concentric circles"
 
-            desciption="A simple scene, training with rotating shapes and interacting with mouse events"
-
+            description="A simple scene, training with rotating shapes and interacting with mouse events"
+            tags={['mouse-interaction']}
+            
             uiTree={{
                 'description': {
                     type: 'display-item-infobox',

@@ -8,7 +8,8 @@ function StaticGradientScene() {
     return (
         <SceneTemplate
             title="Static gradients"
-            desciption=""
+            description="Using built-in methods for drawing gradients obviously shows itself much better, compared to custom functions for rendering pixel by pixel."
+            tags={['color', 'performance', 'benchmark']}
             uiTree={{
                 'description': {
                     type: 'display-infobox',

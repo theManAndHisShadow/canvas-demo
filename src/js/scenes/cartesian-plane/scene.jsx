@@ -13,7 +13,9 @@ function CartesianPlaneScene() {
     return (
         <SceneTemplate
             title="Cartesian plane demo"
-            desciption=""
+            description="Cartesian coordinate system in a plane is a coordinate system that specifies each point uniquely by a pair of real numbers called coordinates, which are the signed distances to the point from two fixed perpendicular oriented lines, called coordinate lines or coordinate axes."
+            tags={['math', 'graphics']}
+
             uiTree={{
                 'description': {
                     type: 'display-infobox',
