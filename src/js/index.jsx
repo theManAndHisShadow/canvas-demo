@@ -119,6 +119,7 @@ function App() {
                             <Suspense fallback={<div>Loading scene...</div>}>
                                 <Routes>
                                     <Route path="/" element={<WelcomeScene setDescription={setDescription} setTags={setTags} />} />
+                                    <Route path="/canvas-demo/index.html" element={<WelcomeScene setDescription={setDescription} setTags={setTags} />} />
                                     <Route path="/concentric-circles" element={<ConcentricCirclesScene setDescription={setDescription} setTags={setTags} />} />
                                     <Route path="/color-picker" element={<ColorPickerScene setDescription={setDescription} setTags={setTags} />} />
                                     <Route path="/static-gradients" element={<StaticGradientScene setDescription={setDescription} setTags={setTags} />} />
