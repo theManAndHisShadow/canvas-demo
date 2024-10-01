@@ -5,6 +5,10 @@ html, body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
+html, body {
+    background-color: #0d1117;
+}
+
 a, a:visited {
     color: white;
     text-decoration: none;
@@ -27,6 +31,45 @@ header {
     background-color: #010409;
     color: #f0f6fc;
     border-bottom: 1px solid #3d444d;
+    height: fit-content;
+}
+
+.header-logo {
+    width: fit-content;
+    position: relative;
+    /* background: #ffffff52; */
+    left: 82px;
+    padding: 10px;
+    top: -3px;
+}
+
+.header-logo a {
+    background: none;
+    color: #ffffff;
+    padding: 4px 5px;
+    display: inline-block;
+    border-radius: 5px;
+    margin: 4px 3px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.header-logo a:hover {
+    background: #ffffff1a;
+    text-decoration: none;
+    color: white !important;
+}
+
+.header-logo span {
+    font-weight: 100;
+    font-size: 14px;
+}
+
+.header-logo i.fa-brands.fa-github{
+    font-size: 31px;
+    position: relative;
+    top: 7px;
+    right: 12px;
 }
 
 main {
@@ -38,8 +81,7 @@ main {
 }
 
 footer {
-    background: #0e111c;
-    color: white;
+    background: #0d1117;
 }
 
 #logo {
@@ -53,7 +95,8 @@ footer {
 
 #footer-info {
     padding: 10px;
-    min-height: 100px;
+    color: #ffffff1c;
+    font-size: 13px;
 }
 
 /* Styles for section blocks */
@@ -62,6 +105,39 @@ footer {
     float: left;
     min-width: 180px;
     height: 100%;
+}
+
+.right-section-block h2, 
+.right-section-block h3, 
+.right-section-block h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+#controls {
+    font-family: monospace;
+    line-height: 28px;
+}
+
+#controls select,
+#controls input, 
+#controls button  {
+    background: #212830;
+    color: white;
+    padding: 4px 4px;
+    border-radius: 5px;
+    border: 1px solid #2f353d;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+#controls input[type="range"] {
+    top: 9px;
+}
+
+#controls button.controls__main-action-button {
+    background-color: #238636 !important;
+    margin-top: 6px;
 }
 
 .section-block__inner {
@@ -126,6 +202,10 @@ footer {
     padding: 16px 0px;
 }
 
+.separated-block:last-child {
+    border-bottom: none;
+}
+
 .text-block {
     line-height: 1.5;
     font-size: 16px;
@@ -175,10 +255,6 @@ footer {
     top: 10px;
     font-size: 14px;
     color: #9198a1;
-}
-
-.scene-viewer .list ul li:nth-child(even) {
-
 }
 
 .scene-viewer .list ul li:nth-child(odd) {
@@ -341,33 +417,6 @@ footer {
     cursor: pointer;
     transition: 0.3s ease;
     opacity: 1;
-}
-
-.controls__main-action-button {
-    background: none;
-    border: 1px solid #23369e;
-    position: relative;
-    border-radius: 3px;
-    margin: 0 auto;
-    cursor: pointer;
-    padding: 5px 10px;
-    transition: 0.3s ease;
-    opacity: 1;
-    display: block;
-    color: white;
-    background-color: #2243f7;
-    font-size: 14px;
-}
-
-[data-selected-option="true"],
-.controls__option-selector-button:hover {
-    color: #0f35ff;
-    border-color: #0f35ff;
-}
-
-.controls__option-selector-button:active,
-.controls__main-action-button:active {
-    opacity: 0.3;
 }
 
 .concepions-tags {
