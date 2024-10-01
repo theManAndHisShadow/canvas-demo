@@ -6,7 +6,7 @@ const RightSidebarComponent = ({ description, tags }) => {
     return (
         <div class="section-block right-section-block">
             <div class="section-block__inner">
-                <div class="medium-block block separated-block text-block">
+                <div id="decription" class="medium-block block separated-block text-block">
                     <h3>Description</h3>
                     <div>{description}</div>
                     <ul class="concepions-tags">
