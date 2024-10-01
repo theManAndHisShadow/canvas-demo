@@ -136,7 +136,8 @@ function App() {
             </main>
 
             <footer>
-                <div id="footer-info" class="centred-text">created in 2024</div>
+                <div id="footer-info" class="centred-text">created in 2024 by  
+                     <Link to="https://t.me/kazumov" target="_blank" rel="noopener noreferrer">@kazumov</Link></div>
             </footer>
         </div>
     );

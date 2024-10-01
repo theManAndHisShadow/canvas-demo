@@ -73,11 +73,9 @@ header {
 }
 
 main {
-    background-color: #dde2eb;
-    height: fit-content;
     background-color: #0d1117;
     color: white;
-    min-height: 530px;
+    height: 100vh;
 }
 
 footer {
@@ -95,8 +93,17 @@ footer {
 
 #footer-info {
     padding: 10px;
-    color: #ffffff1c;
     font-size: 13px;
+}
+
+#footer-info,
+#footer-info a {
+    color: #ffffff1c;
+}
+
+#footer-info a {
+    position: relative;
+    left: 3px;
 }
 
 /* Styles for section blocks */
