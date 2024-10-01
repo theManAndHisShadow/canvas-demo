@@ -23,23 +23,23 @@ function StaticGradientScene({ setDescription, setTags }) {
                 },
 
                 'gradientRenderingMethod': {
-                    type: 'option-selector',
-                    label: 'Gradient rendering method',
-                    optionNames: [
-                        'pixel-by-pixel',
-                        'built-in',
+                    type: 'option-dropdown-list',
+                    label: 'Rendering method',
+                    options: [
+                        {name: 'pixel-by-pixel'},
+                        {name: 'built-in'},
                     ],
                     defaultValue: 0,
                 },
 
                 'gradientTypeSelector': {
-                    type: 'option-selector',
-                    label: 'Gradient type',
-                    optionNames: [
-                        'linear',
-                        'conical',
-                        'radial',
-                        'multicolor'
+                    type: 'option-dropdown-list',
+                    label: 'Type',
+                    options: [
+                        {name: 'linear'},
+                        {name: 'conical'},
+                        {name: 'radial'},
+                        {name: 'multicolor'}
                     ],
 
                     defaultValue: 1,
