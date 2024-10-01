@@ -4,11 +4,12 @@ import SceneTemplate from "../../core/templates/scene.template.jsx";
 
 import { getRandomNumber, measurePerformance,getDistanseBetweenTwoPoint, getNormalizedAngle } from "../../misc/helpers.js";
 
-function StaticGradientScene() {
+function StaticGradientScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Static gradients"
-            desciption=""
+            description="Using built-in methods for drawing gradients obviously shows itself much better, compared to custom functions for rendering pixel by pixel."
+            tags={['color', 'performance', 'benchmark']}
             uiTree={{
                 'description': {
                     type: 'display-infobox',
@@ -22,23 +23,23 @@ function StaticGradientScene() {
                 },
 
                 'gradientRenderingMethod': {
-                    type: 'option-selector',
-                    label: 'Gradient rendering method',
-                    optionNames: [
-                        'pixel-by-pixel',
-                        'built-in',
+                    type: 'option-dropdown-list',
+                    label: 'Rendering method',
+                    options: [
+                        {name: 'pixel-by-pixel'},
+                        {name: 'built-in'},
                     ],
                     defaultValue: 0,
                 },
 
                 'gradientTypeSelector': {
-                    type: 'option-selector',
-                    label: 'Gradient type',
-                    optionNames: [
-                        'linear',
-                        'conical',
-                        'radial',
-                        'multicolor'
+                    type: 'option-dropdown-list',
+                    label: 'Type',
+                    options: [
+                        {name: 'linear'},
+                        {name: 'conical'},
+                        {name: 'radial'},
+                        {name: 'multicolor'}
                     ],
 
                     defaultValue: 1,
@@ -51,6 +52,8 @@ function StaticGradientScene() {
             }}
 
             code={code}
+            setDescription={setDescription}
+            setTags={setTags}
         />
     );
 }

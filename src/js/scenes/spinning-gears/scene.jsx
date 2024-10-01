@@ -6,12 +6,13 @@ import { Gear } from "./gear.class.js";
 import { translateIndexToLetter, drawRect, drawGrid } from "../../misc/helpers.js";
 
  
-function SpinningGearsScene() {
+function SpinningGearsScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Spinning gears"
 
-            desciption="A visual demonstration of the «gear ratio» principle helps you see with your own eyes how gears with different numbers of teeth interact with each other."
+            description="A visual demonstration of the «gear ratio» principle helps you see with your own eyes how gears with different numbers of teeth interact with each other."
+            tags={['gears', 'animation', 'mechanics']}
 
             uiTree={{
                 'description': {
@@ -51,6 +52,8 @@ function SpinningGearsScene() {
             }}
 
             code={code}
+            setDescription={setDescription}
+            setTags={setTags}
         />
     );
 }

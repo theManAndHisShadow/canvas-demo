@@ -6,11 +6,12 @@ import Cycloid from './classes/cycloid.class.js';
 
 import { getColor, changeColorOpacity, truncateFloatNum, drawRect} from "../../misc/helpers.js";
 
-function CycloidMotionScene() {
+function CycloidMotionScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Cycloid motion"
-            desciption=""
+            description="A cycloid is the curve traced by a point on the circumference of a circle as it rolls along a straight line. The key condition in this motion is that the circle rolls without slipping. A specific example of a cycloid is the epicycloid, where a circle rolls inside a larger circle. An example of an hypocycloid is demonstrated in this interactive scene."
+            tags={['geometry', 'math', 'animation']}
             uiTree={{
                 'description': {
                     type: 'display-infobox',
@@ -97,6 +98,8 @@ function CycloidMotionScene() {
             }}
 
             code={code}
+            setDescription={setDescription}
+            setTags={setTags}
         />
     );
 }

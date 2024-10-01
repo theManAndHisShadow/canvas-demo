@@ -11,6 +11,7 @@
         "cross-env": "^7.0.3",
         "gh-pages": "^6.1.1",
         "glob": "^11.0.0",
+        "html-loader": "^5.1.0",
         "html-webpack-plugin": "^5.6.0",
         "install": "^0.13.0",
         "npm": "^10.8.3",

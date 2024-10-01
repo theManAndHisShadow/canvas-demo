@@ -9,11 +9,13 @@ import { CartesianPlane } from "./classes/plane.class.js";
 
 import { getMousePos, getColor, changeColorOpacity } from "../../misc/helpers.js";
 
-function CartesianPlaneScene() {
+function CartesianPlaneScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Cartesian plane demo"
-            desciption=""
+            description="Cartesian coordinate system in a plane is a coordinate system that specifies each point uniquely by a pair of real numbers called coordinates, which are the signed distances to the point from two fixed perpendicular oriented lines, called coordinate lines or coordinate axes."
+            tags={['math', 'graphics']}
+
             uiTree={{
                 'description': {
                     type: 'display-infobox',
@@ -44,6 +46,8 @@ function CartesianPlaneScene() {
             }}
 
             code={code}
+            setDescription={setDescription}
+            setTags={setTags}
         />
     );
 }
