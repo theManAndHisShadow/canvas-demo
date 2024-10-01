@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes, Link, BrowserRouter } from 'rea
 
 import RightSidebarComponent from './components/right_sidebar.component.jsx';
 
+const WelcomeScene = React.lazy(() => import('./scenes/welcome-scene/scene.jsx'));
 const ConcentricCirclesScene = React.lazy(() => import('./scenes/concentric-circles/scene.jsx'));
 const ColorPickerScene = React.lazy(() => import('./scenes/color-picker/scene.jsx'));
 const StaticGradientScene = React.lazy(() => import('./scenes/static-gradients/scene.jsx'));
@@ -117,6 +118,8 @@ function App() {
 
                             <Suspense fallback={<div>Loading scene...</div>}>
                                 <Routes>
+                                    <Route path="/" element={<WelcomeScene setDescription={setDescription} setTags={setTags} />} />
+                                    <Route path="/canvas-demo/index.html" element={<WelcomeScene setDescription={setDescription} setTags={setTags} />} />
                                     <Route path="/concentric-circles" element={<ConcentricCirclesScene setDescription={setDescription} setTags={setTags} />} />
                                     <Route path="/color-picker" element={<ColorPickerScene setDescription={setDescription} setTags={setTags} />} />
                                     <Route path="/static-gradients" element={<StaticGradientScene setDescription={setDescription} setTags={setTags} />} />
