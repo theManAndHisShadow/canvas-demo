@@ -23,7 +23,7 @@ function WelcomeScene({ setDescription, setTags }) {
             controls.style.display = 'none';
 
         return () => {
-            controls.style.displaxy = 'initial';
+            controls.style.display = 'initial';
             description.style.borderBottom = '1px solid #3d444db3';
         }
     });
