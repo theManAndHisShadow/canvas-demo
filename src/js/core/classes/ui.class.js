@@ -367,8 +367,6 @@ class UIControls {
             let element = document.createElement('div');
                 element.id = elementName;
 
-            let separator = document.createElement('div');
-                separator.classList.add('hr-line-separator');
     
             let button = document.createElement('button');
                 button.classList.add('controls__main-action-button');
@@ -384,7 +382,6 @@ class UIControls {
                     }
                 });
     
-            element.appendChild(separator);
             element.appendChild(button);
 
             /**
