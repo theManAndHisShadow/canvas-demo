@@ -95,13 +95,13 @@ function App() {
 
                                         <li>
                                             <Link to="/cartesian-plane">
-                                                <i class="fa-solid fa-cube"></i> spinning-gears
+                                                <i class="fa-solid fa-cube"></i> cartesian-plane
                                             </Link>
                                         </li>
 
                                         <li>
                                             <Link to="/cycloid-motion">
-                                                <i class="fa-solid fa-cube"></i> spinning-gears
+                                                <i class="fa-solid fa-cube"></i> cycloid-motion
                                             </Link>
                                         </li>
                                         <li></li>
@@ -136,7 +136,7 @@ function App() {
             </main>
 
             <footer>
-                <div id="footer-info" class="centred-text">hobby project 2024</div>
+                <div id="footer-info" class="centred-text">created in 2024</div>
             </footer>
         </div>
     );
