@@ -1,34 +1,10 @@
 import { StateManager } from "./states.class.js";
-
-/**
- * Helper class.
- */
-class SceneEventTarget {
-    constructor (){
-        this.events = {};
-    }
-
-    addEventListener(eventType, callback) {
-        if (!this.events[eventType]) {
-            this.events[eventType] = [];
-        }
-        
-        this.events[eventType].push(callback);
-    }
-
-    dispatchEvent(eventType, data) {
-        if (this.events[eventType]) {
-            this.events[eventType].forEach(callback => callback(data));
-        }
-    }
-}
-
-
+import SyntheticEventTarget from "./synthetic_event_target.class.js";
 
 /**
  * Parent class that manages work of UIControls and UIDisplay classes. Also stores StateManager of UI.
  */
-export default class UI extends SceneEventTarget {
+export default class UI extends SyntheticEventTarget {
     constructor({display, controls, timestamp}){
         super();
 
