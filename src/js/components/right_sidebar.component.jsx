@@ -27,7 +27,7 @@ const RightSidebarComponent = ({ description, tags }) => {
                 </div>
 
                 <div class="medium-block block separated-block">
-                    <h3>Controls</h3>
+                    <h3>Control panel</h3>
                     <div id="controls">
 
                     </div>

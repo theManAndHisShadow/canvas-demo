@@ -10,7 +10,7 @@ const SceneTemplate = ({ title, description, tags, uiTree, setDescription, setTa
         const sceneUI = new UI({
             timestamp: Date.now(),
             outputPanel: document.querySelector('#scene-info'),
-            controls: document.querySelector('#controls'),
+            controlPanel: document.querySelector('#controls'),
         });
 
         // render UI using uiTree from component param

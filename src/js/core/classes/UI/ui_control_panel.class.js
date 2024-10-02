@@ -31,7 +31,7 @@ export default class UI_ControlPanel {
 
 
     /**
-     * Resets content of root element of 'controls' HTML Block
+     * Resets content of root element of UI_ControlPanel HTML root block
      */
     clearRoot() {
         this.#html.root.innerHTML = '';
@@ -39,8 +39,8 @@ export default class UI_ControlPanel {
 
 
     /**
-     * Appends new ready HTML element to 'Controls' HTML root block
-     * @param {string} elementName - element name at UIControls class instance '#html' structure tree
+     * Appends new ready HTML element to UI_ControlPanel HTML root block
+     * @param {string} elementName - element name at UI_ControlPanel class instance '#html' structure tree
      * @param {{element: HTMLElement, label: HTMLElement, value: HTMLElement}} renderedElementObject - {element - ref to whole rendered element, label - ref to label, value - ref to value element}
      */
     appendToHTML(elementName, renderedElementObject) {
@@ -52,7 +52,7 @@ export default class UI_ControlPanel {
 
 
     /**
-     * Manage when UI controls is blocked/unblocked
+     * Manage when UI_ControlPanel is blocked/unblocked
      * @param {number} timestamp - scene timestamp, where UI is blockled
      * @returns {{Function: block, Function: unblock}} - block and unblock functions
      */
@@ -288,10 +288,10 @@ export default class UI_ControlPanel {
         /**
          * Some important notes abot this part of code:
          * It was very important for me not to give direct access to this part of the logic from another part of the code.
-         * Therefore, when it became necessary to block interaction with the scene parameter controls (for example, during the execution of some function),
+         * Therefore, when it became necessary to block interaction with the scene parameter controlPanel (for example, during the execution of some function),
          * I solved the problem by creating an auxiliary property "propertyName__status" in the state object.
          *
-         * If the user specifies the need to block the UI control object, then only then is the auxiliary property of the state object created.
+         * If the user specifies the need to block the UI_ControlPanel object, then only then is the auxiliary property of the state object created.
          * It is immediately assigned the status "not-started", after which there is a signature to the changes of the state object...
          */
         if (elementObject.blockControlDuringExecution === true) {

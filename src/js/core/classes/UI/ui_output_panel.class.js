@@ -24,7 +24,7 @@ export default class UI_OutputPanel {
 
 
     /**
-     * Resets content of root element of 'controls' HTML Block
+     * Resets content of root element of UI_ControlPanel HTML root block
      */
     clearRoot() {
         this.#html.root.innerHTML = '';
@@ -32,8 +32,8 @@ export default class UI_OutputPanel {
 
 
     /**
-     * Appends new ready HTML element to 'Controls' HTML block
-     * @param {string} elementName - element name at UIControls class instance '#html' structure tree
+     * Appends new ready HTML element to UI_ControlPanel HTML root block
+     * @param {string} elementName - element name at UI_ControlPanel class instance '#html' structure tree
      * @param {{element: HTMLElement, label: HTMLElement, value: HTMLElement}} renderedElementObject - {element - ref to whole rendered element, label - ref to label, value - ref to value element}
      */
     appendToHTML(elementName, renderedElementObject) {
