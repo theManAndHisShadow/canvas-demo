@@ -46,7 +46,7 @@ function ConcentricCirclesScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings){
+function code(outputPanel, settings){
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
@@ -193,8 +193,8 @@ function code(display, settings){
         distance = Math.round(getDistanseBetweenTwoPoint(mousePos.x, mousePos.y, centerX, centerY));
 
         // add some additional info
-        display.updateValue('distance', distance + ' px.');
-        display.updateValue('angle', Math.round(getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y)) + ' °');
+        outputPanel.updateValue('distance', distance + ' px.');
+        outputPanel.updateValue('angle', Math.round(getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y)) + ' °');
     });
 }
 

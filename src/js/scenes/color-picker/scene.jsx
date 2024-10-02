@@ -48,7 +48,7 @@ function ColorPickerScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings){
+function code(outputPanel, settings){
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
@@ -147,7 +147,7 @@ function code(display, settings){
     };
 
     /**
-     * Select color under mouse and updates info at html display.
+     * Select color under mouse and updates info at html outputPanel.
      */
     let pickColor = () => {
         // check is pickerPos is not false
@@ -171,7 +171,7 @@ function code(display, settings){
             let cssBackgroundColor = changeColorOpacity(color, 0.35);
 
             // update value of 'Current color' display option
-            display.updateValue('currentColor',
+            outputPanel.updateValue('currentColor',
                 // some DARK CSS MAGIC xD
                     // if true - draw round colored element with color string text
                     `<span style="

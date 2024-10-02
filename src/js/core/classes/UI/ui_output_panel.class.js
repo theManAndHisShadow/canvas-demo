@@ -14,8 +14,8 @@ export default class UI_OutputPanel {
 
 
     /**
-     * Updates value of target element of display
-     * @param {string} elementName - name of element (key of object at UI.display.html)
+     * Updates value of target element of UI_OutputPanel
+     * @param {string} elementName - name of element (key of object at UI_OutputPanel.html)
      * @param {number|string|boolean} newValue
      */
     updateValue(elementName, newValue) {
@@ -215,7 +215,7 @@ export default class UI_OutputPanel {
 
 
     /**
-     * Draws an element on the user interface display.
+     * Draws an element item on UI_OutputPanel.
      * Can be called inside '.dynamicRender()'.
      * @param {string} elementName - element name
      * @param {object} elementObject - element object
@@ -253,7 +253,7 @@ export default class UI_OutputPanel {
 
 
     /**
-     * Draws an float-left element on the user interface display.
+     * Draws an float-left element on the UI_OutputPanel.
      * Can be called inside '.dynamicRender()'.
      * @param {string} elementName - element name
      * @param {object} elementObject - element object
@@ -268,7 +268,7 @@ export default class UI_OutputPanel {
 
 
     /**
-     * Dynamiclly draws an element on UI display, marking it with a special attribute.
+     * Dynamiclly draws an element on UI_OutputPanel, marking it with a special attribute.
      * @param {string} elementName - element name
      * @param {object} elementObject - element object
      */

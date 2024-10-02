@@ -104,7 +104,7 @@ function CycloidMotionScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings) {
+function code(outputPanel, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d', { willReadFrequently: true });
@@ -200,7 +200,7 @@ function code(display, settings) {
             `;
             });
 
-            display.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
+            outputPanel.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
         }
     });
 

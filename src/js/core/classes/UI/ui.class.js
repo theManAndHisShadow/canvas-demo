@@ -4,10 +4,10 @@ import UI_OutputPanel from "./ui_output_panel.class.js";
 import UI_ControlPanel from "./ui_control_panel.class.js";
 
 /**
- * Parent class that manages work of UIControls and UIDisplay classes. Also stores StateManager of UI.
+ * Parent class that manages work of UIControls and UI_OutputPanel classes. Also stores StateManager of UI.
  */
 export default class UI extends SyntheticEventTarget {
-    constructor({display, controls, timestamp}){
+    constructor({outputPanel, controls, timestamp}){
         super();
 
         this.currentSceneTimestamp = timestamp;
@@ -16,7 +16,7 @@ export default class UI extends SyntheticEventTarget {
         this.states = new StateManager();
 
         // where is ui root node is placed
-        this.display = new UI_OutputPanel(display), 
+        this.outputPanel = new UI_OutputPanel(outputPanel), 
         this.controls = new UI_ControlPanel(controls, this);
     }
 
@@ -28,7 +28,7 @@ export default class UI extends SyntheticEventTarget {
     render(uiStructureTree){
         if(uiStructureTree){
             // reset inner of #controls container of UI
-            this.display.clearRoot();
+            this.outputPanel.clearRoot();
             this.controls.clearRoot();
 
             // present key array as render queue
@@ -40,10 +40,10 @@ export default class UI extends SyntheticEventTarget {
                 let key = renderQueue.shift();
                 let element = uiStructureTree[key];
     
-                if(element.type == 'display-item') this.display.renderDisplayItem(key, element);
-                if(element.type == 'display-float-tile') this.display.renderDisplayFloatTile(key, element);
-                if(element.type == 'display-spacer') this.display.renderSpacer();
-                if(element.type == 'display-infobox') this.display.renderInfoBox(key, element);
+                if(element.type == 'display-item') this.outputPanel.renderDisplayItem(key, element);
+                if(element.type == 'display-float-tile') this.outputPanel.renderDisplayFloatTile(key, element);
+                if(element.type == 'display-spacer') this.outputPanel.renderSpacer();
+                if(element.type == 'display-infobox') this.outputPanel.renderInfoBox(key, element);
 
                 if(element.type == 'range-slider') this.controls.renderRangeSlider(key, element);
                 if(element.type == 'main-action-button') this.controls.renderMainActionButton(key, element);

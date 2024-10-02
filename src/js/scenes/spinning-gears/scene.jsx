@@ -58,7 +58,7 @@ function SpinningGearsScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings) {
+function code(outputPanel, settings) {
     // describing main variabless
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
@@ -354,7 +354,7 @@ function code(display, settings) {
             // reset 'activePreset'
             activePreset = [];
 
-            display.removeDynamicllyRendered();
+            outputPanel.removeDynamicllyRendered();
 
             // going through the presetS array - preset = presets[selected preset's index]
             presets[newValue].forEach((gearObject, i) => {
@@ -384,12 +384,12 @@ function code(display, settings) {
                     let localPrefix = gear.toothing == 'external' ?
                         gear.role == 'driver' ? 'sun' : 'planet' : 'ring';
 
-                    display.dynamicRender(gearName, {
+                    outputPanel.dynamicRender(gearName, {
                         type: 'display-item',
                         label: `- ${localPrefix} gear ${gearLetter}${gear.numberOfTeeth}</span>`,
                     });
                 } else {
-                    display.dynamicRender(gearName, {
+                    outputPanel.dynamicRender(gearName, {
                         type: 'display-item',
                         label: `- ${gear.role} gear ${gearLetter}${gear.numberOfTeeth}</span>`,
                     });
@@ -403,7 +403,7 @@ function code(display, settings) {
                 gear.addEventListener('fullRotation', () => {
                     gear.rotations += 1;
 
-                    display.updateValue(gearName, `${gear.rotations} revs.`);
+                    outputPanel.updateValue(gearName, `${gear.rotations} revs.`);
                 });
 
                 // updating 'activePreset' array

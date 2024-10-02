@@ -9,7 +9,7 @@ const SceneTemplate = ({ title, description, tags, uiTree, setDescription, setTa
         // N.B.: A temporary solution is to integrate the old class with the new react component.
         const sceneUI = new UI({
             timestamp: Date.now(),
-            display: document.querySelector('#scene-info'),
+            outputPanel: document.querySelector('#scene-info'),
             controls: document.querySelector('#controls'),
         });
 
@@ -17,7 +17,7 @@ const SceneTemplate = ({ title, description, tags, uiTree, setDescription, setTa
         sceneUI.render(uiTree);
 
         // give access to 'display ui' and 'contrls ui' from code
-        code(sceneUI.display, sceneUI.states);
+        code(sceneUI.outputPanel, sceneUI.states);
     }, [setDescription, setTags, code]);
 
     return (

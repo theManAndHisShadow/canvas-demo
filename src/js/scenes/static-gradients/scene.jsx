@@ -58,7 +58,7 @@ function StaticGradientScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings) {
+function code(outputPanel, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas');
     const context = canvas.getContext('2d');
@@ -100,7 +100,7 @@ function code(display, settings) {
 
         // send some data to UI Display
         let className = time < 1 ? 'green-word-bubble' : 'yellow-word-bubble';
-        display.updateValue('executeTime', `<i class='${className}'>${time.toFixed(1)} ms.</i>`);
+        outputPanel.updateValue('executeTime', `<i class='${className}'>${time.toFixed(1)} ms.</i>`);
     }
 
     // default rendering method

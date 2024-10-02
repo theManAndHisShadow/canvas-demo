@@ -52,7 +52,7 @@ function CartesianPlaneScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings) {
+function code(outputPanel, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas');
     const context = canvas.getContext('2d');
@@ -148,7 +148,7 @@ function code(display, settings) {
         `;
 
         // if element already created and existing
-        if (display.isExist('visibleArea')) display.updateValue('visibleArea', visibleAreaDisplayElement);
+        if (outputPanel.isExist('visibleArea')) outputPanel.updateValue('visibleArea', visibleAreaDisplayElement);
     });
 
     // renders colored dot label near tile
@@ -183,7 +183,7 @@ height: 8px;
             plane.clearContent();
 
             // remove all display elements that generated dynamiclly
-            display.removeDynamicllyRendered();
+            outputPanel.removeDynamicllyRendered();
 
             if (newValue == 0) {
                 // some points set 1
@@ -199,7 +199,7 @@ height: 8px;
                 points1.forEach(point => {
                     plane.add(point);
 
-                    display.dynamicRender(`point${point.label}`, {
+                    outputPanel.dynamicRender(`point${point.label}`, {
                         type: 'display-item',
                         label: `- point <span style="font-weight: bold">${point.label}</span>`,
                         text: `<i style="font-size: 15px">(${point.planeX}, ${point.planeY})</i>`,
@@ -228,13 +228,13 @@ height: 8px;
                     plane.add(item);
 
                     if (item instanceof Point) {
-                        display.dynamicRender(`point${item.label}`, {
+                        outputPanel.dynamicRender(`point${item.label}`, {
                             type: 'display-item',
                             label: `- point <span style="font-weight: bold">${item.label}</span>`,
                             text: `<i style="font-size: 15px">(${item.planeX}, ${item.planeY})</i>`,
                         });
                     } else if (item instanceof Segment) {
-                        display.dynamicRender(`segment${item.startPoint.label + item.endPoint.label}`, {
+                        outputPanel.dynamicRender(`segment${item.startPoint.label + item.endPoint.label}`, {
                             type: 'display-item',
                             label: `- segment <span style="font-weight: bold; color: black; text-shadow: 0px 0px 3px  ${item.color}; border-radius: 3px;"> ${item.startPoint.label}${item.endPoint.label}</span>`,
                             text: `[ <i style="font-size: 15px">(${item.startPoint.planeX}, ${item.startPoint.planeY}), (${item.endPoint.planeX}, ${item.endPoint.planeY})</i> ]`,
@@ -297,17 +297,17 @@ height: 8px;
                 console.log(functions[index]);
 
                 // updating info about current visible area of plane
-                display.dynamicRender('visibleArea', {
+                outputPanel.dynamicRender('visibleArea', {
                     type: 'display-item',
                     label: 'Current visible area',
                     text: visibleAreaDisplayElement,
                 });
 
-                display.dynamicRender('spacer', {
+                outputPanel.dynamicRender('spacer', {
                     type: 'display-spacer',
                 });
 
-                display.dynamicRender('function-list-title', {
+                outputPanel.dynamicRender('function-list-title', {
                     type: 'display-item',
                     label: 'Function graphs drawn',
                     text: functions[index].length,
@@ -318,11 +318,11 @@ height: 8px;
                     plane.add(graph);
 
                     // show function formula to display UI
-                    display.dynamicRender('function-formula-' + i, {
+                    outputPanel.dynamicRender('function-formula-' + i, {
                         type: 'display-float-tile',
                         hideColon: true,
                         label: generateColorLabel(graph.color),
-                        text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
+                        text: `ƒ(x) = ${outputPanel.renderFormula(graph.formula)};`
                     });
                 });
             }
