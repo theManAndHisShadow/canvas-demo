@@ -1,5 +1,6 @@
 import { StateManager } from "../states.class.js";
 import SyntheticEventTarget from "../synthetic_event_target.class.js";
+import UI_HUD from "./ui_hud.class.js";
 import UI_OutputPanel from "./ui_output_panel.class.js";
 import UI_ControlPanel from "./ui_control_panel.class.js";
 
@@ -7,7 +8,7 @@ import UI_ControlPanel from "./ui_control_panel.class.js";
  * Parent class that manages work of UI_ControlPanel and UI_OutputPanel classes. Also stores StateManager of UI.
  */
 export default class UI extends SyntheticEventTarget {
-    constructor({outputPanel, controlPanel, timestamp}){
+    constructor({HUD, outputPanel, controlPanel, timestamp}){
         super();
 
         this.currentSceneTimestamp = timestamp;
@@ -16,6 +17,7 @@ export default class UI extends SyntheticEventTarget {
         this.states = new StateManager();
 
         // where is ui root node is placed
+        this.HUD = new UI_HUD(HUD);
         this.outputPanel = new UI_OutputPanel(outputPanel), 
         this.controlPanel = new UI_ControlPanel(controlPanel, this);
     }

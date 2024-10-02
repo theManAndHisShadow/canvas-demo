@@ -9,6 +9,7 @@ const SceneTemplate = ({ title, description, tags, uiTree, setDescription, setTa
         // N.B.: A temporary solution is to integrate the old class with the new react component.
         const sceneUI = new UI({
             timestamp: Date.now(),
+            HUD: document.querySelector('#HUD'),
             outputPanel: document.querySelector('#scene-info'),
             controlPanel: document.querySelector('#controls'),
         });
@@ -23,6 +24,7 @@ const SceneTemplate = ({ title, description, tags, uiTree, setDescription, setTa
     return (
         <div className="wide-block block">
             <h2>{title}</h2>
+            <div id="HUD"></div>
             <canvas width={600} height={400}></canvas>
         </div>
     );
