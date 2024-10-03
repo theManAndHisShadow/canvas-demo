@@ -1,47 +1,16 @@
+import UI_BlockPrototype from "./ui_block.prototype_class";
+
 /**
  * Class which controls the output of additional data
  */
-export default class UI_OutputPanel {
-    #html;
+export default class UI_OutputPanel extends UI_BlockPrototype {
     #elementCSS_SelectorPrefix = 'scene-info__';
     #dynamicllyRenderedAttribute = 'data-dynamiclly-rendered';
 
-    constructor(html) {
-        this.#html = {
-            root: html,
-        };
+    constructor(htmlRootElementRef) {
+        super(htmlRootElementRef);
     }
 
-
-    /**
-     * Updates value of target element of UI_OutputPanel
-     * @param {string} elementName - name of element (key of object at UI_OutputPanel.html)
-     * @param {number|string|boolean} newValue
-     */
-    updateValue(elementName, newValue) {
-        this.#html[elementName].value.innerHTML = newValue;
-    }
-
-
-    /**
-     * Resets content of root element of UI_ControlPanel HTML root block
-     */
-    clearRoot() {
-        this.#html.root.innerHTML = '';
-    }
-
-
-    /**
-     * Appends new ready HTML element to UI_ControlPanel HTML root block
-     * @param {string} elementName - element name at UI_ControlPanel class instance '#html' structure tree
-     * @param {{element: HTMLElement, label: HTMLElement, value: HTMLElement}} renderedElementObject - {element - ref to whole rendered element, label - ref to label, value - ref to value element}
-     */
-    appendToHTML(elementName, renderedElementObject) {
-        let { element, label, value } = renderedElementObject;
-
-        this.#html[elementName] = renderedElementObject;
-        this.#html.root.appendChild(element);
-    }
 
     /**
      * Renders an infobox element at HTML info block with given param (elementObject).
@@ -210,7 +179,7 @@ export default class UI_OutputPanel {
      * @returns {boolean}
      */
     isExist(elementName) {
-        return this.#html[elementName] !== undefined ? true : false;
+        return this.html[elementName] !== undefined ? true : false;
     }
 
 
@@ -243,7 +212,7 @@ export default class UI_OutputPanel {
         element.appendChild(label);
         element.appendChild(valueContainer);
 
-        this.#html[elementName] = valueContainer;
+        this.html[elementName] = valueContainer;
 
         this.appendToHTML(elementName, { element, label, value: valueContainer });
 
@@ -292,5 +261,34 @@ export default class UI_OutputPanel {
         targets.forEach(element => {
             element.remove();
         });
+    }
+
+    render(outputPanel_uiStructureTree){
+        if(outputPanel_uiStructureTree){
+            // reset inner of root element
+            this.clearRoot();
+
+            // present key array as render queue
+            let renderQueue = [...Object.keys(outputPanel_uiStructureTree)];
+
+            // render each element using its key
+            while(renderQueue.length > 0) {
+                // get single elem
+                let key = renderQueue.shift();
+                let element = outputPanel_uiStructureTree[key];
+    
+                if(element.type == 'display-item') this.renderDisplayItem(key, element);
+                if(element.type == 'display-float-tile') this.renderDisplayFloatTile(key, element);
+                if(element.type == 'display-spacer') this.renderSpacer();
+                if(element.type == 'display-infobox') this.renderInfoBox(key, element);
+
+                /**
+                 * For some actions, you need to understand when the rendering queue has reached the end
+                 */
+                if(renderQueue.length == 0) {
+                    this.dispatchEvent('renderEnd');
+                }
+            }
+        }
     }
 }
