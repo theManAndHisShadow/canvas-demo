@@ -15,27 +15,25 @@ function ConcentricCirclesScene({ setDescription, setTags }) {
             tags={['mouse-interaction']}
             
             uiTree={{
-                'description': {
-                    type: 'display-item-infobox',
-                    label: 'Description',
-                    text: 'A simple scene, training with rotating shapes and interacting with mouse events.'
+                HUD: {},
+                outputPanel: {
+                    'distance': {
+                        type: 'display-item',
+                        label: ' - distance to center',
+                    },
+            
+                    'angle': {
+                        type: 'display-item',
+                        label: ' - angle of view',
+                    },
                 },
-        
-                'distance': {
-                    type: 'display-item',
-                    label: ' - distance to center',
-                },
-        
-                'angle': {
-                    type: 'display-item',
-                    label: ' - angle of view',
-                },
-        
-                'circlesAmount': {
-                    type: 'input',
-                    label: 'Circles',
-                    maxValue: 55,
-                    defaultValue: 5,
+                controlPanel: {                            
+                    'circlesAmount': {
+                        type: 'input',
+                        label: 'Circles',
+                        maxValue: 55,
+                        defaultValue: 5,
+                    },
                 },
             }}
             

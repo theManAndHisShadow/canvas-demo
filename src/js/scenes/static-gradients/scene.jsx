@@ -11,43 +11,41 @@ function StaticGradientScene({ setDescription, setTags }) {
             description="Using built-in methods for drawing gradients obviously shows itself much better, compared to custom functions for rendering pixel by pixel."
             tags={['color', 'performance', 'benchmark']}
             uiTree={{
-                'description': {
-                    type: 'display-infobox',
-                    label: 'Description',
-                    text: 'Using built-in methods for drawing gradients obviously shows itself much better, compared to custom functions for rendering pixel by pixel.'
+                HUD: {},
+                outputPanel: {
+                    'executeTime': {
+                        type: 'display-item',
+                        label: 'Gradient rendered in',
+                    },
                 },
+                controlPanel: {
+                    'gradientRenderingMethod': {
+                        type: 'option-dropdown-list',
+                        label: 'Rendering method',
+                        options: [
+                            {name: 'pixel-by-pixel'},
+                            {name: 'built-in'},
+                        ],
+                        defaultValue: 0,
+                    },
 
-                'executeTime': {
-                    type: 'display-item',
-                    label: 'Gradient rendered in',
-                },
+                    'gradientTypeSelector': {
+                        type: 'option-dropdown-list',
+                        label: 'Type',
+                        options: [
+                            {name: 'linear'},
+                            {name: 'conical'},
+                            {name: 'radial'},
+                            {name: 'multicolor'}
+                        ],
 
-                'gradientRenderingMethod': {
-                    type: 'option-dropdown-list',
-                    label: 'Rendering method',
-                    options: [
-                        {name: 'pixel-by-pixel'},
-                        {name: 'built-in'},
-                    ],
-                    defaultValue: 0,
-                },
+                        defaultValue: 1,
+                    },
 
-                'gradientTypeSelector': {
-                    type: 'option-dropdown-list',
-                    label: 'Type',
-                    options: [
-                        {name: 'linear'},
-                        {name: 'conical'},
-                        {name: 'radial'},
-                        {name: 'multicolor'}
-                    ],
-
-                    defaultValue: 1,
-                },
-
-                'regenerate': {
-                    type: 'main-action-button',
-                    text: 'Generate gradient',
+                    'regenerate': {
+                        type: 'main-action-button',
+                        text: 'Generate gradient',
+                    },
                 },
             }}
 

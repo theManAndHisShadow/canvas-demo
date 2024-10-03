@@ -15,30 +15,28 @@ function ColorPickerScene({ setDescription, setTags }) {
             description="Color picker based on multicolor radial gradient and mouse events. Move range slider to adjust color. Click on the desired location on the circle to get color data."
             tags={['color', 'mouse-interaction']}
             uiTree={{
-                'description': {
-                    type: 'display-infobox',
-                    label: 'Description',
-                    text: 'Color picker based on multicolor radial gradient and mouse events. Move range slider to adjust color. Click on the desired location on the circle to get color data.'
+                HUD: {},
+                outputPanel: {
+                    'currentColor': {
+                        type: 'display-item',
+                        label: 'Picker',
+                    },
                 },
-        
-                'currentColor': {
-                    type: 'display-item',
-                    label: 'Picker',
-                },
-        
-                'use-hex': {
-                    type: 'checkbox',
-                    label: 'Use HEX colors',
-                },
-        
-                'adjustment-slider': {
-                    type: 'range-slider',
-                    startLabel: 'Darker',
-                    endLabel: 'Lighter',
-                    minValue: 0,
-                    maxValue: 100,
-                    defaultValue: 50,
-                },
+                controlPanel: {
+                    'use-hex': {
+                        type: 'checkbox',
+                        label: 'Use HEX colors',
+                    },
+            
+                    'adjustment-slider': {
+                        type: 'range-slider',
+                        startLabel: 'Darker',
+                        endLabel: 'Lighter',
+                        minValue: 0,
+                        maxValue: 100,
+                        defaultValue: 50,
+                    },
+                }
             }}
 
             code={code}

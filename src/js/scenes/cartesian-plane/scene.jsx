@@ -17,31 +17,29 @@ function CartesianPlaneScene({ setDescription, setTags }) {
             tags={['math', 'graphics']}
 
             uiTree={{
-                'description': {
-                    type: 'display-infobox',
-                    label: 'Description',
-                    text: 'Cartesian coordinate system in a plane is a coordinate system that specifies each point uniquely by a pair of real numbers called coordinates, which are the signed distances to the point from two fixed perpendicular oriented lines, called coordinate lines or coordinate axes.'
-                },
+                HUD: {},
+                outputPanel: {},
+                controlPanel: {
+                    'centerViewAction': {
+                        type: 'button',
+                        text: 'reset',
+                        label: 'Center view',
+                    },
 
-                'centerViewAction': {
-                    type: 'button',
-                    text: 'reset',
-                    label: 'Center view',
-                },
-
-                'selectedPreset': {
-                    type: 'preset-dropdown-list',
-                    label: 'Preset',
-                    selectedByDefault: 0,
-                    options: [
-                        { name: 'Single points', allowedElements: ['*'] },
-                        { name: 'Segments', allowedElements: ['*'] },
-                        { name: 'Line', allowedElements: ['*'] },
-                        { name: 'Quadratic parabola', allowedElements: ['*'] },
-                        { name: 'Cubic parabola', allowedElements: ['*'] },
-                        { name: 'Hyperbola', allowedElements: ['*'] },
-                        { name: 'Exponential curve', allowedElements: ['*'] },
-                    ],
+                    'selectedPreset': {
+                        type: 'preset-dropdown-list',
+                        label: 'Preset',
+                        selectedByDefault: 0,
+                        options: [
+                            { name: 'Single points', allowedElements: ['*'] },
+                            { name: 'Segments', allowedElements: ['*'] },
+                            { name: 'Line', allowedElements: ['*'] },
+                            { name: 'Quadratic parabola', allowedElements: ['*'] },
+                            { name: 'Cubic parabola', allowedElements: ['*'] },
+                            { name: 'Hyperbola', allowedElements: ['*'] },
+                            { name: 'Exponential curve', allowedElements: ['*'] },
+                        ],
+                    },
                 },
             }}
 

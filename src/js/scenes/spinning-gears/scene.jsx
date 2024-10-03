@@ -15,40 +15,37 @@ function SpinningGearsScene({ setDescription, setTags }) {
             tags={['gears', 'animation', 'mechanics']}
 
             uiTree={{
-                'description': {
-                    type: 'display-infobox',
-                    label: 'Description',
-                    text: 'A visual demonstration of the «gear ratio» principle helps you see with your own eyes how gears with different numbers of teeth interact with each other.',
+                HUD: {},
+                outputPanel: {},
+                controlPanel: {
+                    'dev': {
+                        type: 'checkbox',
+                        label: 'Show dev visual',
+                        state: false,
+                    },
+    
+                    'rotationSpeed': {
+                        type: 'input',
+                        label: 'Rotation speed',
+                        minValue: 0,
+                        maxValue: 100,
+                        defaultValue: 5,
+                    },
+    
+                    'selectedPreset': {
+                        type: 'preset-dropdown-list',
+                        label: 'Preset',
+                        selectedByDefault: 0,
+                        options: [
+                            { name: 'Big driver gear', allowedElements: ['*'] },
+                            { name: 'Small driver gear', allowedElements: ['*'] },
+                            { name: 'Chain of equal gears', allowedElements: ['*'] },
+                            { name: 'Chain 1:2:4', allowedElements: ['*'] },
+                            { name: 'Smooth increase', allowedElements: ['*'] },
+                            { name: 'Planetary gearbox', allowedElements: ['*'] },
+                        ],
+                    },
                 },
-
-                'dev': {
-                    type: 'checkbox',
-                    label: 'Show dev visual',
-                    state: false,
-                },
-
-                'rotationSpeed': {
-                    type: 'input',
-                    label: 'Rotation speed',
-                    minValue: 0,
-                    maxValue: 100,
-                    defaultValue: 5,
-                },
-
-                'selectedPreset': {
-                    type: 'preset-dropdown-list',
-                    label: 'Preset',
-                    selectedByDefault: 0,
-                    options: [
-                        { name: 'Big driver gear', allowedElements: ['*'] },
-                        { name: 'Small driver gear', allowedElements: ['*'] },
-                        { name: 'Chain of equal gears', allowedElements: ['*'] },
-                        { name: 'Chain 1:2:4', allowedElements: ['*'] },
-                        { name: 'Smooth increase', allowedElements: ['*'] },
-                        { name: 'Planetary gearbox', allowedElements: ['*'] },
-                    ],
-                },
-
             }}
 
             code={code}
