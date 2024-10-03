@@ -9,6 +9,7 @@ export default class UI_BlockPrototype extends SyntheticEventTarget {
 
         this.html = {
             root: htmlRootElementRef || null,
+            container: htmlRootElementRef.parentNode,
         };
     }
 
@@ -32,7 +33,7 @@ export default class UI_BlockPrototype extends SyntheticEventTarget {
     * @param {number|string|boolean} newValue
     */
     updateValue(elementName, newValue) {
-        this.html[elementName].innerHTML = newValue;
+        this.html[elementName].value.innerHTML = newValue;
     }
 
 
@@ -44,4 +45,18 @@ export default class UI_BlockPrototype extends SyntheticEventTarget {
     } 
 
 
+    /**
+     * Hides root element with its parent node
+     */
+    hideWholeBlock(){
+        this.html.container.style.display = 'none';
+    }
+
+    
+    /**
+     * unhides root element with its parent node
+     */
+    unhideWholeBlock(){
+        this.html.container.style.display = 'initial';
+    }
 }
