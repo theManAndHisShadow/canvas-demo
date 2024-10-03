@@ -15,30 +15,28 @@ function ColorPickerScene({ setDescription, setTags }) {
             description="Color picker based on multicolor radial gradient and mouse events. Move range slider to adjust color. Click on the desired location on the circle to get color data."
             tags={['color', 'mouse-interaction']}
             uiTree={{
-                'description': {
-                    type: 'display-infobox',
-                    label: 'Description',
-                    text: 'Color picker based on multicolor radial gradient and mouse events. Move range slider to adjust color. Click on the desired location on the circle to get color data.'
+                HUD: {},
+                outputPanel: {
+                    'currentColor': {
+                        type: 'display-item',
+                        label: 'Picker',
+                    },
                 },
-        
-                'currentColor': {
-                    type: 'display-item',
-                    label: 'Picker',
-                },
-        
-                'use-hex': {
-                    type: 'checkbox',
-                    label: 'Use HEX colors',
-                },
-        
-                'adjustment-slider': {
-                    type: 'range-slider',
-                    startLabel: 'Darker',
-                    endLabel: 'Lighter',
-                    minValue: 0,
-                    maxValue: 100,
-                    defaultValue: 50,
-                },
+                controlPanel: {
+                    'use-hex': {
+                        type: 'checkbox',
+                        label: 'Use HEX colors',
+                    },
+            
+                    'adjustment-slider': {
+                        type: 'range-slider',
+                        startLabel: 'Darker',
+                        endLabel: 'Lighter',
+                        minValue: 0,
+                        maxValue: 100,
+                        defaultValue: 50,
+                    },
+                }
             }}
 
             code={code}
@@ -48,7 +46,7 @@ function ColorPickerScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings){
+function code(HUD, outputPanel, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
@@ -147,7 +145,7 @@ function code(display, settings){
     };
 
     /**
-     * Select color under mouse and updates info at html display.
+     * Select color under mouse and updates info at html outputPanel.
      */
     let pickColor = () => {
         // check is pickerPos is not false
@@ -171,7 +169,7 @@ function code(display, settings){
             let cssBackgroundColor = changeColorOpacity(color, 0.35);
 
             // update value of 'Current color' display option
-            display.updateValue('currentColor',
+            outputPanel.updateValue('currentColor',
                 // some DARK CSS MAGIC xD
                     // if true - draw round colored element with color string text
                     `<span style="

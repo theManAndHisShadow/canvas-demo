@@ -16,18 +16,14 @@ const RightSidebarComponent = ({ description, tags }) => {
                     </ul>
                 </div>
 
-                <div class="medium-block block separated-block" style={{ display: 'none' }}>
-                    <h3>Scene info</h3>
+                <div class="medium-block block separated-block">
+                    <h3>Output</h3>
                     <div id="scene-info">
-                        <div class="display-infobox">
-                            <h4>Description</h4>
-                            <div>{description}</div>
-                        </div>
                     </div>
                 </div>
 
                 <div class="medium-block block separated-block">
-                    <h3>Controls</h3>
+                    <h3>Control panel</h3>
                     <div id="controls">
 
                     </div>

@@ -15,27 +15,25 @@ function ConcentricCirclesScene({ setDescription, setTags }) {
             tags={['mouse-interaction']}
             
             uiTree={{
-                'description': {
-                    type: 'display-item-infobox',
-                    label: 'Description',
-                    text: 'A simple scene, training with rotating shapes and interacting with mouse events.'
+                HUD: {
+                    'distance': {
+                        type: 'item',
+                        label: ' - distance to center',
+                    },
+            
+                    'angle': {
+                        type: 'item',
+                        label: ' - angle of view',
+                    },
                 },
-        
-                'distance': {
-                    type: 'display-item',
-                    label: ' - distance to center',
-                },
-        
-                'angle': {
-                    type: 'display-item',
-                    label: ' - angle of view',
-                },
-        
-                'circlesAmount': {
-                    type: 'input',
-                    label: 'Circles',
-                    maxValue: 55,
-                    defaultValue: 5,
+                outputPanel: {},
+                controlPanel: {                            
+                    'circlesAmount': {
+                        type: 'input',
+                        label: 'Circles',
+                        maxValue: 55,
+                        defaultValue: 5,
+                    },
                 },
             }}
             
@@ -46,7 +44,7 @@ function ConcentricCirclesScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings){
+function code(HUD, outputPanel, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
@@ -193,8 +191,8 @@ function code(display, settings){
         distance = Math.round(getDistanseBetweenTwoPoint(mousePos.x, mousePos.y, centerX, centerY));
 
         // add some additional info
-        display.updateValue('distance', distance + ' px.');
-        display.updateValue('angle', Math.round(getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y)) + ' °');
+        HUD.updateValue('distance', distance + ' px.');
+        HUD.updateValue('angle', Math.round(getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y)) + ' °');
     });
 }
 

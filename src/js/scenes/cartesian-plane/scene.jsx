@@ -17,31 +17,39 @@ function CartesianPlaneScene({ setDescription, setTags }) {
             tags={['math', 'graphics']}
 
             uiTree={{
-                'description': {
-                    type: 'display-infobox',
-                    label: 'Description',
-                    text: 'Cartesian coordinate system in a plane is a coordinate system that specifies each point uniquely by a pair of real numbers called coordinates, which are the signed distances to the point from two fixed perpendicular oriented lines, called coordinate lines or coordinate axes.'
-                },
+                HUD: {
+                    'visibleArea_x': {
+                        type: 'item',
+                        label: 'Visible area (x)',
+                    },
 
-                'centerViewAction': {
-                    type: 'button',
-                    text: 'reset',
-                    label: 'Center view',
+                    'visibleArea_y': {
+                        type: 'item',
+                        label: 'Visible area (y)',
+                    },
                 },
+                outputPanel: {},
+                controlPanel: {
+                    'centerViewAction': {
+                        type: 'button',
+                        text: 'reset',
+                        label: 'Center view',
+                    },
 
-                'selectedPreset': {
-                    type: 'preset-dropdown-list',
-                    label: 'Preset',
-                    selectedByDefault: 0,
-                    options: [
-                        { name: 'Single points', allowedElements: ['*'] },
-                        { name: 'Segments', allowedElements: ['*'] },
-                        { name: 'Line', allowedElements: ['*'] },
-                        { name: 'Quadratic parabola', allowedElements: ['*'] },
-                        { name: 'Cubic parabola', allowedElements: ['*'] },
-                        { name: 'Hyperbola', allowedElements: ['*'] },
-                        { name: 'Exponential curve', allowedElements: ['*'] },
-                    ],
+                    'selectedPreset': {
+                        type: 'preset-dropdown-list',
+                        label: 'Preset',
+                        selectedByDefault: 0,
+                        options: [
+                            { name: 'Single points', allowedElements: ['*'] },
+                            { name: 'Segments', allowedElements: ['*'] },
+                            { name: 'Line', allowedElements: ['*'] },
+                            { name: 'Quadratic parabola', allowedElements: ['*'] },
+                            { name: 'Cubic parabola', allowedElements: ['*'] },
+                            { name: 'Hyperbola', allowedElements: ['*'] },
+                            { name: 'Exponential curve', allowedElements: ['*'] },
+                        ],
+                    },
                 },
             }}
 
@@ -52,7 +60,7 @@ function CartesianPlaneScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings) {
+function code(HUD, outputPanel, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas');
     const context = canvas.getContext('2d');
@@ -147,8 +155,8 @@ function code(display, settings) {
             - y-axis - [${plane.visibleArea.y[0] - 2}, ${plane.visibleArea.y[1]}].
         `;
 
-        // if element already created and existing
-        if (display.isExist('visibleArea')) display.updateValue('visibleArea', visibleAreaDisplayElement);
+        HUD.updateValue('visibleArea_x', `[${plane.visibleArea.x}]`);
+        HUD.updateValue('visibleArea_y', `[${plane.visibleArea.y[0] - 2}, ${plane.visibleArea.y[1]}]`);
     });
 
     // renders colored dot label near tile
@@ -182,9 +190,6 @@ height: 8px;
             // remove all other elements
             plane.clearContent();
 
-            // remove all display elements that generated dynamiclly
-            display.removeDynamicllyRendered();
-
             if (newValue == 0) {
                 // some points set 1
                 let points1 = [
@@ -198,12 +203,6 @@ height: 8px;
 
                 points1.forEach(point => {
                     plane.add(point);
-
-                    display.dynamicRender(`point${point.label}`, {
-                        type: 'display-item',
-                        label: `- point <span style="font-weight: bold">${point.label}</span>`,
-                        text: `<i style="font-size: 15px">(${point.planeX}, ${point.planeY})</i>`,
-                    });
                 });
 
             } else if (newValue == 1) {
@@ -226,20 +225,6 @@ height: 8px;
 
                 array.forEach(item => {
                     plane.add(item);
-
-                    if (item instanceof Point) {
-                        display.dynamicRender(`point${item.label}`, {
-                            type: 'display-item',
-                            label: `- point <span style="font-weight: bold">${item.label}</span>`,
-                            text: `<i style="font-size: 15px">(${item.planeX}, ${item.planeY})</i>`,
-                        });
-                    } else if (item instanceof Segment) {
-                        display.dynamicRender(`segment${item.startPoint.label + item.endPoint.label}`, {
-                            type: 'display-item',
-                            label: `- segment <span style="font-weight: bold; color: black; text-shadow: 0px 0px 3px  ${item.color}; border-radius: 3px;"> ${item.startPoint.label}${item.endPoint.label}</span>`,
-                            text: `[ <i style="font-size: 15px">(${item.startPoint.planeX}, ${item.startPoint.planeY}), (${item.endPoint.planeX}, ${item.endPoint.planeY})</i> ]`,
-                        });
-                    }
                 });
             } else if (newValue >= 2 && newValue <= 6) {
                 const index = newValue - 2;
@@ -294,36 +279,9 @@ height: 8px;
                     ],
                 ];
 
-                console.log(functions[index]);
-
-                // updating info about current visible area of plane
-                display.dynamicRender('visibleArea', {
-                    type: 'display-item',
-                    label: 'Current visible area',
-                    text: visibleAreaDisplayElement,
-                });
-
-                display.dynamicRender('spacer', {
-                    type: 'display-spacer',
-                });
-
-                display.dynamicRender('function-list-title', {
-                    type: 'display-item',
-                    label: 'Function graphs drawn',
-                    text: functions[index].length,
-                });
-
                 // make actions with each graph
                 functions[index].forEach((graph, i) => {
                     plane.add(graph);
-
-                    // show function formula to display UI
-                    display.dynamicRender('function-formula-' + i, {
-                        type: 'display-float-tile',
-                        hideColon: true,
-                        label: generateColorLabel(graph.color),
-                        text: `ƒ(x) = ${display.renderFormula(graph.formula)};`
-                    });
                 });
             }
 

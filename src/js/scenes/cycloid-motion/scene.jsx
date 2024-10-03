@@ -13,87 +13,80 @@ function CycloidMotionScene({ setDescription, setTags }) {
             description="A cycloid is the curve traced by a point on the circumference of a circle as it rolls along a straight line. The key condition in this motion is that the circle rolls without slipping. A specific example of a cycloid is the epicycloid, where a circle rolls inside a larger circle. An example of an hypocycloid is demonstrated in this interactive scene."
             tags={['geometry', 'math', 'animation']}
             uiTree={{
-                'description': {
-                    type: 'display-infobox',
-                    label: 'Description',
-                    text: 'A cycloid is the curve traced by a point on the circumference of a circle as it rolls along a straight line. The key condition in this motion is that the circle rolls without slipping. A specific example of a cycloid is the epicycloid, where a circle rolls inside a larger circle. An example of an hypocycloid is demonstrated in this interactive scene.',
-                },
+                HUD: {},
+                outputPanel: {},
+                controlPanel: {
+                    'preset': {
+                        type: 'preset-dropdown-list',
+                        label: 'Preset',
+                        selectedByDefault: 1,
+                        options: [
+                            { name: 'Playground', allowedElements: ['*'] },
+                            { name: 'Hypocycloid overview', allowedElements: ['speed'] },
+                            { name: 'Flat roses curves overview', allowedElements: ['speed'] },
+                            { name: 'Spiral', allowedElements: ['speed'] },
+                            { name: 'Stars', allowedElements: ['speed'] },
+                            { name: 'Astroids', allowedElements: ['speed'] },
+                        ],
+                    },
 
-                'cycloids_info': {
-                    type: 'display-item',
-                    label: 'Rendered curves',
-                },
+                    'externalRadius': {
+                        type: 'input',
+                        label: 'Radius of external circle',
+                        defaultValue: 120, // 150
+                        minValue: 60,
+                        maxValue: 195,
+                    },
 
-                'preset': {
-                    type: 'preset-dropdown-list',
-                    label: 'Preset',
-                    selectedByDefault: 1,
-                    options: [
-                        { name: 'Playground', allowedElements: ['*'] },
-                        { name: 'Hypocycloid overview', allowedElements: ['speed'] },
-                        { name: 'Flat roses curves overview', allowedElements: ['speed'] },
-                        { name: 'Spiral', allowedElements: ['speed'] },
-                        { name: 'Stars', allowedElements: ['speed'] },
-                        { name: 'Astroids', allowedElements: ['speed'] },
-                    ],
-                },
+                    'internalRadius': {
+                        type: 'input',
+                        label: 'Radius of inner circle',
+                        defaultValue: 30, // 50
+                        minValue: 10,
+                        maxValue: 100,
+                    },
 
-                'externalRadius': {
-                    type: 'input',
-                    label: 'Radius of external circle',
-                    defaultValue: 120, // 150
-                    minValue: 60,
-                    maxValue: 195,
-                },
+                    'radiusOfTracePoint': {
+                        type: 'input',
+                        label: 'Radius of trace point',
+                        minValue: 3,
+                        defaultValue: 30,
+                        maxValue: 100,
+                    },
 
-                'internalRadius': {
-                    type: 'input',
-                    label: 'Radius of inner circle',
-                    defaultValue: 30, // 50
-                    minValue: 10,
-                    maxValue: 100,
-                },
+                    'traceLength': {
+                        type: 'input',
+                        label: 'Trace length',
+                        minValue: 200,
+                        defaultValue: 600,
+                        maxValue: 10000,
+                    },
 
-                'radiusOfTracePoint': {
-                    type: 'input',
-                    label: 'Radius of trace point',
-                    minValue: 3,
-                    defaultValue: 30,
-                    maxValue: 100,
-                },
+                    'speed': {
+                        type: 'input',
+                        label: 'Speed',
+                        minValue: 0,
+                        defaultValue: 3,
+                        maxValue: 20,
+                    },
 
-                'traceLength': {
-                    type: 'input',
-                    label: 'Trace length',
-                    minValue: 200,
-                    defaultValue: 600,
-                    maxValue: 10000,
-                },
+                    'invertRotationDirection': {
+                        type: 'checkbox',
+                        label: 'Invert circles rotation dirtection',
+                        state: true,
+                    },
 
-                'speed': {
-                    type: 'input',
-                    label: 'Speed',
-                    minValue: 0,
-                    defaultValue: 3,
-                    maxValue: 20,
-                },
+                    'drawCenterPoint': {
+                        type: 'checkbox',
+                        label: 'Draw center point',
+                        state: true,
+                    },
 
-                'invertRotationDirection': {
-                    type: 'checkbox',
-                    label: 'Invert circles rotation dirtection',
-                    state: true,
-                },
-
-                'drawCenterPoint': {
-                    type: 'checkbox',
-                    label: 'Draw center point',
-                    state: true,
-                },
-
-                'drawRadiusLine': {
-                    type: 'checkbox',
-                    label: 'Draw radius line',
-                    state: true,
+                    'drawRadiusLine': {
+                        type: 'checkbox',
+                        label: 'Draw radius line',
+                        state: true,
+                    },
                 },
             }}
 
@@ -104,7 +97,7 @@ function CycloidMotionScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings) {
+function code(HUD, outputPanel, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d', { willReadFrequently: true });
@@ -200,7 +193,7 @@ function code(display, settings) {
             `;
             });
 
-            display.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
+            // outputPanel.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
         }
     });
 
