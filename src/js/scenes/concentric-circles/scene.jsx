@@ -15,18 +15,18 @@ function ConcentricCirclesScene({ setDescription, setTags }) {
             tags={['mouse-interaction']}
             
             uiTree={{
-                HUD: {},
-                outputPanel: {
+                HUD: {
                     'distance': {
-                        type: 'display-item',
+                        type: 'item',
                         label: ' - distance to center',
                     },
             
                     'angle': {
-                        type: 'display-item',
+                        type: 'item',
                         label: ' - angle of view',
                     },
                 },
+                outputPanel: {},
                 controlPanel: {                            
                     'circlesAmount': {
                         type: 'input',
@@ -44,7 +44,7 @@ function ConcentricCirclesScene({ setDescription, setTags }) {
     );
 }
 
-function code(outputPanel, settings){
+function code(HUD, outputPanel, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
@@ -191,8 +191,8 @@ function code(outputPanel, settings){
         distance = Math.round(getDistanseBetweenTwoPoint(mousePos.x, mousePos.y, centerX, centerY));
 
         // add some additional info
-        outputPanel.updateValue('distance', distance + ' px.');
-        outputPanel.updateValue('angle', Math.round(getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y)) + ' °');
+        HUD.updateValue('distance', distance + ' px.');
+        HUD.updateValue('angle', Math.round(getAngleBetweenTwoPoints(centerX, centerY, mousePos.x, mousePos.y)) + ' °');
     });
 }
 

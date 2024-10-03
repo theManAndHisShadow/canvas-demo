@@ -44,7 +44,7 @@ function WelcomeScene({ setDescription, setTags }) {
     );
 }
 
-function code(display, settings){
+function code(HUD, outputPanel, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');

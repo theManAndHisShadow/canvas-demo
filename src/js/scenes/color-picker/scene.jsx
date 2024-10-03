@@ -46,7 +46,7 @@ function ColorPickerScene({ setDescription, setTags }) {
     );
 }
 
-function code(outputPanel, settings){
+function code(HUD, outputPanel, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
