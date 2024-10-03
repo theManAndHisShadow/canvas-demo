@@ -325,9 +325,9 @@ export default class UI_ControlPanel extends UI_BlockPrototype{
                     const element = this.html[id].element;
 
                     if (elementsToHide.includes(id)) {
-                        element.classList.add('hidden');
+                        if(element) element.classList.add('hidden');
                     } else {
-                        element.classList.remove('hidden');
+                        if(element) element.classList.remove('hidden');
                     }
                 }
             });
