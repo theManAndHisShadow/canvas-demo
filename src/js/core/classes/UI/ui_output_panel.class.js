@@ -264,7 +264,9 @@ export default class UI_OutputPanel extends UI_BlockPrototype {
     }
 
     render(outputPanel_uiStructureTree){
-        if(outputPanel_uiStructureTree){
+        if(outputPanel_uiStructureTree && Object.keys(outputPanel_uiStructureTree).length > 0){
+            this.unhideWholeBlock();
+
             // reset inner of root element
             this.clearRoot();
 
@@ -289,6 +291,8 @@ export default class UI_OutputPanel extends UI_BlockPrototype {
                     this.dispatchEvent('renderEnd');
                 }
             }
+        } else {
+            this.hideWholeBlock();
         }
     }
 }
