@@ -160,7 +160,7 @@ function code(HUD, outputPanel, settings) {
             let color = `rgba(${r}, ${g}, ${b}, 1)`;
 
             // color text name
-            let colorText = settings.getState('use-hex') === true ? rgba2hex(r, g, b, 1) : `rgba(${r}, ${g}, ${b}, 1)`;
+            let colorText = settings.getState('use-hex') === true ? rgba2hex(r, g, b, 1) : `rgba (${r}, ${g}, ${b}, 1)`;
 
             // color for css 'color' prop of html element with color code
             let cssTextColor = correctColor(color, settings.getState('adjustment-slider'));
