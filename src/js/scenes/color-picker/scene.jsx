@@ -486,8 +486,8 @@ function drawPickerPointer(context, {radius = 10, x, y, forElement}){
 
         parent.appendChild(pickerRound);
     } else {
-        pickerRound.style.left = x + 23 + 'px';
-        pickerRound.style.top = y + 55 + 'px';
+        pickerRound.style.left = x + 216 + 'px';
+        pickerRound.style.top = y + 52 + 'px';
     }
 }
 
