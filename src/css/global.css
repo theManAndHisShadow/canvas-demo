@@ -493,3 +493,8 @@ footer {
 #HUD h4 {
     margin-top: 0px;
 }
+
+.scene-info__display-value i {
+    position: relative;
+    top: 2px;
+}
