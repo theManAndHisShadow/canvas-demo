@@ -14,7 +14,7 @@ function CycloidMotionScene({ setDescription, setTags }) {
             tags={['geometry', 'math', 'animation']}
             uiTree={{
                 HUD: {},
-                outputPanel: {},
+                outputDisplay: {},
                 controlPanel: {
                     'preset': {
                         type: 'preset-dropdown-list',
@@ -97,7 +97,7 @@ function CycloidMotionScene({ setDescription, setTags }) {
     );
 }
 
-function code(HUD, outputPanel, settings) {
+function code(HUD, outputDisplay, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d', { willReadFrequently: true });
@@ -193,7 +193,7 @@ function code(HUD, outputPanel, settings) {
             `;
             });
 
-            // outputPanel.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
+            // outputDisplay.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
         }
     });
 

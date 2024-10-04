@@ -263,21 +263,21 @@ export default class UI_OutputPanel extends UI_BlockPrototype {
         });
     }
 
-    render(outputPanel_uiStructureTree){
-        if(outputPanel_uiStructureTree && Object.keys(outputPanel_uiStructureTree).length > 0){
+    render(outputDisplay_uiStructureTree){
+        if(outputDisplay_uiStructureTree && Object.keys(outputDisplay_uiStructureTree).length > 0){
             this.unhideWholeBlock();
 
             // reset inner of root element
             this.clearRoot();
 
             // present key array as render queue
-            let renderQueue = [...Object.keys(outputPanel_uiStructureTree)];
+            let renderQueue = [...Object.keys(outputDisplay_uiStructureTree)];
 
             // render each element using its key
             while(renderQueue.length > 0) {
                 // get single elem
                 let key = renderQueue.shift();
-                let element = outputPanel_uiStructureTree[key];
+                let element = outputDisplay_uiStructureTree[key];
     
                 if(element.type == 'display-item') this.renderDisplayItem(key, element);
                 if(element.type == 'display-float-tile') this.renderDisplayFloatTile(key, element);

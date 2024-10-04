@@ -16,7 +16,7 @@ function ColorPickerScene({ setDescription, setTags }) {
             tags={['color', 'mouse-interaction']}
             uiTree={{
                 HUD: {},
-                outputPanel: {
+                outputDisplay: {
                     'currentColor': {
                         type: 'display-item',
                         label: 'Picker',
@@ -46,7 +46,7 @@ function ColorPickerScene({ setDescription, setTags }) {
     );
 }
 
-function code(HUD, outputPanel, settings) {
+function code(HUD, outputDisplay, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
@@ -145,7 +145,7 @@ function code(HUD, outputPanel, settings) {
     };
 
     /**
-     * Select color under mouse and updates info at html outputPanel.
+     * Select color under mouse and updates info at html outputDisplay.
      */
     let pickColor = () => {
         // check is pickerPos is not false
@@ -169,7 +169,7 @@ function code(HUD, outputPanel, settings) {
             let cssBackgroundColor = changeColorOpacity(color, 0.35);
 
             // update value of 'Current color' display option
-            outputPanel.updateValue('currentColor',
+            outputDisplay.updateValue('currentColor',
                 // some DARK CSS MAGIC xD
                     // if true - draw round colored element with color string text
                     `<span style="

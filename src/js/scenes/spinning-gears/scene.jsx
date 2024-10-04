@@ -16,7 +16,7 @@ function SpinningGearsScene({ setDescription, setTags }) {
 
             uiTree={{
                 HUD: {},
-                outputPanel: {},
+                outputDisplay: {},
                 controlPanel: {
                     'dev': {
                         type: 'checkbox',
@@ -55,7 +55,7 @@ function SpinningGearsScene({ setDescription, setTags }) {
     );
 }
 
-function code(HUD, outputPanel, settings) {
+function code(HUD, outputDisplay, settings) {
     // describing main variabless
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
@@ -351,7 +351,7 @@ function code(HUD, outputPanel, settings) {
             // reset 'activePreset'
             activePreset = [];
 
-            // outputPanel.removeDynamicllyRendered();
+            // outputDisplay.removeDynamicllyRendered();
 
             // going through the presetS array - preset = presets[selected preset's index]
             presets[newValue].forEach((gearObject, i) => {
@@ -381,12 +381,12 @@ function code(HUD, outputPanel, settings) {
                     let localPrefix = gear.toothing == 'external' ?
                         gear.role == 'driver' ? 'sun' : 'planet' : 'ring';
 
-                    // outputPanel.dynamicRender(gearName, {
+                    // outputDisplay.dynamicRender(gearName, {
                     //     type: 'display-item',
                     //     label: `- ${localPrefix} gear ${gearLetter}${gear.numberOfTeeth}</span>`,
                     // });
                 } else {
-                    // outputPanel.dynamicRender(gearName, {
+                    // outputDisplay.dynamicRender(gearName, {
                     //     type: 'display-item',
                     //     label: `- ${gear.role} gear ${gearLetter}${gear.numberOfTeeth}</span>`,
                     // });
@@ -400,7 +400,7 @@ function code(HUD, outputPanel, settings) {
                 gear.addEventListener('fullRotation', () => {
                     gear.rotations += 1;
 
-                    // outputPanel.updateValue(gearName, `${gear.rotations} revs.`);
+                    // outputDisplay.updateValue(gearName, `${gear.rotations} revs.`);
                 });
 
                 // updating 'activePreset' array

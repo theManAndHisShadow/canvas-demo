@@ -12,7 +12,7 @@ function StaticGradientScene({ setDescription, setTags }) {
             tags={['color', 'performance', 'benchmark']}
             uiTree={{
                 HUD: {},
-                outputPanel: {
+                outputDisplay: {
                     'executeTime': {
                         type: 'display-item',
                         label: 'Gradient rendered in',
@@ -56,7 +56,7 @@ function StaticGradientScene({ setDescription, setTags }) {
     );
 }
 
-function code(HUD, outputPanel, settings) {
+function code(HUD, outputDisplay, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas');
     const context = canvas.getContext('2d');
@@ -98,7 +98,7 @@ function code(HUD, outputPanel, settings) {
 
         // send some data to UI Display
         let className = time < 1 ? 'green-word-bubble' : 'yellow-word-bubble';
-        outputPanel.updateValue('executeTime', `<i class='${className}'>${time.toFixed(1)} ms.</i>`);
+        outputDisplay.updateValue('executeTime', `<i class='${className}'>${time.toFixed(1)} ms.</i>`);
     }
 
     // default rendering method

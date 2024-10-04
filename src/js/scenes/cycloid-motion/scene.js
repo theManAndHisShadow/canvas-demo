@@ -191,7 +191,7 @@ let cycloidMotionScene = new Scene({
                     `;
                 });
                 
-                outputPanel.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
+                outputDisplay.updateValue('cycloids_info', `${renderedCurvesTextInfo}`);
             }
         });
 

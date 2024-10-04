@@ -17,7 +17,7 @@ const RightSidebarComponent = ({ description, tags }) => {
                 </div>
 
                 <div className="medium-block block separated-block">
-                    <h3>Output</h3>
+                    <h3>Output display</h3>
                     <div id="scene-info">
                     </div>
                 </div>

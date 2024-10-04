@@ -10,7 +10,7 @@ const SceneTemplate = ({ title, description, tags, uiTree, setDescription, setTa
         const sceneUI = new UI({
             timestamp: Date.now(),
             HUD: document.querySelector('#HUD div'),
-            outputPanel: document.querySelector('#scene-info'),
+            outputDisplay: document.querySelector('#scene-info'),
             controlPanel: document.querySelector('#controls'),
         });
 
@@ -18,7 +18,7 @@ const SceneTemplate = ({ title, description, tags, uiTree, setDescription, setTa
         sceneUI.render(uiTree);
 
         // give access to 'display ui' and 'contrls ui' from code
-        code(sceneUI.HUD, sceneUI.outputPanel, sceneUI.states);
+        code(sceneUI.HUD, sceneUI.outputDisplay, sceneUI.states);
     }, [setDescription, setTags, code]);
 
     return (
