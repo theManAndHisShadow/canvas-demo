@@ -185,6 +185,9 @@ function code(HUD, outputPanel, settings) {
                             top: 3px;
                         "></span>
                         <span class="gray-word-bubble" style="
+                            position: relative;
+                            left: 5px;
+                            top: 1px;
                             font-size: 13px;
                             background: ${cssBackgroundColor};
                             color: ${cssTextColor}
