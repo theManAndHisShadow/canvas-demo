@@ -46,9 +46,9 @@ function App() {
     return (
         <div>
             <header>
-                <div class="section-block left-section-block">
+                <div className="section-block left-section-block">
                     <div className='header-logo' style={{ left: `${offsetLeft}px` }}>
-                        <i class="fa-brands fa-github"></i><Link to="https://github.com">github.com</Link> 
+                        <i className="fa-brands fa-github"></i><Link to="https://github.com">github.com</Link> 
                         <span>/</span>
                         <Link to="https://github.com/theManAndHisShadow">theManAndHisShadow</Link>
                         <span>/</span>
@@ -60,10 +60,10 @@ function App() {
             </header>
 
             <main>
-                <div class="section-block left-section-block">
-                    <div class="section-block__inner">
+                <div className="section-block left-section-block">
+                    <div className="section-block__inner">
                         <div className='scene-viewer' ref={sceneViewerElementRef}>
-                            <div class="list block">
+                            <div className="list block">
                                 <div className='list-title'>
                                     <h3>Navigation</h3>
                                 </div>
@@ -72,37 +72,37 @@ function App() {
                                     <ul>
                                         <li>
                                             <Link to="/concentric-circles">
-                                                <i class="fa-solid fa-cube"></i> concentric-circles
+                                                <i className="fa-solid fa-cube"></i> concentric-circles
                                             </Link>
                                         </li>
 
                                         <li>
                                             <Link to="/color-picker">
-                                                <i class="fa-solid fa-cube"></i> color-picker
+                                                <i className="fa-solid fa-cube"></i> color-picker
                                             </Link>
                                         </li>
                                         
                                         <li>
                                             <Link to="/static-gradients">
-                                                <i class="fa-solid fa-cube"></i> static-gradients
+                                                <i className="fa-solid fa-cube"></i> static-gradients
                                             </Link>
                                         </li>
                                         
                                         <li>
                                             <Link to="/spinning-gears">
-                                                <i class="fa-solid fa-cube"></i> spinning-gears
+                                                <i className="fa-solid fa-cube"></i> spinning-gears
                                             </Link>
                                         </li>
 
                                         <li>
                                             <Link to="/cartesian-plane">
-                                                <i class="fa-solid fa-cube"></i> cartesian-plane
+                                                <i className="fa-solid fa-cube"></i> cartesian-plane
                                             </Link>
                                         </li>
 
                                         <li>
                                             <Link to="/cycloid-motion">
-                                                <i class="fa-solid fa-cube"></i> cycloid-motion
+                                                <i className="fa-solid fa-cube"></i> cycloid-motion
                                             </Link>
                                         </li>
                                         <li></li>
@@ -139,7 +139,7 @@ function App() {
             </main>
 
             <footer>
-                <div id="footer-info" class="centred-text">created in 2024 by  
+                <div id="footer-info" className="centred-text">created in 2024 by  
                      <Link to="https://t.me/kazumov" target="_blank" rel="noopener noreferrer">@kazumov</Link></div>
             </footer>
         </div>
