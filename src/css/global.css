@@ -477,7 +477,7 @@ footer {
 }
 
 #HUD {
-    background: #00000059;
+    background: #000000cc;
     padding: 10px;
     width: fit-content;
     border-radius: 6px;
@@ -488,6 +488,7 @@ footer {
     font-size: 11px;
     top: 68px;
     user-select: none;
+    border: 1px solid #2f353d;
 }
 
 #HUD h4 {
