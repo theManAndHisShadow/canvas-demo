@@ -16,7 +16,7 @@ function ColorPickerScene({ setDescription, setTags }) {
             tags={['color', 'mouse-interaction']}
             uiTree={{
                 HUD: {},
-                outputPanel: {
+                outputDisplay: {
                     'currentColor': {
                         type: 'display-item',
                         label: 'Picker',
@@ -46,7 +46,7 @@ function ColorPickerScene({ setDescription, setTags }) {
     );
 }
 
-function code(HUD, outputPanel, settings) {
+function code(HUD, outputDisplay, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
@@ -145,7 +145,7 @@ function code(HUD, outputPanel, settings) {
     };
 
     /**
-     * Select color under mouse and updates info at html outputPanel.
+     * Select color under mouse and updates info at html outputDisplay.
      */
     let pickColor = () => {
         // check is pickerPos is not false
@@ -160,7 +160,7 @@ function code(HUD, outputPanel, settings) {
             let color = `rgba(${r}, ${g}, ${b}, 1)`;
 
             // color text name
-            let colorText = settings.getState('use-hex') === true ? rgba2hex(r, g, b, 1) : `rgba(${r}, ${g}, ${b}, 1)`;
+            let colorText = settings.getState('use-hex') === true ? rgba2hex(r, g, b, 1) : `rgba (${r}, ${g}, ${b}, 1)`;
 
             // color for css 'color' prop of html element with color code
             let cssTextColor = correctColor(color, settings.getState('adjustment-slider'));
@@ -169,7 +169,7 @@ function code(HUD, outputPanel, settings) {
             let cssBackgroundColor = changeColorOpacity(color, 0.35);
 
             // update value of 'Current color' display option
-            outputPanel.updateValue('currentColor',
+            outputDisplay.updateValue('currentColor',
                 // some DARK CSS MAGIC xD
                     // if true - draw round colored element with color string text
                     `<span style="
@@ -185,6 +185,9 @@ function code(HUD, outputPanel, settings) {
                             top: 3px;
                         "></span>
                         <span class="gray-word-bubble" style="
+                            position: relative;
+                            left: 5px;
+                            top: 1px;
                             font-size: 13px;
                             background: ${cssBackgroundColor};
                             color: ${cssTextColor}
@@ -486,8 +489,8 @@ function drawPickerPointer(context, {radius = 10, x, y, forElement}){
 
         parent.appendChild(pickerRound);
     } else {
-        pickerRound.style.left = x + 23 + 'px';
-        pickerRound.style.top = y + 55 + 'px';
+        pickerRound.style.left = x + 216 + 'px';
+        pickerRound.style.top = y + 52 + 'px';
     }
 }
 

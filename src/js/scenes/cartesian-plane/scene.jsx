@@ -28,7 +28,7 @@ function CartesianPlaneScene({ setDescription, setTags }) {
                         label: 'Visible area (y)',
                     },
                 },
-                outputPanel: {},
+                outputDisplay: {},
                 controlPanel: {
                     'centerViewAction': {
                         type: 'button',
@@ -60,7 +60,7 @@ function CartesianPlaneScene({ setDescription, setTags }) {
     );
 }
 
-function code(HUD, outputPanel, settings) {
+function code(HUD, outputDisplay, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas');
     const context = canvas.getContext('2d');

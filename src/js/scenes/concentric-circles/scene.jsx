@@ -26,7 +26,7 @@ function ConcentricCirclesScene({ setDescription, setTags }) {
                         label: ' - angle of view',
                     },
                 },
-                outputPanel: {},
+                outputDisplay: {},
                 controlPanel: {                            
                     'circlesAmount': {
                         type: 'input',
@@ -44,7 +44,7 @@ function ConcentricCirclesScene({ setDescription, setTags }) {
     );
 }
 
-function code(HUD, outputPanel, settings) {
+function code(HUD, outputDisplay, settings) {
     const root = document.querySelector('#root');
     const canvas = root.querySelector('canvas'); 
     const context = canvas.getContext('2d');
