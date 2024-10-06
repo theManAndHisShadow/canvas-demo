@@ -1,6 +1,8 @@
 
 import React from "react";
 import SceneTemplate from "../../core/templates/scene.template.jsx";
+import { drawRect, getColor } from '../../misc/helpers.js';
+import drawSerpinskiFractal from "./collection/serpinski_triangle.fractal.js";
 
 function FractalsScene({ setDescription, setTags }) {
     return (
@@ -35,9 +37,31 @@ function code(HUD, outputDisplay, settings) {
     const centerY = height / 2;
 
     // main animating function
-    let draw = (method, type) => {
-        // ...
+    let draw = () => {
+        context.clearRect(
+            0, 0,
+            width,
+            height
+        );
+
+        drawRect(context, {
+            x: 0,
+            y: 0,
+            width: width,
+            height: height,
+            fillColor: 'rgba(0, 0, 0, 1)',
+        });
+
+        drawSerpinskiFractal(context, {
+            cx: centerX, cy: centerY,
+            h: 360,b: 450,
+            depth: 8, delay: 250,
+            borderThickness: 0.5,
+            onRenderEnd: () => { console.log(true) }
+        });
     }
+
+    draw();
 }
 
 
