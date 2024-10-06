@@ -598,6 +598,39 @@ export function drawGrid(context, {cellSize, lineThickness, lineColor}){
 }
 
 
+
+/**
+ * 
+ * @param {CanvasRenderingContext2D} context - 2d context of canvas 
+ * @param {number} param.cx - triangle center point pos at x axis
+ * @param {number} param.cy - triangle center point pos at y axis
+ * @param {number} param.h - triangle height
+ * @param {number} param.b - triangle base length
+ * @param {number} param.fillColor - triangle fill color
+ * @param {number} param.borderThickness - triangle border thickness
+ * @param {number} param.borderColor - triangle border color
+ */
+export function drawTriangle(context, {cx, cy, h, b, fillColor = 'transparent', borderThickness, borderColor }) {
+    context.beginPath();
+
+    const topVertex =   {x: cx,         y: cy - h / 2};
+    const leftVertex =  {x: cx - b / 2, y: cy + h / 2};
+    const rightVertex = {x: cx + b / 2, y: cy + h / 2};
+
+    context.moveTo(topVertex.x, topVertex.y);
+    context.lineTo(leftVertex.x, leftVertex.y);
+    context.lineTo(rightVertex.x, rightVertex.y);
+
+    context.fillStyle = fillColor;
+    context.fill();
+    context.lineWidth = borderThickness;
+    context.strokeStyle = borderColor
+    context.closePath();
+    context.stroke();
+}
+
+
+
 /**
  * Draws a text at canvas.
  * @param {Number} param.x - text x pos
