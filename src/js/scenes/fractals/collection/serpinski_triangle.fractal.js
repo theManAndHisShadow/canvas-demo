@@ -14,19 +14,20 @@ const colors = ['red', 'orange', 'yellow', 'brightGreen', 'cyan', 'indigo', 'pur
  * @param {number} param.borderThickness - border thnickness of triangle
  * @param {number} param.depth - fractal max depth level size
  * @param {number} param.delay - delay before next level render
+ * @param {Function} param.onRender - action when fractal is fully rendered 
  * @param {Function} param.onRenderEnd - action when fractal is fully rendered 
  */
-export default function drawSerpinskiFractal(context, {cx, cy, h, b, borderThickness, depth, delay = 100, onRenderEnd}){
+export default function drawSerpinskiFractal(context, {cx, cy, h, b, borderThickness, depth, delay = 100, onRender, onRenderEnd}){
     onRenderEnd = onRenderEnd || function() {};
 
     // call local function
-    __drawSerpinski(context, {cx, cy, h, b, borderThickness, depth, delay, onRenderEnd});
+    __drawSerpinski(context, {cx, cy, h, b, borderThickness, depth, delay, onRender, onRenderEnd});
 }
 
 
 
 // local function
-function __drawSerpinski(context, { cx, cy, h, b, borderThickness, depth, delay, onRenderEnd}) {
+function __drawSerpinski(context, { cx, cy, h, b, borderThickness, depth, delay, onRender, onRenderEnd}) {
     let triangles = [{ cx, cy, h, b, currentDepth: 0 }];
     
     function drawNextLevel() {
@@ -49,6 +50,8 @@ function __drawSerpinski(context, { cx, cy, h, b, borderThickness, depth, delay,
                     { cx: bCenter.x, cy: bCenter.y, h: h / 2, b: b / 2, currentDepth: currentDepth + 1 },
                     { cx: cCenter.x, cy: cCenter.y, h: h / 2, b: b / 2, currentDepth: currentDepth + 1 }
                 );
+
+                onRender(triangles.length);
             }
         }
         
@@ -57,7 +60,7 @@ function __drawSerpinski(context, { cx, cy, h, b, borderThickness, depth, delay,
             setTimeout(drawNextLevel, delay);
         } else {
             console.log('Render end!');
-            onRenderEnd();
+            onRenderEnd(levelSize);
         }
     }
     
