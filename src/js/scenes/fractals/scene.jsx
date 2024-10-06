@@ -8,8 +8,8 @@ function FractalsScene({ setDescription, setTags }) {
     return (
         <SceneTemplate
             title="Fractals"
-            description="Empty"
-            tags={[]}
+            description="A fractal is a complex geometric shape that can be split into parts, each of which is a reduced-scale copy of the whole, a property known as self-similarity. Fractals are often used to model natural phenomena that exhibit similar patterns at different scales, such as coastlines, snowflakes, and clouds."
+            tags={['math', 'geometry', 'art', 'nature']}
             uiTree={{
                 HUD: {
                     'trianglesRendered': {
