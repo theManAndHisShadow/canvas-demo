@@ -1,6 +1,6 @@
 import { drawTriangle, getColor } from "../../../misc/helpers";
 
-const colors = ['red', 'orange', 'yellow', 'brightGreen', 'cyan', 'indigo', 'purple', 'deepPurple', 'magenta'];
+const colors = ['red', 'amber', 'orange', 'yellow', 'brightGreen', 'cyan', 'indigo', 'purple', 'deepPurple', 'darkPurple'];
 
 
 
