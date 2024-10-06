@@ -11,7 +11,17 @@ function FractalsScene({ setDescription, setTags }) {
             description="Empty"
             tags={[]}
             uiTree={{
-                HUD: {},
+                HUD: {
+                    'trianglesRendered': {
+                        type: 'item',
+                        label: 'Triangles rendered',
+                    },
+
+                    'renderStatus': {
+                        type: 'item',
+                        label: 'Render status',
+                    },
+                },
                 outputDisplay: {},
                 controlPanel: {},
             }}
@@ -57,7 +67,15 @@ function code(HUD, outputDisplay, settings) {
             h: 360,b: 450,
             depth: 8, delay: 250,
             borderThickness: 0.5,
-            onRenderEnd: () => { console.log(true) }
+
+            onRender: (count) => {
+                HUD.updateValue('trianglesRendered', '<i>'+ count +'</i>');
+                HUD.updateValue('renderStatus', '<i style="color: orange">in-process</i>');
+            },
+
+            onRenderEnd: () => { 
+                HUD.updateValue('renderStatus', '<i style="color: green">done</i>');
+            }
         });
     }
 
