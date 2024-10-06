@@ -33,7 +33,7 @@ function FractalsScene({ setDescription, setTags }) {
                         label: 'Preset',
                         selectedByDefault: 0,
                         options: [
-                            { name: 'Seprinski Triangle', allowedElements: ['*'] },
+                            { name: 'Seprinski Triangle', allowedElements: ['depth', 'levelRenderDelay', 'regenerate'] },
                             { name: 'Tree', allowedElements: ['*'] },
                         ],
                     },
@@ -53,6 +53,23 @@ function FractalsScene({ setDescription, setTags }) {
                         minValue: 1,
                         maxValue: 9,
                     },
+
+                    'angle': {
+                        type: 'input',
+                        label: 'Branch angle',
+                        defaultValue: 15, 
+                        minValue: 8,
+                        maxValue: 90,
+                    },
+
+                    'height': {
+                        type: 'input',
+                        label: 'Tree height',
+                        defaultValue: 80, 
+                        minValue: 15,
+                        maxValue: 120,
+                    },
+
 
                     'regenerate': {
                         type: 'main-action-button',
@@ -83,11 +100,15 @@ function code(HUD, outputDisplay, settings) {
 
     let depth = 5;
     let delay = 300;
+    let angle = 15;
+    let treeHeight = 80;
     let renderIsFinished = false;
 
     settings.subscribe((key, nveValue, oldValue) => {
         if(key == 'regenerate' && renderIsFinished === true) {
             depth = settings.getState('depth');
+            angle = settings.getState('angle');
+            treeHeight = settings.getState('height');
             delay = settings.getState('levelRenderDelay');
 
             draw();
@@ -136,6 +157,8 @@ function code(HUD, outputDisplay, settings) {
                 length: 80,
                 depth: depth,
                 delay: delay,
+                length: treeHeight,
+                branchAngle: angle,
 
                 onRender: (count) => {
                     renderIsFinished = false;
