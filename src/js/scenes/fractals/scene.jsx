@@ -2,7 +2,9 @@
 import React from "react";
 import SceneTemplate from "../../core/templates/scene.template.jsx";
 import { drawRect, getColor } from '../../misc/helpers.js';
+
 import drawSerpinskiFractal from "./collection/serpinski_triangle.fractal.js";
+import drawTreeFractal from "./collection/tree.fractal.js";
 
 function FractalsScene({ setDescription, setTags }) {
     return (
@@ -12,9 +14,9 @@ function FractalsScene({ setDescription, setTags }) {
             tags={['math', 'geometry', 'art', 'nature']}
             uiTree={{
                 HUD: {
-                    'trianglesRendered': {
+                    'itemsRendered': {
                         type: 'item',
-                        label: 'Triangles rendered',
+                        label: 'Items rendered',
                     },
 
                     'renderStatus': {
@@ -22,8 +24,20 @@ function FractalsScene({ setDescription, setTags }) {
                         label: 'Render status',
                     },
                 },
+
                 outputDisplay: {},
+
                 controlPanel: {
+                    'preset': {
+                        type: 'preset-dropdown-list',
+                        label: 'Preset',
+                        selectedByDefault: 0,
+                        options: [
+                            { name: 'Seprinski Triangle', allowedElements: ['*'] },
+                            { name: 'Tree', allowedElements: ['*'] },
+                        ],
+                    },
+
                     'levelRenderDelay': {
                         type: 'input',
                         label: 'Level render delay',
@@ -96,24 +110,46 @@ function code(HUD, outputDisplay, settings) {
             fillColor: 'rgba(0, 0, 0, 1)',
         });
 
-        drawSerpinskiFractal(context, {
-            cx: centerX, cy: centerY,
-            h: 360,b: 450,
-            depth: depth, delay: delay,
-            borderThickness: 0.5,
+        if(settings.getState('preset') == 0) {
+            drawSerpinskiFractal(context, {
+                cx: centerX, cy: centerY,
+                h: 360,b: 450,
+                depth: depth, delay: delay,
+                borderThickness: 0.5,
+    
+                onRender: (count) => {
+                    renderIsFinished = false;
+    
+                    HUD.updateValue('itemsRendered', '<i>'+ count +' triangles</i>');
+                    HUD.updateValue('renderStatus', '<i style="color: orange">in-process</i>');
+                },
+    
+                onRenderEnd: () => { 
+                    renderIsFinished = true;
+                    HUD.updateValue('renderStatus', '<i style="color: green">done</i>');
+                }
+            });
+        } else {
+            drawTreeFractal(context, {
+                startX: centerX,
+                startY: centerY + 200, 
+                length: 80,
+                depth: depth,
+                delay: delay,
 
-            onRender: (count) => {
-                renderIsFinished = false;
-
-                HUD.updateValue('trianglesRendered', '<i>'+ count +'</i>');
-                HUD.updateValue('renderStatus', '<i style="color: orange">in-process</i>');
-            },
-
-            onRenderEnd: () => { 
-                renderIsFinished = true;
-                HUD.updateValue('renderStatus', '<i style="color: green">done</i>');
-            }
-        });
+                onRender: (count) => {
+                    renderIsFinished = false;
+    
+                    HUD.updateValue('itemsRendered', '<i>'+ count +' segments</i>');
+                    HUD.updateValue('renderStatus', '<i style="color: orange">in-process</i>');
+                },
+    
+                onRenderEnd: () => { 
+                    renderIsFinished = true;
+                    HUD.updateValue('renderStatus', '<i style="color: green">done</i>');
+                }
+            });
+        }
     }
 
     draw();
