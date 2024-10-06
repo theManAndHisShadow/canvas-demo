@@ -11,6 +11,7 @@ const StaticGradientScene = React.lazy(() => import('./scenes/static-gradients/s
 const SpinningGearsScene = React.lazy(() => import('./scenes/spinning-gears/scene.jsx'));
 const CartesianPlaneScene = React.lazy(() => import('./scenes/cartesian-plane/scene.jsx'));
 const CycloidMotionScene = React.lazy(() => import('./scenes/cycloid-motion/scene.jsx'));
+const FractalsScene = React.lazy(() => import('./scenes/fractals/scene.jsx'));
 
 function App() {
     const [description, setDescription] = useState('');
@@ -105,6 +106,12 @@ function App() {
                                                 <i className="fa-solid fa-cube"></i> cycloid-motion
                                             </Link>
                                         </li>
+
+                                        <li>
+                                            <Link to="/fractals">
+                                                <i className="fa-solid fa-cube"></i> fractals
+                                            </Link>
+                                        </li>
                                         <li></li>
                                         <li></li>
                                         <li></li>
@@ -126,6 +133,7 @@ function App() {
                                     <Route path="/spinning-gears" element={<SpinningGearsScene setDescription={setDescription} setTags={setTags} />} />
                                     <Route path="/cartesian-plane" element={<CartesianPlaneScene setDescription={setDescription} setTags={setTags} />} />
                                     <Route path="/cycloid-motion" element={<CycloidMotionScene setDescription={setDescription} setTags={setTags} />} />
+                                    <Route path="/fractals" element={<FractalsScene setDescription={setDescription} setTags={setTags} />} />
                                 </Routes>
                             </Suspense>
                         </div>
