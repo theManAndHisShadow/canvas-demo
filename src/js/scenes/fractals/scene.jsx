@@ -57,7 +57,7 @@ function FractalsScene({ setDescription, setTags }) {
                     'angle': {
                         type: 'input',
                         label: 'Branch angle',
-                        defaultValue: 15, 
+                        defaultValue: 25, 
                         minValue: 8,
                         maxValue: 90,
                     },
