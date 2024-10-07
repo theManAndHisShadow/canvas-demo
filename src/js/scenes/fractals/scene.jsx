@@ -5,6 +5,7 @@ import { drawRect, getColor } from '../../misc/helpers.js';
 
 import drawSerpinskiFractal from "./collection/serpinski_triangle.fractal.js";
 import drawTreeFractal from "./collection/tree.fractal.js";
+import drawMandelbrotFractal from "./collection/mandelbrot.fractal.js";
 
 function FractalsScene({ setDescription, setTags }) {
     return (
@@ -35,6 +36,7 @@ function FractalsScene({ setDescription, setTags }) {
                         options: [
                             { name: 'Seprinski Triangle', allowedElements: ['depth', 'levelRenderDelay', 'regenerate'] },
                             { name: 'Tree', allowedElements: ['*'] },
+                            { name: 'Mandelbrot', allowedElements: ['iterations', 'zoom', 'regenerate']  }
                         ],
                     },
 
@@ -70,6 +72,22 @@ function FractalsScene({ setDescription, setTags }) {
                         maxValue: 120,
                     },
 
+                    'iterations': {
+                        type: 'input',
+                        label: 'Resolution',
+                        defaultValue: 100, 
+                        minValue: 1,
+                        maxValue: 1000,
+                    },
+
+                    'zoom': {
+                        type: 'input',
+                        label: 'Zoom',
+                        defaultValue: 1, 
+                        minValue: 1,
+                        maxValue: 10,
+                    },
+
 
                     'regenerate': {
                         type: 'main-action-button',
@@ -102,6 +120,8 @@ function code(HUD, outputDisplay, settings) {
     let delay = 300;
     let angle = 15;
     let treeHeight = 80;
+    let max_iterations = 100;
+    let zoom = 1;
     let renderIsFinished = false;
 
     settings.subscribe((key, nveValue, oldValue) => {
@@ -110,6 +130,8 @@ function code(HUD, outputDisplay, settings) {
             angle = settings.getState('angle');
             treeHeight = settings.getState('height');
             delay = settings.getState('levelRenderDelay');
+            max_iterations = settings.getState('iterations');
+            zoom = settings.getState('zoom');
 
             draw();
         }
@@ -150,7 +172,7 @@ function code(HUD, outputDisplay, settings) {
                     HUD.updateValue('renderStatus', '<i style="color: green">done</i>');
                 }
             });
-        } else {
+        } else if(settings.getState('preset') == 1){
             drawTreeFractal(context, {
                 startX: centerX,
                 startY: centerY + 200, 
@@ -169,6 +191,25 @@ function code(HUD, outputDisplay, settings) {
     
                 onRenderEnd: () => { 
                     renderIsFinished = true;
+                    HUD.updateValue('renderStatus', '<i style="color: green">done</i>');
+                }
+            });
+        } else {
+            drawMandelbrotFractal(context, {
+                xmin: -1.5 * zoom,
+                xmax: 1.5 * zoom,
+                ymin: -1 * zoom,
+                ymax: 1 * zoom,
+                max_iterations: max_iterations,
+
+                onRender: (count) => {
+                    renderIsFinished = false;
+                },
+    
+                onRenderEnd: () => { 
+                    renderIsFinished = true;
+
+                    HUD.updateValue('itemsRendered', '<i>'+ count +' points</i>');
                     HUD.updateValue('renderStatus', '<i style="color: green">done</i>');
                 }
             });
