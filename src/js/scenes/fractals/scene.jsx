@@ -206,10 +206,10 @@ function code(HUD, outputDisplay, settings) {
                     renderIsFinished = false;
                 },
     
-                onRenderEnd: () => { 
+                onRenderEnd: (count) => { 
                     renderIsFinished = true;
 
-                    HUD.updateValue('itemsRendered', '<i>'+ count +' points</i>');
+                    HUD.updateValue('itemsRendered', '<i>'+ count +' pixels</i>');
                     HUD.updateValue('renderStatus', '<i style="color: green">done</i>');
                 }
             });

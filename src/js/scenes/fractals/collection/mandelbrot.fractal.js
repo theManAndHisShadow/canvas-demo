@@ -47,7 +47,7 @@ export default function drawMandelbrotFractal(context, { xmin, xmax, ymin, ymax,
 
             // Call the `onRenderEnd` callback after rendering the last pixel
             if(y === height - 1 && x === width - 1) {
-                onRenderEnd();
+                onRenderEnd(darkPoints);
             }
         }
     }
